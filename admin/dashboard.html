@@ -345,10 +345,19 @@
     <script>
         function getLoggedUser() {
             try {
-                return JSON.parse(localStorage.getItem('loggedUser') || 'null');
+                const user = JSON.parse(localStorage.getItem('loggedUser') || 'null');
+                if (user && user.role === 'collector') {
+                    user.role = 'kolektor';
+                    localStorage.setItem('loggedUser', JSON.stringify(user));
+                }
+                return user;
             } catch (error) {
                 return null;
             }
+        }
+
+        function isKolektorRole(role) {
+            return role === 'kolektor' || role === 'collector';
         }
 
         function checkAuth() {
@@ -361,7 +370,7 @@
             const userNameEl = document.getElementById('user-name');
             const userRoleEl = document.getElementById('user-role');
             if (userNameEl) userNameEl.textContent = user.name || 'Pengguna';
-            if (userRoleEl) userRoleEl.textContent = user.role === 'admin' ? 'Administrator' : user.role === 'collector' ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : 'Pengguna';
+            if (userRoleEl) userRoleEl.textContent = user.role === 'admin' ? 'Administrator' : isKolektorRole(user.role) ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : 'Pengguna';
 
             setRoleNavigation(user.role);
             loadDashboardStats();
@@ -372,7 +381,7 @@
                 el.style.display = role === 'admin' ? 'flex' : 'none';
             });
 
-            if (role === 'collector' || role === 'rt') {
+            if (isKolektorRole(role) || role === 'rt') {
                 const openProofButton = document.getElementById('open-proof-form-button');
                 if (openProofButton) openProofButton.classList.remove('hidden');
             } else {
@@ -516,7 +525,7 @@
                     data.forEach(item => {
                         const row = document.createElement('tr');
                         row.className = 'hover:bg-gray-50 transition';
-                        const proofButton = (user.role === 'collector' || user.role === 'rt') ? `<button onclick="openProofForm(${item.id}, '${item.nop}')" class="px-3 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700">Bukti</button>` : '';
+                        const proofButton = (isKolektorRole(user.role) || user.role === 'rt') ? `<button onclick="openProofForm(${item.id}, '${item.nop}')" class="px-3 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700">Bukti</button>` : '';
                         const approveButton = user.role === 'admin' ? `<button onclick="approvePbb(${item.id}, '${item.nop}')" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Approve</button>` : '';
                         row.innerHTML = `
                             <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>

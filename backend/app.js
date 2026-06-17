@@ -5,6 +5,15 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+function normalizeRole(role) {
+  if (role === 'collector') return 'kolektor';
+  return role;
+}
+
+function isKolektorRole(role) {
+  return normalizeRole(role) === 'kolektor';
+}
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -17,7 +26,7 @@ const PORT = process.env.PORT || 3000;
 const database = {
   users: [
     { id: 1, name: 'Admin Desa', email: 'admin@kasomalangkulon.id', password: 'admin123', role: 'admin' },
-    { id: 2, name: 'Kolektor Desa', email: 'kolektor@kasomalangkulon.id', password: 'kolektor123', role: 'collector' },
+    { id: 2, name: 'Kolektor Desa', email: 'kolektor@kasomalangkulon.id', password: 'kolektor123', role: 'kolektor' },
     { id: 3, name: 'Ketua RT 1', email: 'rt1@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '01/01', rw: '01' },
     { id: 4, name: 'Ketua RT 2', email: 'rt2@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '02/01', rw: '01' },
     { id: 5, name: 'Budi Santoso', nik: '1234567890123456', password: '123456', role: 'penduduk' }
@@ -65,11 +74,11 @@ app.post('/api/auth/login', (req, res) => {
 
   res.json({
     success: true,
-    token: `${user.role}_token_${Date.now()}`,
+    token: `${normalizeRole(user.role)}_token_${Date.now()}`,
     user: {
       id: user.id,
       name: user.name,
-      role: user.role,
+      role: normalizeRole(user.role),
       email: user.email || null,
       nik: user.nik || null,
       rt: user.rt || null,
@@ -181,7 +190,7 @@ app.post('/api/pbb/accessible', (req, res) => {
   }
 
   let data = [];
-  if (user.role === 'admin' || user.role === 'collector') {
+  if (user.role === 'admin' || isKolektorRole(user.role)) {
     data = database.pbb;
   } else if (user.role === 'rt') {
     data = database.pbb.filter(p => p.rt === user.rt && p.rw === user.rw);
@@ -229,7 +238,7 @@ app.post('/api/pbb/:id/proof', (req, res) => {
     return res.status(404).json({ success: false, message: 'User atau data PBB tidak ditemukan' });
   }
 
-  if (user.role !== 'collector' && user.role !== 'rt') {
+  if (!isKolektorRole(user.role) && user.role !== 'rt') {
     return res.status(403).json({ success: false, message: 'Akses terbatas: hanya kolektor atau RT dapat mengirim bukti' });
   }
 
