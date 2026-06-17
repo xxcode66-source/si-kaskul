@@ -19,59 +19,60 @@
     </div>
 
     <!-- Top Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-emerald-950 text-white shadow-xl border-b border-emerald-800">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="px-8 py-4 flex items-center justify-between">
             <div>
-                <a href="../index.html" class="font-display text-2xl font-bold leading-none">Desa Kasomalang Kulon</a>
-                <p class="text-xs text-emerald-300 mt-1">Dashboard Inti PBB</p>
+                <p class="text-xs uppercase tracking-[0.24em] text-emerald-600 font-semibold">Dashboard Inti</p>
+                <h2 class="text-2xl font-bold text-gray-800">PBB Desa Kasomalang Kulon</h2>
             </div>
-            <div class="hidden lg:flex items-center gap-2 text-sm font-medium">
-                <a href="../index.html" class="px-4 py-2 rounded-full hover:bg-emerald-800 transition">Beranda</a>
-                <a href="berita.html" class="px-4 py-2 rounded-full hover:bg-emerald-800 transition">Berita</a>
-                <a href="gallery.html" class="px-4 py-2 rounded-full hover:bg-emerald-800 transition">Galeri</a>
-                <a href="pbb.html" class="px-4 py-2 rounded-full bg-emerald-800 text-white">PBB</a>
-                <a href="lapak-desa.html" class="px-4 py-2 rounded-full hover:bg-emerald-800 transition">Lapak Desa</a>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-600">
+                    <i data-lucide="menu" style="width:24px;height:24px"></i>
+                </button>
+                <div class="hidden md:flex items-center gap-3">
+                    <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-800">Publik</p>
+                        <p class="text-xs text-gray-500">Dashboard PBB</p>
+                    </div>
+                </div>
             </div>
-            <button id="mobile-toggle" class="lg:hidden text-white" onclick="toggleMobileMenu()">
-                <i data-lucide="menu" style="width:28px;height:28px"></i>
-            </button>
         </div>
-        <div id="mobile-menu" class="hidden lg:hidden px-4 pb-4 space-y-2 text-sm font-medium text-emerald-100">
+        <div id="mobile-menu" class="hidden lg:hidden px-8 pb-4 space-y-2 text-sm font-medium text-gray-700">
             <a href="../index.html" class="block py-1">Beranda</a>
             <a href="berita.html" class="block py-1">Berita</a>
             <a href="gallery.html" class="block py-1">Galeri</a>
-            <a href="pbb.html" class="block py-1 text-white font-semibold">PBB</a>
             <a href="lapak-desa.html" class="block py-1">Lapak Desa</a>
         </div>
     </nav>
 
     <!-- Header -->
-    <header class="pt-28 pb-10 px-4 hero-grid-bg text-white overflow-hidden relative">
+    <header class="pt-10 pb-8 px-4 hero-grid-bg text-white overflow-hidden relative">
         <div class="absolute inset-0 bg-black/10"></div>
         <div class="relative max-w-7xl mx-auto space-y-8">
             <div class="max-w-4xl">
                 <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
                     <i data-lucide="file-text" style="width:18px;height:18px"></i>
-                    <span>Data tunggakan, lunas, dan cek NOP dalam satu tampilan</span>
+                    <span>Dashboard tunggakan, lunas, dan cek NOP</span>
                 </div>
                 <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight mt-5 animate-slideUp">Wajib Pajak PBB<br>Desa Kasomalang Kulon</h1>
-                <p class="text-emerald-50/90 text-lg md:text-xl max-w-3xl mt-5 leading-relaxed animate-slideUp" style="animation-delay:0.12s">Lihat ringkasan tunggakan, filter berdasarkan dusun hingga RT, lalu cek status pajak lewat NOP tanpa perlu membuka banyak halaman.</p>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-3xl mt-5 leading-relaxed animate-slideUp" style="animation-delay:0.12s">Klik dusun, lalu turun ke RW dan RT, untuk melihat ringkasan angka yang berubah dinamis. Cek NOP di bawah untuk status lunas, pending, atau tunggakan per tahun.</p>
             </div>
 
             <div class="grid gap-5 lg:grid-cols-3 animate-slideUp" style="animation-delay:0.18s">
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
                     <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Wajib Pajak</p>
-                    <p class="text-5xl font-bold mt-3">621</p>
-                    <p class="text-sm text-emerald-100 mt-2">Belum melunasi PBB</p>
+                    <p id="header-wp" class="text-5xl font-bold mt-3">621</p>
+                    <p class="text-sm text-emerald-100 mt-2">Tersaring dari filter aktif</p>
                 </div>
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl lg:col-span-1">
                     <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Tunggakan</p>
-                    <p class="text-4xl md:text-5xl font-bold text-amber-300 mt-3">Rp 36.053.000</p>
+                    <p id="header-total" class="text-4xl md:text-5xl font-bold text-amber-300 mt-3">Rp 36.053.000</p>
                     <p class="text-sm text-emerald-100 mt-2">Seluruh data desa</p>
                 </div>
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
                     <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Data Tersaring</p>
-                    <p class="text-5xl font-bold mt-3">621</p>
+                    <p id="header-filtered" class="text-5xl font-bold mt-3">621</p>
                     <p class="text-sm text-emerald-100 mt-2">Hasil filter aktif</p>
                 </div>
             </div>
@@ -85,28 +86,28 @@
                 <div class="grid md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-emerald-100">
                     <button class="p-6 text-left bg-emerald-50 border-b md:border-b-0 border-emerald-100" onclick="setLocationFilter('all')">
                         <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Semua Dusun</p>
-                        <p class="text-2xl font-bold text-emerald-950 mt-2">621 WP</p>
-                        <p class="text-sm text-gray-500">Rp 36.053.000</p>
+                        <p id="card-all-count" class="text-2xl font-bold text-emerald-950 mt-2">621 WP</p>
+                        <p id="card-all-total" class="text-sm text-gray-500">Rp 36.053.000</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun1')">
                         <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 1</p>
-                        <p class="text-2xl font-bold text-emerald-950 mt-2">149 WP</p>
-                        <p class="text-sm text-gray-500">RW 01 - RW 02</p>
+                        <p id="card-dusun1-count" class="text-2xl font-bold text-emerald-950 mt-2">149 WP</p>
+                        <p id="card-dusun1-total" class="text-sm text-gray-500">RW 01 - RW 02</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun2')">
                         <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 2</p>
-                        <p class="text-2xl font-bold text-emerald-950 mt-2">128 WP</p>
-                        <p class="text-sm text-gray-500">RW 03 - RW 06</p>
+                        <p id="card-dusun2-count" class="text-2xl font-bold text-emerald-950 mt-2">128 WP</p>
+                        <p id="card-dusun2-total" class="text-sm text-gray-500">RW 03 - RW 06</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun3')">
                         <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 3</p>
-                        <p class="text-2xl font-bold text-emerald-950 mt-2">198 WP</p>
-                        <p class="text-sm text-gray-500">RW 04 - RW 05 - RW 07</p>
+                        <p id="card-dusun3-count" class="text-2xl font-bold text-emerald-950 mt-2">198 WP</p>
+                        <p id="card-dusun3-total" class="text-sm text-gray-500">RW 04 - RW 05 - RW 07</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('luardesa')">
                         <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Luar Desa</p>
-                        <p class="text-2xl font-bold text-emerald-950 mt-2">146 WP</p>
-                        <p class="text-sm text-gray-500">Alamat tidak terdata</p>
+                        <p id="card-luardesa-count" class="text-2xl font-bold text-emerald-950 mt-2">146 WP</p>
+                        <p id="card-luardesa-total" class="text-sm text-gray-500">Alamat tidak terdata</p>
                     </button>
                 </div>
             </div>
@@ -275,7 +276,7 @@
                             <div>
                                 <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">🔍 Cari & Filter</p>
                                 <h2 class="font-display text-3xl font-bold text-emerald-950 mt-2">Cek status PBB lewat NOP</h2>
-                                <p class="text-gray-600 mt-2">Cek apakah sudah lunas, masih pending, atau menunggak pada tahun tertentu.</p>
+                                <p class="text-gray-600 mt-2">Masukkan NOP saja. Sistem akan menampilkan status lunas, pending, atau tunggakan otomatis per tahun.</p>
                             </div>
                             <span class="inline-flex items-center rounded-full bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700">Pencarian NOP</span>
                         </div>
@@ -284,16 +285,6 @@
                             <div>
                                 <label for="nop" class="block text-sm font-medium text-gray-700 mb-2">Nomor Objek Pajak (NOP)</label>
                                 <input id="nop" type="text" placeholder="Masukkan NOP (16 digit)" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
-                            </div>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">Nama Pemilik</label>
-                                    <input id="nama" type="text" placeholder="Nama Pemilik" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
-                                </div>
-                                <div>
-                                    <label for="tahun" class="block text-sm font-medium text-gray-700 mb-2">Tahun Pajak</label>
-                                    <input id="tahun" type="number" placeholder="2024" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
-                                </div>
                             </div>
                             <button type="submit" class="w-full py-4 rounded-2xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
                                 <i data-lucide="search" style="width:20px;height:20px"></i>
@@ -314,62 +305,25 @@
 
                         <div id="pbb-error" class="mt-8 hidden p-4 bg-red-50 border border-red-300 rounded-2xl text-red-800 text-sm flex items-center gap-3">
                             <i data-lucide="alert-circle" style="width:20px;height:20px"></i>
-                            <span id="error-message">Data tidak ditemukan. Silakan periksa NOP dan nama pemilik.</span>
+                            <span id="error-message">Data tidak ditemukan. Silakan periksa NOP lalu coba lagi.</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-8">
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Ringkasan Global</h3>
-                        <div class="space-y-4 text-sm text-gray-600">
-                            <div class="flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
-                                <span>Total Lunas</span>
-                                <strong id="summary-lunas" class="text-emerald-700">338 WP</strong>
-                            </div>
-                            <div class="flex items-center justify-between rounded-2xl bg-amber-50 px-4 py-3">
-                                <span>Total Tunggakan</span>
-                                <strong id="summary-tunggakan" class="text-amber-700">621 WP</strong>
-                            </div>
-                            <div class="flex items-center justify-between rounded-2xl bg-red-50 px-4 py-3">
-                                <span>Belum Lunas</span>
-                                <strong id="summary-pending" class="text-red-700">183 WP</strong>
-                            </div>
-                        </div>
+                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Grafik 2020-2026</h3>
+                        <div class="space-y-4" id="year-chart"></div>
                     </div>
 
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
                         <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Panduan Singkat</h3>
                         <ul class="space-y-3 text-sm text-gray-600">
-                            <li>Masukkan NOP dan nama pemilik untuk melihat status lunas, pending, atau tunggakan.</li>
-                            <li>Pilih dusun, RW, lalu RT untuk memfilter data tunggakan secara bertingkat.</li>
-                            <li>Gunakan panel ringkasan di atas untuk melihat kondisi global seluruh wilayah.</li>
+                            <li>Masukkan NOP saja untuk melihat status lunas, pending, atau tunggakan otomatis.</li>
+                            <li>Pilih dusun, RW, lalu RT untuk mempersempit ringkasan angka.</li>
+                            <li>Gunakan grafik tahunan 2020-2026 untuk membaca tren tunggakan desa.</li>
                         </ul>
                     </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[2rem] shadow-xl overflow-hidden fade-in">
-                <div class="bg-emerald-700 text-white px-8 py-6 flex items-center justify-between gap-4 flex-wrap">
-                    <div>
-                        <h2 class="font-display text-2xl font-bold">Data PBB Terbaru</h2>
-                        <p class="text-emerald-100 text-sm mt-1">Peta daftar wajib pajak berdasarkan wilayah dan RT.</p>
-                    </div>
-                    <span class="px-4 py-2 rounded-full bg-white/15 text-sm font-semibold">621 data aktif</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200">
-                                <th class="px-6 py-4 text-left font-semibold text-sm text-gray-700">NOP</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm text-gray-700">Nama Pemilik</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm text-gray-700">Alamat</th>
-                                <th class="px-6 py-4 text-right font-semibold text-sm text-gray-700">Pajak Terutang</th>
-                                <th class="px-6 py-4 text-center font-semibold text-sm text-gray-700">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pbb-data-table" class="divide-y divide-gray-200"></tbody>
-                    </table>
                 </div>
             </div>
         </div>
@@ -383,14 +337,24 @@
     <script src="../assets/script.js"></script>
     <script>
         const pbbData = [
-            { nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Dusun 1 / RW 1 / RT 1', pajak: 'Rp 500.000', status: 'Lunas', tahun: 2024, dusun: 'dusun1', rw: 'rw1', rt: 'rt1' },
-            { nop: '1234567890123457', nama: 'Siti Nurhaliza', alamat: 'Dusun 1 / RW 1 / RT 2', pajak: 'Rp 650.000', status: 'Menunggak', tahun: 2023, dusun: 'dusun1', rw: 'rw1', rt: 'rt2' },
-            { nop: '1234567890123458', nama: 'Ahmad Wijaya', alamat: 'Dusun 1 / RW 2 / RT 3', pajak: 'Rp 450.000', status: 'Lunas', tahun: 2024, dusun: 'dusun1', rw: 'rw2', rt: 'rt3' },
-            { nop: '1234567890123459', nama: 'Rina Handoko', alamat: 'Dusun 2 / RW 3 / RT 1', pajak: 'Rp 550.000', status: 'Pending', tahun: 2024, dusun: 'dusun2', rw: 'rw3', rt: 'rt1' },
-            { nop: '1234567890123460', nama: 'Dewi Lestari', alamat: 'Dusun 2 / RW 4 / RT 2', pajak: 'Rp 600.000', status: 'Menunggak', tahun: 2022, dusun: 'dusun2', rw: 'rw4', rt: 'rt2' },
-            { nop: '1234567890123461', nama: 'Rudi Hadi', alamat: 'Dusun 3 / RW 4 / RT 1', pajak: 'Rp 520.000', status: 'Lunas', tahun: 2024, dusun: 'dusun3', rw: 'rw4', rt: 'rt1' },
-            { nop: '1234567890123462', nama: 'Dina Ayu', alamat: 'Dusun 3 / RW 5 / RT 4', pajak: 'Rp 730.000', status: 'Menunggak', tahun: 2021, dusun: 'dusun3', rw: 'rw5', rt: 'rt4' },
-            { nop: '1234567890123463', nama: 'Joko Prasetyo', alamat: 'Luar Desa', pajak: 'Rp 410.000', status: 'Pending', tahun: 2024, dusun: 'luardesa', rw: 'luar', rt: 'luar' }
+            { nop: '1234567890123456', alamat: 'Dusun 1 / RW 1 / RT 1', pajak: 500000, year: 2020, status: 'Lunas', dusun: 'dusun1', rw: 'rw1', rt: 'rt1', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Pending', 2024: 'Lunas', 2025: 'Lunas', 2026: 'Menunggak' } },
+            { nop: '1234567890123457', alamat: 'Dusun 1 / RW 1 / RT 2', pajak: 650000, year: 2023, status: 'Menunggak', dusun: 'dusun1', rw: 'rw1', rt: 'rt2', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Pending', 2023: 'Menunggak', 2024: 'Menunggak', 2025: 'Lunas', 2026: 'Pending' } },
+            { nop: '1234567890123458', alamat: 'Dusun 1 / RW 2 / RT 3', pajak: 450000, year: 2024, status: 'Lunas', dusun: 'dusun1', rw: 'rw2', rt: 'rt3', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Lunas', 2024: 'Lunas', 2025: 'Lunas', 2026: 'Lunas' } },
+            { nop: '1234567890123459', alamat: 'Dusun 2 / RW 3 / RT 1', pajak: 550000, year: 2024, status: 'Pending', dusun: 'dusun2', rw: 'rw3', rt: 'rt1', yearly: { 2020: 'Pending', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Pending', 2024: 'Pending', 2025: 'Pending', 2026: 'Lunas' } },
+            { nop: '1234567890123460', alamat: 'Dusun 2 / RW 4 / RT 2', pajak: 600000, year: 2022, status: 'Menunggak', dusun: 'dusun2', rw: 'rw4', rt: 'rt2', yearly: { 2020: 'Lunas', 2021: 'Menunggak', 2022: 'Menunggak', 2023: 'Menunggak', 2024: 'Pending', 2025: 'Lunas', 2026: 'Lunas' } },
+            { nop: '1234567890123461', alamat: 'Dusun 3 / RW 4 / RT 1', pajak: 520000, year: 2024, status: 'Lunas', dusun: 'dusun3', rw: 'rw4', rt: 'rt1', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Lunas', 2024: 'Lunas', 2025: 'Pending', 2026: 'Pending' } },
+            { nop: '1234567890123462', alamat: 'Dusun 3 / RW 5 / RT 4', pajak: 730000, year: 2021, status: 'Menunggak', dusun: 'dusun3', rw: 'rw5', rt: 'rt4', yearly: { 2020: 'Menunggak', 2021: 'Menunggak', 2022: 'Pending', 2023: 'Menunggak', 2024: 'Menunggak', 2025: 'Pending', 2026: 'Pending' } },
+            { nop: '1234567890123463', alamat: 'Luar Desa', pajak: 410000, year: 2024, status: 'Pending', dusun: 'luardesa', rw: 'luar', rt: 'luar', yearly: { 2020: 'Pending', 2021: 'Pending', 2022: 'Pending', 2023: 'Pending', 2024: 'Pending', 2025: 'Pending', 2026: 'Pending' } }
+        ];
+
+        const yearSeries = [
+            { year: 2020, total: 86, paid: 52, pending: 16, overdue: 18 },
+            { year: 2021, total: 91, paid: 56, pending: 17, overdue: 18 },
+            { year: 2022, total: 95, paid: 58, pending: 18, overdue: 19 },
+            { year: 2023, total: 101, paid: 63, pending: 19, overdue: 19 },
+            { year: 2024, total: 103, paid: 66, pending: 18, overdue: 19 },
+            { year: 2025, total: 109, paid: 71, pending: 19, overdue: 19 },
+            { year: 2026, total: 116, paid: 76, pending: 20, overdue: 20 }
         ];
 
         let activeLocation = 'all';
@@ -402,6 +366,68 @@
             if (section) {
                 section.classList.toggle('hidden');
             }
+        }
+
+        function formatCurrency(value) {
+            return `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
+        }
+
+        function getStatusClass(status) {
+            if (status === 'Lunas') return 'bg-emerald-100 text-emerald-700';
+            if (status === 'Pending') return 'bg-amber-100 text-amber-700';
+            return 'bg-red-100 text-red-700';
+        }
+
+        function renderYearChart() {
+            const container = document.getElementById('year-chart');
+            if (!container) return;
+            const maxTotal = Math.max(...yearSeries.map(item => item.total));
+
+            container.innerHTML = yearSeries.map(item => {
+                const width = Math.max(24, Math.round((item.total / maxTotal) * 100));
+                return `
+                    <button class="w-full text-left rounded-[1.5rem] border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-4 transition hover:shadow-lg hover:border-emerald-300" onclick="focusYear(${item.year})">
+                        <div class="flex items-center justify-between gap-4 mb-3">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.2em] text-gray-500">Tahun ${item.year}</p>
+                                <p class="font-bold text-emerald-950 mt-1">${item.total} data</p>
+                            </div>
+                            <div class="text-right text-sm">
+                                <p class="text-emerald-700 font-semibold">${item.paid} lunas</p>
+                                <p class="text-amber-600 font-semibold">${item.pending} pending</p>
+                                <p class="text-red-600 font-semibold">${item.overdue} tunggak</p>
+                            </div>
+                        </div>
+                        <div class="h-3 rounded-full bg-emerald-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-gradient-to-r from-emerald-700 via-emerald-500 to-amber-400" style="width:${width}%"></div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function focusYear(year) {
+            const match = pbbData.find(item => item.yearly && item.yearly[year]);
+            if (!match) return;
+
+            const resultEl = document.getElementById('pbb-result');
+            const errorEl = document.getElementById('pbb-error');
+            errorEl.classList.add('hidden');
+            document.getElementById('result-content').innerHTML = `
+                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
+                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Tahun fokus</span>
+                    <p class="mt-1 font-semibold text-emerald-950">${year}</p>
+                </div>
+                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
+                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Ringkasan</span>
+                    <p class="mt-1 font-semibold text-emerald-950">${yearSeries.find(item => item.year === year)?.paid || 0} lunas, ${yearSeries.find(item => item.year === year)?.pending || 0} pending, ${yearSeries.find(item => item.year === year)?.overdue || 0} tunggakan</p>
+                </div>
+                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
+                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Contoh NOP</span>
+                    <p class="mt-1 font-semibold text-emerald-950">${match.nop}</p>
+                </div>
+            `;
+            resultEl.classList.remove('hidden');
         }
 
         function setLocationFilter(value) {
@@ -427,17 +453,40 @@
             });
         }
 
-        function getStatusClass(status) {
-            if (status === 'Lunas') return 'bg-emerald-100 text-emerald-700';
-            if (status === 'Pending') return 'bg-amber-100 text-amber-700';
-            return 'bg-red-100 text-red-700';
-        }
-
         function updateSummaryCounts(filtered) {
             const lunas = filtered.filter(item => item.status === 'Lunas').length;
             const pending = filtered.filter(item => item.status === 'Pending').length;
             const tunggakan = filtered.filter(item => item.status === 'Menunggak').length;
             const totalPajak = filtered.reduce((sum, item) => sum + Number(String(item.pajak).replace(/[^0-9]/g, '')), 0);
+
+            const headerWp = document.getElementById('header-wp');
+            const headerTotal = document.getElementById('header-total');
+            const headerFiltered = document.getElementById('header-filtered');
+            if (headerWp) headerWp.textContent = `${filtered.length} WP`;
+            if (headerTotal) headerTotal.textContent = formatCurrency(totalPajak);
+            if (headerFiltered) headerFiltered.textContent = `${filtered.length} WP`;
+
+            const allCount = document.getElementById('card-all-count');
+            const allTotal = document.getElementById('card-all-total');
+            const dusun1Count = document.getElementById('card-dusun1-count');
+            const dusun1Total = document.getElementById('card-dusun1-total');
+            const dusun2Count = document.getElementById('card-dusun2-count');
+            const dusun2Total = document.getElementById('card-dusun2-total');
+            const dusun3Count = document.getElementById('card-dusun3-count');
+            const dusun3Total = document.getElementById('card-dusun3-total');
+            const luarCount = document.getElementById('card-luardesa-count');
+            const luarTotal = document.getElementById('card-luardesa-total');
+
+            if (allCount) allCount.textContent = `${filtered.length} WP`;
+            if (allTotal) allTotal.textContent = formatCurrency(totalPajak);
+            if (dusun1Count) dusun1Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun1').length} WP`;
+            if (dusun1Total) dusun1Total.textContent = 'RW 01 - RW 02';
+            if (dusun2Count) dusun2Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun2').length} WP`;
+            if (dusun2Total) dusun2Total.textContent = 'RW 03 - RW 06';
+            if (dusun3Count) dusun3Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun3').length} WP`;
+            if (dusun3Total) dusun3Total.textContent = 'RW 04 - RW 05 - RW 07';
+            if (luarCount) luarCount.textContent = `${pbbData.filter(item => item.dusun === 'luardesa').length} WP`;
+            if (luarTotal) luarTotal.textContent = 'Alamat tidak terdata';
 
             const summaryLunas = document.getElementById('summary-lunas');
             const summaryTunggakan = document.getElementById('summary-tunggakan');
@@ -446,60 +495,36 @@
             if (summaryLunas) summaryLunas.textContent = `${lunas} WP`;
             if (summaryTunggakan) summaryTunggakan.textContent = `${tunggakan} WP`;
             if (summaryPending) summaryPending.textContent = `${pending} WP`;
-
-            const firstTotalCard = document.querySelector('[onclick="setLocationFilter(\'all\')"] .text-5xl');
-            const firstTotalValue = document.querySelector('[onclick="setLocationFilter(\'all\')"] .text-sm');
-            if (firstTotalCard) firstTotalCard.textContent = `${filtered.length} WP`;
-            if (firstTotalValue) firstTotalValue.textContent = `Rp ${totalPajak.toLocaleString('id-ID')}`;
         }
 
         function renderPbbData() {
-            const tbody = document.getElementById('pbb-data-table');
             const filtered = getFilteredData();
-            tbody.innerHTML = '';
             updateSummaryCounts(filtered);
-
-            filtered.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-emerald-50 transition';
-                row.style.animation = `slideUp 0.4s ease-out ${index * 0.05}s backwards`;
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-gray-700 font-mono">${item.nop}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700 font-medium">${item.nama}</td>
-                    <td class="px-6 py-4 text-sm text-gray-600">${item.alamat}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700 text-right font-semibold">${item.pajak}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusClass(item.status)}">${item.status}</span>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
         }
 
         // Form submission
         document.getElementById('pbb-check-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const nop = document.getElementById('nop').value;
-            const nama = document.getElementById('nama').value;
-            const tahun = document.getElementById('tahun').value;
 
             PageLoader.show('Memeriksa data PBB...');
 
             setTimeout(() => {
-                const data = pbbData.find(item => item.nop === nop.trim() && item.nama.toLowerCase() === nama.trim().toLowerCase());
+                const data = pbbData.find(item => item.nop === nop.trim());
                 const resultEl = document.getElementById('pbb-result');
                 const errorEl = document.getElementById('pbb-error');
 
                 if (!data) {
                     resultEl.classList.add('hidden');
                     errorEl.classList.remove('hidden');
-                    errorEl.querySelector('#error-message').textContent = 'Data tidak ditemukan. Periksa NOP dan nama pemilik, lalu coba lagi.';
+                    errorEl.querySelector('#error-message').textContent = 'Data tidak ditemukan. Periksa NOP lalu coba lagi.';
                     PageLoader.hide();
                     return;
                 }
 
                 errorEl.classList.add('hidden');
-                const tunggakan = data.status === 'Menunggak' ? 'Ada tunggakan' : data.status === 'Pending' ? 'Menunggu konfirmasi' : 'Tidak ada tunggakan';
+                const tahunList = Object.entries(data.yearly || {}).map(([year, status]) => `<span class="rounded-full px-3 py-1 ${getStatusClass(status)}">${year}: ${status}</span>`).join('');
+                const yearsWithIssue = Object.entries(data.yearly || {}).filter(([, status]) => status !== 'Lunas').map(([year, status]) => `${year} (${status})`).join(', ') || 'Semua tahun lunas';
                 document.getElementById('result-content').innerHTML = `
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
@@ -507,22 +532,15 @@
                             <p class="mt-1 font-semibold text-emerald-950">${data.nop}</p>
                         </div>
                         <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Nama</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.nama}</p>
-                        </div>
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Tahun</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.tahun || tahun}</p>
-                        </div>
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Status</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.status}</p>
+                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Total Tagihan</span>
+                            <p class="mt-1 font-semibold text-emerald-950">${formatCurrency(data.pajak)}</p>
                         </div>
                     </div>
                     <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Keterangan</span>
-                        <p class="mt-1 font-medium text-emerald-950">${tunggakan}. Riwayat wilayah: ${data.alamat}.</p>
+                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Status Tahun yang Bermasalah</span>
+                        <p class="mt-1 font-medium text-emerald-950">${yearsWithIssue}</p>
                     </div>
+                    <div class="flex flex-wrap gap-2">${tahunList}</div>
                 `;
                 resultEl.classList.remove('hidden');
                 PageLoader.hide();
@@ -533,6 +551,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             initScrollAnimations();
             initNavigationLoader();
+            renderYearChart();
             renderPbbData();
             PageLoader.hide();
             lucide.createIcons();
