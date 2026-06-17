@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="id">
+ <head><script src="/_sdk/telemetry_sdk.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desa Kasomalang Kulon</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet">
+  <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        
+        /* Staggered animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInSlow { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 0 rgba(16,185,129,0.2); } 50% { box-shadow: 0 0 20px rgba(16,185,129,0.4); } }
+        
+        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s, transform 0.6s; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        
+        /* Stagger effect utilities */
+        .stagger-item { animation: slideUp 0.8s ease-out forwards; opacity: 0; }
+        .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-item:nth-child(2) { animation-delay: 0.2s; }
+        .stagger-item:nth-child(3) { animation-delay: 0.3s; }
+        .stagger-item:nth-child(4) { animation-delay: 0.4s; }
+        .stagger-item:nth-child(5) { animation-delay: 0.5s; }
+        .stagger-item:nth-child(6) { animation-delay: 0.6s; }
+        
+        .hero-overlay { background: linear-gradient(135deg, rgba(6,78,59,0.7), rgba(16,185,129,0.4)); }
+        .nav-blur { backdrop-filter: blur(12px); background: rgba(255,255,255,0.85); }
+        
+        /* Gallery animations */
+        .gallery-item { position: relative; overflow: hidden; }
+        .gallery-item img { 
+          transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .gallery-item:hover img { transform: scale(1.12) rotate(2deg); filter: brightness(1.1); }
+        
+        /* News cards with elevation */
+        .news-card-animated {
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          position: relative;
+        }
+        .news-card-animated:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(16,185,129,0.15);
+        }
+        
+        /* PBB cards with glow */
+        .pbb-card-animated {
+          transition: all 0.4s ease;
+          position: relative;
+          border-left: 4px solid #10b981;
+        }
+        .pbb-card-animated:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 15px 35px rgba(16,185,129,0.2);
+          border-left-color: #059669;
+        }
+        
+        /* Stat numbers animation */
+        .stat-number {
+          animation: slideUp 0.8s ease-out 0.3s forwards;
+          opacity: 0;
+        }
+        
+        /* Button animations */
+        .btn-hover-glow {
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .btn-hover-glow:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 20px rgba(16,185,129,0.3);
+        }
+        .btn-hover-glow:active {
+          transform: scale(0.98);
+        }
+        
+        /* Filter button transitions */
+        .filter-btn-animated {
+          transition: all 0.3s ease;
+        }
+        .filter-btn-animated.active {
+          animation: slideUp 0.3s ease-out;
+        }
+        
+        /* Lightbox animations */
+        .lightbox { 
+          display: none; 
+          position: fixed; 
+          inset: 0; 
+          z-index: 100; 
+          background: rgba(0,0,0,0.95); 
+          align-items: center; 
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .lightbox.active { 
+          display: flex;
+          opacity: 1;
+        }
+        .lightbox img {
+          animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          max-width: 90vw;
+          max-height: 85vh;
+          object-fit: contain;
+        }
+        
+        /* Parallax effect for hero */
+        .hero-image-parallax {
+          transform: translateZ(0);
+        }
+        
+        /* Section entrance animations */
+        .section-reveal {
+          animation: fadeInSlow 0.6s ease-out;
+        }
+    </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/resizing_sdk.js" type="text/javascript"></script>
+ </head>
+ <body data-template-id="__page-root" class="w-full min-h-screen">
+  <!-- Nav -->
+  <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
+   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="#hero" data-template-id="nav-brand" class="canva-text font-display text-emerald-800 text-xl font-bold"></a> <button id="mobile-toggle" class="md:hidden text-emerald-800"><i data-lucide="menu" style="width:28px;height:28px"></i></button>
+    <ul id="nav-links" class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+     <li><a href="#profil" class="hover:text-emerald-600 transition">Profil</a></li>
+     <li><a href="#berita" class="hover:text-emerald-600 transition">Berita</a></li>
+     <li><a href="#galeri" class="hover:text-emerald-600 transition">Galeri</a></li>
+     <li><a href="#pbb" class="hover:text-emerald-600 transition">PBB</a></li>
+     <li><a href="#bansos" class="hover:text-emerald-600 transition">Bansos</a></li>
+     <li><a href="#login" class="hover:text-emerald-600 transition">Login</a></li>
+    </ul>
+   </div>
+   <ul id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-medium text-gray-700">
+    <li><a href="#profil" class="block py-1">Profil</a></li>
+    <li><a href="#berita" class="block py-1">Berita</a></li>
+    <li><a href="#galeri" class="block py-1">Galeri</a></li>
+    <li><a href="#pbb" class="block py-1">PBB</a></li>
+    <li><a href="#bansos" class="block py-1">Bansos</a></li>
+    <li><a href="#login" class="block py-1">Login</a></li>
+   </ul>
+  </nav><!-- Hero -->
+  <section id="hero" class="relative w-full" style="height: calc(100 * min(var(--vh, 1vh), 1vh))">
+   <img data-template-id="hero-bg" class="canva-image absolute inset-0 w-full h-full object-cover" loading="lazy">
+   <div class="hero-overlay absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+    <h1 data-template-id="hero-title" class="canva-text font-display text-white text-4xl md:text-6xl mb-4 drop-shadow-lg"></h1>
+    <p data-template-id="hero-subtitle" class="canva-text text-emerald-100 text-lg md:text-xl max-w-2xl mb-8"></p>
+    <div class="grid grid-cols-3 gap-6 md:gap-12 text-white">
+     <div class="text-center">
+      <p class="stat-number text-3xl md:text-4xl font-bold">3,245</p>
+      <p class="text-sm text-emerald-200">Penduduk</p>
+     </div>
+     <div class="text-center">
+      <p class="stat-number text-3xl md:text-4xl font-bold">856</p>
+      <p class="text-sm text-emerald-200">KK</p>
+     </div>
+     <div class="text-center">
+      <p class="stat-number text-3xl md:text-4xl font-bold">4</p>
+      <p class="text-sm text-emerald-200">RW</p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Profil -->
+  <section id="profil" class="py-20 px-4">
+   <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center fade-in">
+    <img data-template-id="about-img" class="canva-image rounded-2xl shadow-xl w-full h-72 object-cover" loading="lazy">
+    <div>
+     <h2 data-template-id="about-title" class="canva-text font-display text-emerald-900 text-3xl mb-4"></h2>
+     <p data-template-id="about-desc" class="canva-text text-gray-600 leading-relaxed"></p>
+    </div>
+   </div>
+  </section><!-- Berita -->
+  <section id="berita" data-template-id="news-section" class="canva-section py-20 px-4">
+   <div class="max-w-6xl mx-auto">
+    <h2 data-template-id="news-title" class="canva-text font-display text-emerald-900 text-3xl text-center mb-12"></h2>
+    <div class="grid md:grid-cols-3 gap-8 fade-in">
+     <article data-template-id="news-card-1" class="canva-card news-card-animated rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition">
+      <img data-template-id="news-img-1" class="canva-image w-full h-48 object-cover" loading="lazy">
+      <div class="p-5">
+       <h3 data-template-id="news-card-1-title" class="canva-text font-bold text-gray-800 mb-2"></h3>
+       <p data-template-id="news-card-1-desc" class="canva-text text-gray-500 text-sm"></p>
+      </div>
+     </article>
+     <article data-template-id="news-card-2" class="canva-card news-card-animated rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition">
+      <img data-template-id="news-img-2" class="canva-image w-full h-48 object-cover" loading="lazy">
+      <div class="p-5">
+       <h3 data-template-id="news-card-2-title" class="canva-text font-bold text-gray-800 mb-2"></h3>
+       <p data-template-id="news-card-2-desc" class="canva-text text-gray-500 text-sm"></p>
+      </div>
+     </article>
+     <article data-template-id="news-card-3" class="canva-card news-card-animated rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition">
+      <img data-template-id="news-img-3" class="canva-image w-full h-48 object-cover" loading="lazy">
+      <div class="p-5">
+       <h3 data-template-id="news-card-3-title" class="canva-text font-bold text-gray-800 mb-2"></h3>
+       <p data-template-id="news-card-3-desc" class="canva-text text-gray-500 text-sm"></p>
+      </div>
+     </article>
+    </div>
+   </div>
+  </section><!-- Galeri -->
+  <section id="galeri" class="py-20 px-4">
+   <div class="max-w-6xl mx-auto">
+    <h2 data-template-id="gallery-title" class="canva-text font-display text-emerald-900 text-3xl text-center mb-12"></h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 fade-in">
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-1" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-2" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-3" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-4" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-5" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+     <div class="gallery-item rounded-xl overflow-hidden cursor-pointer stagger-item"><img data-template-id="gal-6" class="canva-image w-full h-48 object-cover transition-transform duration-300" loading="lazy">
+     </div>
+    </div>
+   </div>
+  </section><!-- PBB Dashboard -->
+  <section id="pbb" data-template-id="pbb-section" class="canva-section py-20 px-4">
+   <div class="max-w-6xl mx-auto">
+    <h2 data-template-id="pbb-title" class="canva-text font-display text-emerald-900 text-3xl text-center mb-12"></h2>
+    <div class="grid md:grid-cols-3 gap-8 mb-12 fade-in">
+     <div data-template-id="pbb-card-1" class="canva-card pbb-card-animated bg-white rounded-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+       <h3 data-template-id="pbb-card-1-title" class="canva-text text-emerald-900 font-bold text-lg"></h3><i data-lucide="home" style="width:28px;height:28px;color:#059669"></i>
+      </div>
+      <p data-template-id="pbb-card-1-value" class="canva-text text-3xl font-bold text-emerald-600 mb-2"></p>
+      <p data-template-id="pbb-card-1-desc" class="canva-text text-sm text-gray-500"></p>
+     </div>
+     <div data-template-id="pbb-card-2" class="canva-card pbb-card-animated bg-white rounded-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+       <h3 data-template-id="pbb-card-2-title" class="canva-text text-emerald-900 font-bold text-lg"></h3><i data-lucide="receipt" style="width:28px;height:28px;color:#059669"></i>
+      </div>
+      <p data-template-id="pbb-card-2-value" class="canva-text text-3xl font-bold text-emerald-600 mb-2"></p>
+      <p data-template-id="pbb-card-2-desc" class="canva-text text-sm text-gray-500"></p>
+     </div>
+     <div data-template-id="pbb-card-3" class="canva-card pbb-card-animated bg-white rounded-2xl p-6 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+       <h3 data-template-id="pbb-card-3-title" class="canva-text text-emerald-900 font-bold text-lg"></h3><i data-lucide="percent" style="width:28px;height:28px;color:#059669"></i>
+      </div>
+      <p data-template-id="pbb-card-3-value" class="canva-text text-3xl font-bold text-emerald-600 mb-2"></p>
+      <p data-template-id="pbb-card-3-desc" class="canva-text text-sm text-gray-500"></p>
+     </div>
+    </div>
+    <div data-template-id="pbb-check-section" class="canva-card bg-white rounded-2xl p-8 shadow-lg max-w-2xl mx-auto fade-in">
+     <h3 data-template-id="pbb-check-title" class="canva-text font-bold text-emerald-900 text-xl mb-6 text-center"></h3>
+     <form id="pbb-form" class="space-y-4">
+      <div><label data-template-id="pbb-nop-label" for="pbb-nop" class="canva-text block text-sm font-medium text-gray-700 mb-2"></label> <input id="pbb-nop" type="text" data-template-id="pbb-nop-input" class="canva-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition" placeholder="">
+      </div><button data-template-id="pbb-check-btn" type="submit" class="canva-button btn-hover-glow w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200"></button>
+     </form>
+     <div id="pbb-result" class="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 hidden">
+      <p data-template-id="pbb-result-text" class="canva-text text-emerald-900 text-sm"></p>
+     </div>
+    </div>
+   </div>
+  </section><!-- Bansos -->
+  <section id="bansos" data-template-id="bansos-section" class="canva-section py-20 px-4">
+   <div class="max-w-6xl mx-auto">
+    <h2 data-template-id="bansos-title" class="canva-text font-display text-emerald-900 text-3xl text-center mb-12"></h2>
+    <div class="mb-8 flex flex-wrap gap-3 justify-center">
+     <button data-template-id="bansos-filter-rt1" class="canva-button filter-btn-animated px-4 py-2 rounded-lg font-medium text-sm transition" onclick="filterBansos('rt1')"></button> <button data-template-id="bansos-filter-rt2" class="canva-button filter-btn-animated px-4 py-2 rounded-lg font-medium text-sm transition" onclick="filterBansos('rt2')"></button> <button data-template-id="bansos-filter-rt3" class="canva-button filter-btn-animated px-4 py-2 rounded-lg font-medium text-sm transition" onclick="filterBansos('rt3')"></button> <button data-template-id="bansos-filter-rt4" class="canva-button filter-btn-animated px-4 py-2 rounded-lg font-medium text-sm transition" onclick="filterBansos('rt4')"></button>
+    </div>
+    <div class="overflow-x-auto rounded-2xl shadow-lg fade-in">
+     <table class="w-full">
+      <thead>
+       <tr class="bg-emerald-700 text-white">
+        <th data-template-id="bansos-col-no" class="canva-text px-4 py-3 text-left font-semibold text-sm"></th>
+        <th data-template-id="bansos-col-nama" class="canva-text px-4 py-3 text-left font-semibold text-sm"></th>
+        <th data-template-id="bansos-col-alamat" class="canva-text px-4 py-3 text-left font-semibold text-sm"></th>
+        <th data-template-id="bansos-col-program" class="canva-text px-4 py-3 text-center font-semibold text-sm"></th>
+       </tr>
+      </thead>
+      <tbody id="bansos-table-body" class="divide-y divide-gray-200">
+      </tbody>
+     </table>
+    </div>
+   </div>
+  </section><!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="this.classList.remove('active')">
+   <img id="lightbox-img" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg">
+  </div><!-- Login -->
+  <section id="login" data-template-id="login-section" class="canva-section py-20 px-4">
+   <div class="max-w-md mx-auto fade-in">
+    <div data-template-id="login-card" class="canva-card bg-white rounded-3xl shadow-2xl p-8">
+     <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+       <i data-lucide="shield-check" style="width:32px;height:32px;color:#059669"></i>
+      </div>
+      <h2 data-template-id="login-title" class="canva-text font-display text-emerald-900 text-2xl"></h2>
+      <p data-template-id="login-subtitle" class="canva-text text-gray-500 text-sm mt-2"></p>
+     </div>
+     <form id="login-form" class="space-y-5">
+      <div>
+       <label data-template-id="login-email-label" for="email" class="canva-text block text-sm font-medium text-gray-700 mb-1"></label> <input id="email" type="email" data-template-id="login-email-input" class="canva-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition">
+      </div>
+      <div>
+       <label data-template-id="login-pass-label" for="password" class="canva-text block text-sm font-medium text-gray-700 mb-1"></label> <input id="password" type="password" data-template-id="login-pass-input" class="canva-input w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 focus:border-transparent outline-none transition">
+      </div><button data-template-id="login-btn" type="submit" class="canva-button btn-hover-glow w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200"></button>
+     </form>
+     <p id="login-msg" class="text-center text-sm mt-4 text-gray-500 hidden"></p>
+    </div>
+   </div>
+  </section><!-- Footer -->
+  <footer data-template-id="footer-section" class="canva-footer py-10 px-4 text-center">
+   <p data-template-id="footer-text" class="canva-text text-sm"></p>
+  </footer>
+  <script src="/_sdk/editing_sdk.js"></script>
+  <script>
+        lucide.createIcons();
+
+        // Mobile menu
+        document.getElementById('mobile-toggle').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Scroll animations
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Gallery lightbox
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const src = item.querySelector('img').src;
+                if (src) {
+                    document.getElementById('lightbox-img').src = src;
+                    document.getElementById('lightbox').classList.add('active');
+                }
+            });
+        });
+
+        // Login form
+        document.getElementById('login-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const msg = document.getElementById('login-msg');
+            msg.textContent = 'Silakan integrasikan dengan backend Anda.';
+            msg.classList.remove('hidden');
+        });
+
+        // PBB form
+        document.getElementById('pbb-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const nop = document.getElementById('pbb-nop').value;
+            if (nop.trim()) {
+                document.getElementById('pbb-result').classList.remove('hidden');
+                document.getElementById('pbb-nop').value = '';
+            }
+        });
+
+        // Bansos data
+        const bansosData = [
+            { rt: 'rt1', no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', program: 'PKH + BPNT' },
+            { rt: 'rt1', no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', program: 'BPNT' },
+            { rt: 'rt1', no: 3, nama: 'Rina Handoko', alamat: 'Jl. Raya No. 18', program: 'PKH' },
+            { rt: 'rt2', no: 4, nama: 'Budi Santoso', alamat: 'Jl. Tengah No. 5', program: 'PKH + BPNT' },
+            { rt: 'rt2', no: 5, nama: 'Dewi Lestari', alamat: 'Jl. Tengah No. 8', program: 'BPNT' },
+            { rt: 'rt3', no: 6, nama: 'Hendra Wijaya', alamat: 'Jl. Utama No. 22', program: 'PKH + BPNT' },
+            { rt: 'rt3', no: 7, nama: 'Lisa Amelia', alamat: 'Jl. Utama No. 25', program: 'PKH' },
+            { rt: 'rt4', no: 8, nama: 'Roni Pratama', alamat: 'Jl. Maju No. 7', program: 'BPNT' },
+            { rt: 'rt4', no: 9, nama: 'Susi Hermawan', alamat: 'Jl. Maju No. 10', program: 'PKH + BPNT' }
+        ];
+
+        let currentRT = 'rt1';
+
+        function filterBansos(rt) {
+            currentRT = rt;
+            const filtered = bansosData.filter(item => item.rt === rt);
+            const tbody = document.getElementById('bansos-table-body');
+            tbody.innerHTML = '';
+            filtered.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-emerald-50 transition';
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-gray-700">${item.no}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700 font-medium">${item.nama}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.alamat}</td>
+                    <td class="px-4 py-3 text-sm text-center">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${item.program.includes('PKH') && item.program.includes('BPNT') ? 'bg-emerald-100 text-emerald-700' : item.program === 'PKH' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">${item.program}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            updateFilterButtons();
+        }
+
+        function updateFilterButtons() {
+            document.querySelectorAll('[data-template-id^="bansos-filter"]').forEach(btn => {
+                const rt = btn.getAttribute('onclick').match(/'(rt\d+)'/)[1];
+                if (rt === currentRT) {
+                    btn.classList.add('bg-emerald-600', 'text-white');
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('bg-emerald-600', 'text-white', 'active');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+        }
+
+        // Initialize Bansos table
+        window.addEventListener('DOMContentLoaded', () => {
+            filterBansos('rt1');
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0d40b0a734f6595',t:'MTc4MTcyMDE2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
