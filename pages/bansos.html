@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bansos - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Memuat data Bansos...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../index.html" class="font-display text-emerald-800 text-xl font-bold">Desa Kasomalang</a>
+            <button id="mobile-toggle" class="md:hidden text-emerald-800" onclick="toggleMobileMenu()">
+                <i data-lucide="menu" style="width:28px;height:28px"></i>
+            </button>
+            <ul id="nav-links" class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <li><a href="../index.html" class="hover:text-emerald-600 transition">Beranda</a></li>
+                <li><a href="berita.html" class="hover:text-emerald-600 transition">Berita</a></li>
+                <li><a href="gallery.html" class="hover:text-emerald-600 transition">Galeri</a></li>
+                <li><a href="pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
+                <li><a href="bansos.html" class="text-emerald-600 font-semibold transition">Bansos</a></li>
+                <li><a href="login.html" class="hover:text-emerald-600 transition">Login</a></li>
+            </ul>
+        </div>
+        <ul id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-medium text-gray-700">
+            <li><a href="../index.html" class="block py-1">Beranda</a></li>
+            <li><a href="berita.html" class="block py-1">Berita</a></li>
+            <li><a href="gallery.html" class="block py-1">Galeri</a></li>
+            <li><a href="pbb.html" class="block py-1">PBB</a></li>
+            <li><a href="bansos.html" class="block py-1">Bansos</a></li>
+            <li><a href="login.html" class="block py-1">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Program Bantuan Sosial</h1>
+            <p class="text-emerald-100 text-lg">Data penerima bantuan sosial di Desa Kasomalang Kulon</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Stats -->
+            <div class="grid md:grid-cols-4 gap-6 mb-12 fade-in">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600 text-sm font-medium">Total Penerima</span>
+                        <i data-lucide="users" style="width:24px;height:24px;color:#10b981"></i>
+                    </div>
+                    <p class="text-3xl font-bold text-emerald-600">156</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600 text-sm font-medium">Program PKH</span>
+                        <i data-lucide="heart" style="width:24px;height:24px;color:#f59e0b"></i>
+                    </div>
+                    <p class="text-3xl font-bold text-amber-600">89</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600 text-sm font-medium">Program BPNT</span>
+                        <i data-lucide="package" style="width:24px;height:24px;color:#ef4444"></i>
+                    </div>
+                    <p class="text-3xl font-bold text-red-600">78</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600 text-sm font-medium">Bansos Lainnya</span>
+                        <i data-lucide="gift" style="width:24px;height:24px;color:#8b5cf6"></i>
+                    </div>
+                    <p class="text-3xl font-bold text-purple-600">45</p>
+                </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="mb-8 flex flex-wrap gap-3 justify-center fade-in">
+                <button onclick="filterBansos('semua')" class="filter-btn-animated active px-6 py-2 rounded-full font-medium text-sm transition bg-emerald-600 text-white">Semua</button>
+                <button onclick="filterBansos('rt1')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">RT 1</button>
+                <button onclick="filterBansos('rt2')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">RT 2</button>
+                <button onclick="filterBansos('rt3')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">RT 3</button>
+                <button onclick="filterBansos('rt4')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">RT 4</button>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden fade-in">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">No</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">RT/RW</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Program</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bansos-table-body" class="divide-y divide-gray-200">
+                            <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="mt-8 grid md:grid-cols-3 gap-4 text-sm fade-in">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-3 h-3 bg-emerald-100 border border-emerald-600 rounded"></span>
+                    <span>PKH + BPNT</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-3 h-3 bg-blue-100 border border-blue-600 rounded"></span>
+                    <span>PKH Saja</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-3 h-3 bg-orange-100 border border-orange-600 rounded"></span>
+                    <span>BPNT Saja</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
+        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
+    </footer>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        // Bansos data
+        const bansosData = [
+            { no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', rt_code: 'rt1', program: 'PKH + BPNT', status: 'Aktif' },
+            { no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', rt_code: 'rt1', program: 'BPNT', status: 'Aktif' },
+            { no: 3, nama: 'Rina Handoko', alamat: 'Jl. Raya No. 18', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif' },
+            { no: 4, nama: 'Budi Santoso', alamat: 'Jl. Tengah No. 5', rt: '02/01', rt_code: 'rt2', program: 'PKH + BPNT', status: 'Aktif' },
+            { no: 5, nama: 'Dewi Lestari', alamat: 'Jl. Tengah No. 8', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif' },
+            { no: 6, nama: 'Hendra Wijaya', alamat: 'Jl. Utama No. 22', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif' },
+            { no: 7, nama: 'Lisa Amelia', alamat: 'Jl. Utama No. 25', rt: '03/01', rt_code: 'rt3', program: 'PKH', status: 'Aktif' },
+            { no: 8, nama: 'Roni Pratama', alamat: 'Jl. Maju No. 7', rt: '04/01', rt_code: 'rt4', program: 'BPNT', status: 'Aktif' },
+            { no: 9, nama: 'Susi Hermawan', alamat: 'Jl. Maju No. 10', rt: '04/01', rt_code: 'rt4', program: 'PKH + BPNT', status: 'Aktif' },
+            { no: 10, nama: 'Yolanda Putri', alamat: 'Jl. Raya No. 20', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif' },
+            { no: 11, nama: 'Bambang Irawan', alamat: 'Jl. Tengah No. 3', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif' },
+            { no: 12, nama: 'Nur Fitriani', alamat: 'Jl. Utama No. 30', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif' }
+        ];
+
+        let currentFilter = 'semua';
+
+        function getProgramColor(program) {
+            if (program.includes('PKH') && program.includes('BPNT')) {
+                return { bg: 'bg-emerald-100', text: 'text-emerald-700' };
+            } else if (program === 'PKH') {
+                return { bg: 'bg-blue-100', text: 'text-blue-700' };
+            } else {
+                return { bg: 'bg-orange-100', text: 'text-orange-700' };
+            }
+        }
+
+        function renderBansos() {
+            const tbody = document.getElementById('bansos-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = currentFilter === 'semua' 
+                ? bansosData 
+                : bansosData.filter(item => item.rt_code === currentFilter);
+
+            filtered.forEach((item, index) => {
+                const colors = getProgramColor(item.program);
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-emerald-50 transition';
+                row.style.animation = `slideUp 0.4s ease-out ${index * 0.05}s backwards`;
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-700 font-medium">${item.no}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700 font-medium">${item.nama}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.alamat}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.rt}</td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text}">${item.program}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${item.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterBansos(rt) {
+            currentFilter = rt;
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn-animated').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white', 'active');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-emerald-600', 'text-white', 'active');
+
+            renderBansos();
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBansos();
+        });
+    </script>
+</body>
+</html>

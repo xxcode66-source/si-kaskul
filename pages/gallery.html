@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-white">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Memuat galeri...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../index.html" class="font-display text-emerald-800 text-xl font-bold">Desa Kasomalang</a>
+            <button id="mobile-toggle" class="md:hidden text-emerald-800" onclick="toggleMobileMenu()">
+                <i data-lucide="menu" style="width:28px;height:28px"></i>
+            </button>
+            <ul id="nav-links" class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <li><a href="../index.html" class="hover:text-emerald-600 transition">Beranda</a></li>
+                <li><a href="berita.html" class="hover:text-emerald-600 transition">Berita</a></li>
+                <li><a href="gallery.html" class="text-emerald-600 font-semibold transition">Galeri</a></li>
+                <li><a href="pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
+                <li><a href="bansos.html" class="hover:text-emerald-600 transition">Bansos</a></li>
+                <li><a href="login.html" class="hover:text-emerald-600 transition">Login</a></li>
+            </ul>
+        </div>
+        <ul id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-medium text-gray-700">
+            <li><a href="../index.html" class="block py-1">Beranda</a></li>
+            <li><a href="berita.html" class="block py-1">Berita</a></li>
+            <li><a href="gallery.html" class="block py-1">Galeri</a></li>
+            <li><a href="pbb.html" class="block py-1">PBB</a></li>
+            <li><a href="bansos.html" class="block py-1">Bansos</a></li>
+            <li><a href="login.html" class="block py-1">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Galeri Foto</h1>
+            <p class="text-emerald-100 text-lg">Dokumentasi kegiatan dan momen indah dari Desa Kasomalang Kulon</p>
+        </div>
+    </div>
+
+    <!-- Gallery Content -->
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Filter Buttons -->
+            <div class="mb-12 flex flex-wrap gap-3 justify-center fade-in">
+                <button onclick="filterGallery('semua')" class="filter-btn-animated active px-6 py-2 rounded-full font-medium text-sm transition bg-emerald-600 text-white">Semua</button>
+                <button onclick="filterGallery('kegiatan')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Kegiatan</button>
+                <button onclick="filterGallery('acara')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Acara</button>
+                <button onclick="filterGallery('infrastruktur')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Infrastruktur</button>
+                <button onclick="filterGallery('lainnya')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Lainnya</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 fade-in">
+                <!-- Gallery items will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
+        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="this.classList.remove('active')">
+        <span class="lightbox-close" onclick="event.stopPropagation(); document.getElementById('lightbox').classList.remove('active')">
+            <i data-lucide="x" style="width:24px;height:24px"></i>
+        </span>
+        <img id="lightbox-img" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg">
+    </div>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        // Gallery data
+        const galleryData = [
+            { id: 1, category: 'kegiatan', title: 'Rapat Koordinasi', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
+            { id: 2, category: 'acara', title: 'Festival Desa', image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop' },
+            { id: 3, category: 'infrastruktur', title: 'Jalan Baru', image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400&h=400&fit=crop' },
+            { id: 4, category: 'kegiatan', title: 'Sosialisasi Program', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
+            { id: 5, category: 'acara', title: 'Perayaan 17 Agustus', image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=400&fit=crop' },
+            { id: 6, category: 'lainnya', title: 'Kehidupan Masyarakat', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop' },
+            { id: 7, category: 'infrastruktur', title: 'Kantor Desa', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=400&fit=crop' },
+            { id: 8, category: 'kegiatan', title: 'Pelatihan Masyarakat', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
+            { id: 9, category: 'acara', title: 'Pengajian Rutin', image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop' },
+            { id: 10, category: 'lainnya', title: 'Pesawahan Desa', image: 'https://images.unsplash.com/photo-1500595046891-e9eda8b2fa4d?w=400&h=400&fit=crop' },
+            { id: 11, category: 'infrastruktur', title: 'Sarana Air Bersih', image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400&h=400&fit=crop' },
+            { id: 12, category: 'kegiatan', title: 'Bakti Sosial', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' }
+        ];
+
+        let currentFilter = 'semua';
+
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+
+            const filtered = currentFilter === 'semua' 
+                ? galleryData 
+                : galleryData.filter(item => item.category === currentFilter);
+
+            filtered.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'gallery-item rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item';
+                div.style.animationDelay = (index * 0.1) + 's';
+                div.innerHTML = `
+                    <img src="${item.image}" alt="${item.title}" class="w-full h-48 md:h-56 object-cover transition-transform duration-300">
+                    <div class="absolute inset-0 bg-black/0 hover:bg-black/30 transition flex items-end">
+                        <p class="text-white font-semibold text-sm p-3 w-full">${item.title}</p>
+                    </div>
+                `;
+                
+                div.addEventListener('click', () => {
+                    document.getElementById('lightbox-img').src = item.image;
+                    document.getElementById('lightbox').classList.add('active');
+                });
+
+                grid.appendChild(div);
+            });
+        }
+
+        function filterGallery(category) {
+            currentFilter = category;
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn-animated').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white', 'active');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-emerald-600', 'text-white', 'active');
+
+            renderGallery();
+        }
+
+        // Initialize gallery on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderGallery();
+        });
+    </script>
+</body>
+</html>

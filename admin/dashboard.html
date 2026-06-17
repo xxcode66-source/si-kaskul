@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Memuat dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-emerald-900 text-white shadow-xl overflow-y-auto">
+        <div class="p-6 border-b border-emerald-800">
+            <h1 class="font-display text-2xl font-bold">Admin Panel</h1>
+            <p class="text-emerald-200 text-xs mt-1">Desa Kasomalang Kulon</p>
+        </div>
+
+        <nav class="p-6 space-y-2">
+            <a href="#dashboard" onclick="switchPage('dashboard')" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
+                <i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>
+                Dashboard
+            </a>
+            <a href="#berita" onclick="switchPage('berita')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="newspaper" style="width:20px;height:20px"></i>
+                Kelola Berita
+            </a>
+            <a href="#pbb" onclick="switchPage('pbb')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="building2" style="width:20px;height:20px"></i>
+                Kelola PBB
+            </a>
+            <a href="#bansos" onclick="switchPage('bansos')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
+                Kelola Bansos
+            </a>
+            <a href="#galeri" onclick="switchPage('galeri')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="images" style="width:20px;height:20px"></i>
+                Kelola Galeri
+            </a>
+            <a href="#pengguna" onclick="switchPage('pengguna')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="users" style="width:20px;height:20px"></i>
+                Kelola Pengguna
+            </a>
+        </nav>
+
+        <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-emerald-800 bg-emerald-950">
+            <div class="mb-4 pb-4 border-b border-emerald-800">
+                <p class="text-xs text-emerald-300 mb-2">Logged in as</p>
+                <p class="font-semibold text-white">Admin User</p>
+            </div>
+            <button onclick="logout()" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="log-out" style="width:18px;height:18px"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+            <div class="px-8 py-4 flex items-center justify-between">
+                <h2 id="page-title" class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-600">
+                        <i data-lucide="menu" style="width:24px;height:24px"></i>
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Admin</p>
+                            <p class="text-xs text-gray-500">Administrator</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="p-8">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Penduduk</span>
+                            <i data-lucide="users" style="width:24px;height:24px;color:#10b981"></i>
+                        </div>
+                        <p class="text-3xl font-bold text-emerald-600">3,245</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Berita</span>
+                            <i data-lucide="newspaper" style="width:24px;height:24px;color:#3b82f6"></i>
+                        </div>
+                        <p id="stat-berita" class="text-3xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total PBB</span>
+                            <i data-lucide="building2" style="width:24px;height:24px;color:#f59e0b"></i>
+                        </div>
+                        <p id="stat-pbb" class="text-3xl font-bold text-amber-600">0</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Bansos</span>
+                            <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#ec4899"></i>
+                        </div>
+                        <p id="stat-bansos" class="text-3xl font-bold text-pink-600">0</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Ringkasan Aktivitas</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Berita Terbaru</span>
+                                <span class="text-lg font-bold text-emerald-600" id="berita-count">0</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Objektif Pajak</span>
+                                <span class="text-lg font-bold text-blue-600">856</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-pink-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Penerima Bansos</span>
+                                <span class="text-lg font-bold text-pink-600" id="bansos-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Informasi Penting</h3>
+                        <div class="space-y-3 text-sm text-gray-600">
+                            <p class="flex gap-2">
+                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
+                                <span>Sistem berjalan normal dan siap digunakan</span>
+                            </p>
+                            <p class="flex gap-2">
+                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
+                                <span>Data backup otomatis setiap hari</span>
+                            </p>
+                            <p class="flex gap-2">
+                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
+                                <span>Semua fitur terintegrasi dengan baik</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Berita Page -->
+            <div id="berita-page" class="page-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Kelola Berita</h3>
+                    <button onclick="openBeritaForm()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                        <i data-lucide="plus" style="width:20px;height:20px"></i>
+                        Tambah Berita
+                    </button>
+                </div>
+
+                <!-- Berita Form (Modal) -->
+                <div id="berita-form-container" class="hidden mb-6 bg-white rounded-2xl p-6 shadow-lg">
+                    <form id="berita-form" class="space-y-4">
+                        <input type="hidden" id="berita-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Judul</label>
+                            <input id="berita-title" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                                <select id="berita-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                                    <option value="pengumuman">Pengumuman</option>
+                                    <option value="program">Program</option>
+                                    <option value="acara">Acara</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
+                                <input id="berita-date" type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Konten</label>
+                            <textarea id="berita-content" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="5" required></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                            <button type="button" onclick="closeBeritaForm()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Berita Table -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Judul</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Kategori</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="berita-table" class="divide-y divide-gray-200">
+                            <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PBB Page -->
+            <div id="pbb-page" class="page-content hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Kelola PBB</h3>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Pajak</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pbb-table" class="divide-y divide-gray-200">
+                            <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bansos Page -->
+            <div id="bansos-page" class="page-content hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Kelola Bansos</h3>
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">RT/RW</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Program</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bansos-table" class="divide-y divide-gray-200">
+                            <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Other Pages (Placeholder) -->
+            <div id="galeri-page" class="page-content hidden text-center text-gray-500">
+                <p class="text-lg">Fitur Kelola Galeri akan segera hadir</p>
+            </div>
+
+            <div id="pengguna-page" class="page-content hidden text-center text-gray-500">
+                <p class="text-lg">Fitur Kelola Pengguna akan segera hadir</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        // Check authentication
+        function checkAuth() {
+            if (!localStorage.getItem('adminToken')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Page switching
+        function switchPage(page) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(page + '-page').classList.remove('hidden');
+            document.getElementById('page-title').textContent = getPageTitle(page);
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-emerald-800', 'text-white'));
+            event.target.closest('.nav-item').classList.add('active', 'bg-emerald-800', 'text-white');
+
+            // Load data for specific pages
+            if (page === 'berita') loadBeritaData();
+            if (page === 'pbb') loadPbbData();
+            if (page === 'bansos') loadBansosData();
+        }
+
+        function getPageTitle(page) {
+            const titles = {
+                'dashboard': 'Dashboard',
+                'berita': 'Kelola Berita',
+                'pbb': 'Kelola PBB',
+                'bansos': 'Kelola Bansos',
+                'galeri': 'Kelola Galeri',
+                'pengguna': 'Kelola Pengguna'
+            };
+            return titles[page] || page;
+        }
+
+        // Berita Functions
+        function openBeritaForm() {
+            document.getElementById('berita-form-container').classList.remove('hidden');
+            document.getElementById('berita-form').reset();
+            document.getElementById('berita-id').value = '';
+        }
+
+        function closeBeritaForm() {
+            document.getElementById('berita-form-container').classList.add('hidden');
+        }
+
+        function loadBeritaData() {
+            // Simulate API call
+            const data = [
+                { id: 1, title: 'Program Pelatihan', category: 'program', date: '2024-01-15' },
+                { id: 2, title: 'Pengumuman Bansos', category: 'pengumuman', date: '2024-01-10' }
+            ];
+
+            document.getElementById('stat-berita').textContent = data.length;
+            document.getElementById('berita-count').textContent = data.length;
+
+            const tbody = document.getElementById('berita-table');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.title}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.category}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.date}</td>
+                    <td class="px-6 py-4 text-center space-x-2">
+                        <button onclick="editBerita(${item.id})" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Edit</button>
+                        <button onclick="deleteBerita(${item.id})" class="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function editBerita(id) {
+            openBeritaForm();
+            // Load data into form
+            document.getElementById('berita-id').value = id;
+            document.getElementById('berita-title').value = 'Sample Title';
+            document.getElementById('berita-category').value = 'program';
+        }
+
+        function deleteBerita(id) {
+            if (confirm('Yakin ingin menghapus berita ini?')) {
+                alert('Berita dihapus');
+                loadBeritaData();
+            }
+        }
+
+        function loadPbbData() {
+            const data = [
+                { nop: '1234567890123456', nama: 'Budi Santoso', pajak: 'Rp 500.000', status: 'Lunas' },
+                { nop: '1234567890123457', nama: 'Siti Nurhaliza', pajak: 'Rp 650.000', status: 'Lunas' }
+            ];
+
+            document.getElementById('stat-pbb').textContent = data.length;
+
+            const tbody = document.getElementById('pbb-table');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.pajak}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${item.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadBansosData() {
+            const data = [
+                { nama: 'Siti Nurhaliza', rt: '01/01', program: 'PKH + BPNT', status: 'Aktif' },
+                { nama: 'Ahmad Sutisna', rt: '01/01', program: 'BPNT', status: 'Aktif' }
+            ];
+
+            document.getElementById('stat-bansos').textContent = data.length;
+            document.getElementById('bansos-count').textContent = data.length;
+
+            const tbody = document.getElementById('bansos-table');
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.rt}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${item.program}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${item.status}</span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Berita form submit
+        document.getElementById('berita-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Berita berhasil disimpan!');
+            closeBeritaForm();
+            loadBeritaData();
+        });
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '../pages/login.html';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadBeritaData();
+        });
+    </script>
+</body>
+</html>

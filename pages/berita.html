@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berita - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Memuat berita...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="../index.html" class="font-display text-emerald-800 text-xl font-bold">Desa Kasomalang</a>
+            <button id="mobile-toggle" class="md:hidden text-emerald-800" onclick="toggleMobileMenu()">
+                <i data-lucide="menu" style="width:28px;height:28px"></i>
+            </button>
+            <ul id="nav-links" class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
+                <li><a href="../index.html" class="hover:text-emerald-600 transition">Beranda</a></li>
+                <li><a href="berita.html" class="text-emerald-600 font-semibold transition">Berita</a></li>
+                <li><a href="gallery.html" class="hover:text-emerald-600 transition">Galeri</a></li>
+                <li><a href="pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
+                <li><a href="bansos.html" class="hover:text-emerald-600 transition">Bansos</a></li>
+                <li><a href="login.html" class="hover:text-emerald-600 transition">Login</a></li>
+            </ul>
+        </div>
+        <ul id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-medium text-gray-700">
+            <li><a href="../index.html" class="block py-1">Beranda</a></li>
+            <li><a href="berita.html" class="block py-1">Berita</a></li>
+            <li><a href="gallery.html" class="block py-1">Galeri</a></li>
+            <li><a href="pbb.html" class="block py-1">PBB</a></li>
+            <li><a href="bansos.html" class="block py-1">Bansos</a></li>
+            <li><a href="login.html" class="block py-1">Login</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Berita & Informasi</h1>
+            <p class="text-emerald-100 text-lg">Dapatkan informasi terkini dari Desa Kasomalang Kulon</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Search and Filter -->
+            <div class="mb-12 flex flex-col md:flex-row gap-4 fade-in">
+                <input type="text" id="search-input" placeholder="Cari berita..." class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none">
+                <select id="category-filter" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none">
+                    <option value="">Semua Kategori</option>
+                    <option value="pengumuman">Pengumuman</option>
+                    <option value="program">Program</option>
+                    <option value="acara">Acara</option>
+                    <option value="edukasi">Edukasi</option>
+                </select>
+            </div>
+
+            <!-- Featured News -->
+            <div id="featured-news" class="mb-16"></div>
+
+            <!-- News Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="news-grid">
+                <!-- News cards will be loaded here -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-12 flex justify-center gap-2" id="pagination">
+                <!-- Pagination buttons will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
+        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
+    </footer>
+
+    <script src="../assets/script.js"></script>
+    <script>
+        // News data
+        const newsData = [
+            {
+                id: 1,
+                title: 'Program Pelatihan Kewirausahaan untuk Ibu PKK',
+                category: 'program',
+                date: '2024-01-15',
+                image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
+                excerpt: 'Desa Kasomalang Kulon mengadakan program pelatihan kewirausahaan untuk meningkatkan keterampilan dan ekonomi ibu-ibu PKK...',
+                content: 'Desa Kasomalang Kulon mengadakan program pelatihan kewirausahaan yang komprehensif untuk meningkatkan keterampilan dan ekonomi ibu-ibu PKK. Program ini dirancang untuk memberdayakan masyarakat dan menciptakan lapangan kerja baru.'
+            },
+            {
+                id: 2,
+                title: 'Pengumuman Pendaftaran Bansos 2024',
+                category: 'pengumuman',
+                date: '2024-01-10',
+                image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
+                excerpt: 'Dibuka pendaftaran bantuan sosial untuk periode tahun 2024. Pendaftar dapat langsung mengunjungi kantor desa...',
+                content: 'Dibuka pendaftaran bantuan sosial untuk periode tahun 2024. Pendaftar dapat langsung mengunjungi kantor desa dengan membawa dokumen-dokumen yang diperlukan.'
+            },
+            {
+                id: 3,
+                title: 'Perbaikan Infrastruktur Jalan Utama Selesai 100%',
+                category: 'program',
+                date: '2024-01-05',
+                image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=500&h=300&fit=crop',
+                excerpt: 'Proyek perbaikan jalan utama desa telah mencapai 100% sesuai jadwal. Jalan sepanjang 5 km telah diaspal dengan baik...',
+                content: 'Proyek perbaikan jalan utama desa telah mencapai 100% sesuai jadwal. Jalan sepanjang 5 km telah diaspal dengan baik dan siap digunakan oleh masyarakat.'
+            },
+            {
+                id: 4,
+                title: 'Acara Pengajian Rutin Dilaksanakan Setiap Minggu',
+                category: 'acara',
+                date: '2024-01-01',
+                image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&h=300&fit=crop',
+                excerpt: 'Pengajian rutin diadakan setiap minggu sebagai bagian dari program pembinaan keagamaan masyarakat...',
+                content: 'Pengajian rutin diadakan setiap minggu sebagai bagian dari program pembinaan keagamaan masyarakat yang bertujuan meningkatkan pemahaman agama.'
+            },
+            {
+                id: 5,
+                title: 'Tips Kesehatan: Pentingnya Vaksinasi untuk Anak',
+                category: 'edukasi',
+                date: '2023-12-28',
+                image: 'https://images.unsplash.com/photo-1631217314831-dc56366b34fa?w=500&h=300&fit=crop',
+                excerpt: 'Vaksinasi merupakan langkah penting dalam menjaga kesehatan anak. Berikut adalah informasi lengkap tentang vaksinasi...',
+                content: 'Vaksinasi merupakan langkah penting dalam menjaga kesehatan anak. Vaksin dapat melindungi anak dari berbagai penyakit berbahaya yang dapat dicegah.'
+            },
+            {
+                id: 6,
+                title: 'Persiapan Perayaan 17 Agustus Dimulai',
+                category: 'acara',
+                date: '2023-12-20',
+                image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500&h=300&fit=crop',
+                excerpt: 'Persiapan perayaan hari kemerdekaan sudah dimulai. Berbagai kegiatan menarik telah direncanakan...',
+                content: 'Persiapan perayaan hari kemerdekaan sudah dimulai dengan antusiasme tinggi dari masyarakat. Berbagai kegiatan menarik telah direncanakan untuk memeriahkan perayaan.'
+            },
+            {
+                id: 7,
+                title: 'Program Penyuluhan Pertanian Berkelanjutan',
+                category: 'program',
+                date: '2023-12-15',
+                image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad576?w=500&h=300&fit=crop',
+                excerpt: 'Program penyuluhan pertanian berkelanjutan dilaksanakan untuk meningkatkan produktivitas pertanian lokal...',
+                content: 'Program penyuluhan pertanian berkelanjutan dilaksanakan untuk meningkatkan produktivitas pertanian lokal dan kesejahteraan petani.'
+            },
+            {
+                id: 8,
+                title: 'Edukasi Literasi Digital untuk Orang Tua',
+                category: 'edukasi',
+                date: '2023-12-10',
+                image: 'https://images.unsplash.com/photo-1516321318423-f06f70fc504e?w=500&h=300&fit=crop',
+                excerpt: 'Diadakan workshop literasi digital untuk orang tua agar dapat mendampingi anak-anak dalam menggunakan teknologi...',
+                content: 'Diadakan workshop literasi digital untuk orang tua agar dapat mendampingi anak-anak dalam menggunakan teknologi dengan bijak dan aman.'
+            },
+            {
+                id: 9,
+                title: 'Pembukaan Klinik Kesehatan Desa yang Baru',
+                category: 'pengumuman',
+                date: '2023-12-05',
+                image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=300&fit=crop',
+                excerpt: 'Klinik kesehatan desa yang baru telah diresmikan dan siap melayani masyarakat dengan fasilitas yang lebih baik...',
+                content: 'Klinik kesehatan desa yang baru telah diresmikan dan siap melayani masyarakat dengan fasilitas yang lebih baik dan pelayanan yang maksimal.'
+            }
+        ];
+
+        const itemsPerPage = 6;
+        let currentPage = 1;
+        let filteredNews = [...newsData];
+
+        function renderNews() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const newsToShow = filteredNews.slice(start, end);
+            
+            const newsGrid = document.getElementById('news-grid');
+            newsGrid.innerHTML = '';
+
+            newsToShow.forEach((news, index) => {
+                const div = document.createElement('article');
+                div.className = 'bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition news-card-animated stagger-item';
+                div.style.animationDelay = (index * 0.1) + 's';
+                div.innerHTML = `
+                    <img src="${news.image}" alt="${news.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">${news.category}</span>
+                            <span class="text-xs text-gray-500">${formatDate(news.date)}</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2 text-lg line-clamp-2">${news.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">${news.excerpt}</p>
+                        <button onclick="showNewsDetail(${news.id})" class="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition">
+                            Baca Selengkapnya →
+                        </button>
+                    </div>
+                `;
+                newsGrid.appendChild(div);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 rounded-lg font-medium transition ${
+                    i === currentPage 
+                        ? 'bg-emerald-600 text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`;
+                btn.textContent = i;
+                btn.onclick = () => {
+                    currentPage = i;
+                    renderNews();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+                pagination.appendChild(btn);
+            }
+        }
+
+        function filterNews() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+
+            filteredNews = newsData.filter(news => {
+                const matchSearch = news.title.toLowerCase().includes(searchTerm) || 
+                                   news.excerpt.toLowerCase().includes(searchTerm);
+                const matchCategory = !category || news.category === category;
+                return matchSearch && matchCategory;
+            });
+
+            currentPage = 1;
+            renderNews();
+        }
+
+        function showNewsDetail(id) {
+            const news = newsData.find(n => n.id === id);
+            if (news) {
+                alert(`${news.title}\n\n${news.content}`);
+            }
+        }
+
+        function renderFeaturedNews() {
+            const featured = newsData[0];
+            const featuredDiv = document.getElementById('featured-news');
+            featuredDiv.innerHTML = `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-xl fade-in mb-12">
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <img src="${featured.image}" alt="${featured.title}" class="w-full h-64 md:h-80 object-cover">
+                        <div class="p-8">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full inline-block mb-4">${featured.category}</span>
+                            <h2 class="font-display text-3xl font-bold text-gray-800 mb-4">${featured.title}</h2>
+                            <p class="text-gray-600 mb-6 leading-relaxed">${featured.content}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">${formatDate(featured.date)}</span>
+                                <button onclick="showNewsDetail(${featured.id})" class="px-6 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition">
+                                    Baca Lengkap
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', filterNews);
+        document.getElementById('category-filter').addEventListener('change', filterNews);
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            renderFeaturedNews();
+            renderNews();
+        });
+    </script>
+</body>
+</html>

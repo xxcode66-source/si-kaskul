@@ -1,0 +1,41 @@
+# Frontend
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+
+# Backend
+backend/node_modules/
+backend/package-lock.json
+backend/.env
+backend/.env.local
+backend/logs/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Testing
+.coverage
+.pytest_cache
+*.pyc
+
+# Temp files
+temp/
+tmp/
+*.tmp
