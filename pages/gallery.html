@@ -49,10 +49,32 @@
     </nav>
 
     <!-- Header -->
-    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Galeri Foto</h1>
-            <p class="text-emerald-100 text-lg">Dokumentasi kegiatan dan momen indah dari Desa Kasomalang Kulon</p>
+    <div class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1fr_.85fr] gap-10 items-end">
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                    <i data-lucide="images" style="width:18px;height:18px"></i>
+                    <span>Potret desa, kegiatan warga, dan suasana lapangan</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Galeri Foto</h1>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Lihat dokumentasi Desa Kasomalang Kulon dalam tampilan yang lebih rapi, kontras, dan mudah dinikmati di layar kecil maupun besar.</p>
+            </div>
+
+            <div class="hero-card rounded-[2rem] p-5 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-[1.5rem] overflow-hidden h-40">
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=900&h=600&fit=crop" alt="Momen desa" class="w-full h-full object-cover">
+                    </div>
+                    <div class="rounded-[1.5rem] overflow-hidden h-40">
+                        <img src="https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=900&h=600&fit=crop" alt="Infrastruktur desa" class="w-full h-full object-cover">
+                    </div>
+                    <div class="col-span-2 rounded-[1.5rem] bg-emerald-50 p-4 border border-emerald-100">
+                        <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Filter cepat</p>
+                        <p class="mt-1 font-semibold text-emerald-950">Kegiatan, acara, infrastruktur, dan momen harian.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -118,12 +140,19 @@
 
             filtered.forEach((item, index) => {
                 const div = document.createElement('div');
-                div.className = 'gallery-item rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item';
+                div.className = 'gallery-item group rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item relative bg-gray-900';
                 div.style.animationDelay = (index * 0.1) + 's';
                 div.innerHTML = `
-                    <img src="${item.image}" alt="${item.title}" class="w-full h-48 md:h-56 object-cover transition-transform duration-300">
-                    <div class="absolute inset-0 bg-black/0 hover:bg-black/30 transition flex items-end">
-                        <p class="text-white font-semibold text-sm p-3 w-full">${item.title}</p>
+                    <img src="${item.image}" alt="${item.title}" class="w-full h-48 md:h-60 object-cover transition-transform duration-500 group-hover:scale-110 group-hover:rotate-1">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+                    <div class="absolute inset-x-0 bottom-0 p-4 text-white">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-200 mb-1">${item.category}</p>
+                                <p class="font-semibold text-sm md:text-base leading-snug">${item.title}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold">Lihat</span>
+                        </div>
                     </div>
                 `;
                 

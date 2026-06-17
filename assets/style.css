@@ -285,6 +285,46 @@ body {
     box-shadow: 0 30px 70px rgba(15, 86, 56, 0.08);
 }
 
+.animate-slideUp {
+    animation: slideUp 0.9s ease-out both;
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+    animation: fadeInSlow 2.4s ease-in-out infinite alternate;
+}
+
+.hero-grid-bg {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14) 0, transparent 25%),
+        radial-gradient(circle at 80% 15%, rgba(16, 185, 129, 0.2) 0, transparent 22%),
+        radial-gradient(circle at 70% 85%, rgba(255, 255, 255, 0.08) 0, transparent 18%),
+        linear-gradient(135deg, #064e3b 0%, #047857 45%, #0f766e 100%);
+}
+
+.prayer-chip {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.market-card {
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.market-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+}
+
+.market-badge {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.88);
+}
+
 .map-card iframe {
     min-height: 340px;
     width: 100%;

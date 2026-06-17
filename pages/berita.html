@@ -49,10 +49,38 @@
     </nav>
 
     <!-- Header -->
-    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Berita & Informasi</h1>
-            <p class="text-emerald-100 text-lg">Dapatkan informasi terkini dari Desa Kasomalang Kulon</p>
+    <div class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-end">
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                    <i data-lucide="newspaper" style="width:18px;height:18px"></i>
+                    <span>Berita desa, program, dan pengumuman penting</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Berita & Informasi</h1>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Ikuti pembaruan kegiatan, program, dan kabar terbaru dari Desa Kasomalang Kulon dengan tampilan yang lebih hidup dan mudah dipindai.</p>
+                <div class="flex flex-wrap gap-3 animate-slideUp" style="animation-delay:0.18s">
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Program Desa</span>
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Pengumuman</span>
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Edukasi Warga</span>
+                </div>
+            </div>
+
+            <div class="hero-card rounded-[2rem] p-5 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
+                <div class="grid gap-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Sorotan Terbaru</p>
+                            <h2 class="text-2xl font-bold text-emerald-950 mt-1">Rangkuman berita paling penting</h2>
+                        </div>
+                        <i data-lucide="sparkles" style="width:24px;height:24px;color:#059669"></i>
+                    </div>
+                    <div class="rounded-[1.5rem] overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=520&fit=crop" alt="Berita desa" class="w-full h-56 object-cover">
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">Dari pelatihan warga sampai pengumuman layanan publik, semua disajikan lebih ringkas, jelas, dan enak dibaca di mobile.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -192,19 +220,24 @@
 
             newsToShow.forEach((news, index) => {
                 const div = document.createElement('article');
-                div.className = 'bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition news-card-animated stagger-item';
+                div.className = 'bg-white rounded-[1.75rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition news-card-animated stagger-item';
                 div.style.animationDelay = (index * 0.1) + 's';
                 div.innerHTML = `
-                    <img src="${news.image}" alt="${news.title}" class="w-full h-48 object-cover">
+                    <div class="relative">
+                        <img src="${news.image}" alt="${news.title}" class="w-full h-52 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/10 to-transparent"></div>
+                        <div class="absolute left-4 top-4 px-3 py-1 rounded-full bg-white/90 text-emerald-700 text-xs font-semibold shadow-lg">${news.category}</div>
+                    </div>
                     <div class="p-6">
-                        <div class="flex items-center gap-2 mb-3">
+                        <div class="flex items-center gap-2 mb-3 text-xs text-gray-500">
                             <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">${news.category}</span>
-                            <span class="text-xs text-gray-500">${formatDate(news.date)}</span>
+                            <span>${formatDate(news.date)}</span>
                         </div>
-                        <h3 class="font-bold text-gray-800 mb-2 text-lg line-clamp-2">${news.title}</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">${news.excerpt}</p>
-                        <button onclick="showNewsDetail(${news.id})" class="text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition">
-                            Baca Selengkapnya →
+                        <h3 class="font-bold text-gray-900 mb-2 text-lg leading-snug">${news.title}</h3>
+                        <p class="text-gray-600 text-sm mb-5 leading-relaxed">${news.excerpt}</p>
+                        <button onclick="showNewsDetail(${news.id})" class="inline-flex items-center gap-2 text-emerald-700 font-semibold text-sm hover:text-emerald-800 transition">
+                            Baca Selengkapnya
+                            <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
                         </button>
                     </div>
                 `;
@@ -262,14 +295,17 @@
             const featured = newsData[0];
             const featuredDiv = document.getElementById('featured-news');
             featuredDiv.innerHTML = `
-                <div class="bg-white rounded-2xl overflow-hidden shadow-xl fade-in mb-12">
+                <div class="bg-white rounded-[2rem] overflow-hidden shadow-xl border border-gray-100 fade-in mb-12">
                     <div class="grid md:grid-cols-2 gap-6 items-center">
                         <img src="${featured.image}" alt="${featured.title}" class="w-full h-64 md:h-80 object-cover">
                         <div class="p-8">
-                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full inline-block mb-4">${featured.category}</span>
-                            <h2 class="font-display text-3xl font-bold text-gray-800 mb-4">${featured.title}</h2>
-                            <p class="text-gray-600 mb-6 leading-relaxed">${featured.content}</p>
-                            <div class="flex items-center justify-between">
+                            <div class="flex flex-wrap items-center gap-2 mb-4">
+                                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full inline-block">${featured.category}</span>
+                                <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">Berita utama</span>
+                            </div>
+                            <h2 class="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">${featured.title}</h2>
+                            <p class="text-gray-600 mb-6 leading-relaxed text-base">${featured.content}</p>
+                            <div class="flex items-center justify-between gap-4 flex-wrap">
                                 <span class="text-sm text-gray-500">${formatDate(featured.date)}</span>
                                 <button onclick="showNewsDetail(${featured.id})" class="px-6 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition">
                                     Baca Lengkap

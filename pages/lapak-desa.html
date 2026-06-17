@@ -48,61 +48,132 @@
         </ul>
     </nav>
 
-    <header class="pt-32 pb-12 px-4 bg-gradient-to-br from-emerald-900 to-emerald-600 text-white">
-        <div class="max-w-7xl mx-auto text-center">
-            <h1 class="font-display text-5xl md:text-6xl font-bold mb-4 animate-slideUp">Lapak Desa</h1>
-            <p class="text-emerald-100 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed animate-slideUp" style="animation-delay:0.2s">Temukan produk lokal dan layanan desa yang terhubung langsung dengan WhatsApp dan peta lokasi.</p>
+    <header class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1.08fr_.92fr] gap-10 items-center">
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                    <i data-lucide="shopping-bag" style="width:18px;height:18px"></i>
+                    <span>Lapak produk lokal, jasa warga, dan pemesanan cepat</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Lapak Desa</h1>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Wadah promosi produk warga dengan tampilan marketplace yang lebih rapi, kartu produk yang jelas, dan jalur pesan langsung ke WhatsApp.</p>
+                <div class="flex flex-wrap gap-3 animate-slideUp" style="animation-delay:0.18s">
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Olahan Desa</span>
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Kerajinan</span>
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Hasil Tani</span>
+                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Layanan Antar</span>
+                </div>
+            </div>
+
+            <div class="hero-card rounded-[2rem] p-5 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
+                <div class="grid gap-4">
+                    <div class="rounded-[1.6rem] overflow-hidden shadow-lg">
+                        <img src="https://images.unsplash.com/photo-1500595046891-e9eda8b2fa4d?w=1000&h=700&fit=crop" alt="Lapak desa" class="w-full h-56 object-cover">
+                    </div>
+                    <div class="grid sm:grid-cols-3 gap-3 text-sm">
+                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
+                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Produk</p>
+                            <p class="font-semibold text-emerald-950 mt-1">4 kategori</p>
+                        </div>
+                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
+                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Pesan</p>
+                            <p class="font-semibold text-emerald-950 mt-1">Via WA</p>
+                        </div>
+                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
+                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Lokasi</p>
+                            <p class="font-semibold text-emerald-950 mt-1">Subang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <section class="py-20 px-4">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-8">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-[1.15fr_.85fr] gap-8 items-start">
+            <div class="space-y-8">
                 <div class="grid md:grid-cols-2 gap-6">
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition">
-                        <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=500&fit=crop" alt="Produk Makanan" class="w-full h-56 object-cover">
+                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=500&fit=crop" alt="Produk Makanan" class="w-full h-56 object-cover">
+                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Olahan Desa</div>
+                        </div>
                         <div class="p-6">
-                            <h2 class="font-semibold text-xl text-gray-900 mb-2">Olahan Khas Desa</h2>
-                            <p class="text-gray-600 text-sm mb-4">Emping, keripik, dan sambal buatan lokal yang sehat dan nikmat.</p>
-                            <div class="flex items-center justify-between gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20memesan%20produk%20khas%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Kontak WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Peta</a>
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                    <h2 class="font-semibold text-2xl text-gray-900">Olahan Khas Desa</h2>
+                                    <p class="text-sm text-gray-500 mt-1">Rp 15.000 - 35.000</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Stok tersedia</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Emping, keripik, sambal, dan cemilan rumahan yang dikemas rapi oleh pelaku usaha lokal.</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20memesan%20produk%20olahan%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
+                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
                             </div>
                         </div>
                     </article>
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition">
-                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=500&fit=crop" alt="Kerajinan Lokal" class="w-full h-56 object-cover">
+                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=500&fit=crop" alt="Kerajinan Lokal" class="w-full h-56 object-cover">
+                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Kerajinan</div>
+                        </div>
                         <div class="p-6">
-                            <h2 class="font-semibold text-xl text-gray-900 mb-2">Kerajinan Tangan</h2>
-                            <p class="text-gray-600 text-sm mb-4">Anyaman bambu, tas eceng gondok, dan suvenir desa yang unik.</p>
-                            <div class="flex items-center justify-between gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20membeli%20kerajinan%20lokal" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Kontak WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Peta</a>
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                    <h2 class="font-semibold text-2xl text-gray-900">Kerajinan Tangan</h2>
+                                    <p class="text-sm text-gray-500 mt-1">Produk pesanan & suvenir</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Pre-order</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Anyaman bambu, tas eceng gondok, dan suvenir desa yang cocok untuk hadiah maupun acara.</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20membeli%20kerajinan%20lokal" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
+                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
                             </div>
                         </div>
                     </article>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition">
-                        <img src="https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=500&fit=crop" alt="Pertanian Lokal" class="w-full h-56 object-cover">
+                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=500&fit=crop" alt="Pertanian Lokal" class="w-full h-56 object-cover">
+                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Hasil Tani</div>
+                        </div>
                         <div class="p-6">
-                            <h2 class="font-semibold text-xl text-gray-900 mb-2">Produk Pertanian</h2>
-                            <p class="text-gray-600 text-sm mb-4">Sayur segar, beras organik, dan hasil bumi dari petani lokal.</p>
-                            <div class="flex items-center justify-between gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20mengetahui%20produk%20pertanian" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Kontak WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Peta</a>
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                    <h2 class="font-semibold text-2xl text-gray-900">Produk Pertanian</h2>
+                                    <p class="text-sm text-gray-500 mt-1">Panen segar dari warga</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">Fresh</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Sayur segar, beras organik, dan hasil bumi lokal untuk kebutuhan rumah tangga dan usaha kuliner.</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20mengetahui%20produk%20pertanian" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
+                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
                             </div>
                         </div>
                     </article>
-                    <article class="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition">
-                        <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=500&fit=crop" alt="Jasa Lokal" class="w-full h-56 object-cover">
+                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=500&fit=crop" alt="Jasa Lokal" class="w-full h-56 object-cover">
+                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Layanan</div>
+                        </div>
                         <div class="p-6">
-                            <h2 class="font-semibold text-xl text-gray-900 mb-2">Layanan Desa</h2>
-                            <p class="text-gray-600 text-sm mb-4">Jasa antar, tour desa, dan pengiriman produk langsung ke rumah.</p>
-                            <div class="flex items-center justify-between gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20menggunakan%20layanan%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Kontak WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Peta</a>
+                            <div class="flex items-start justify-between gap-4 mb-3">
+                                <div>
+                                    <h2 class="font-semibold text-2xl text-gray-900">Layanan Desa</h2>
+                                    <p class="text-sm text-gray-500 mt-1">Antar, titip, dan bantuan harian</p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700">Cepat</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Jasa antar, tour desa, dan pengiriman produk langsung ke rumah warga dengan koordinasi yang praktis.</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20menggunakan%20layanan%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
+                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
                             </div>
                         </div>
                     </article>
@@ -110,19 +181,19 @@
             </div>
 
             <aside class="space-y-6">
-                <div class="bg-white rounded-3xl p-8 shadow-xl">
-                    <h3 class="font-semibold text-xl text-emerald-900 mb-4">Cara Pesan</h3>
-                    <ol class="list-decimal list-inside space-y-3 text-gray-600 text-sm">
-                        <li>Pilih produk yang ingin dipesan.</li>
-                        <li>Hubungi melalui tombol WhatsApp.</li>
-                        <li>Berikan alamat tujuan dan jumlah pesanan.</li>
-                        <li>Konfirmasi dan tunggu proses pengiriman.</li>
+                <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
+                    <h3 class="font-semibold text-xl text-emerald-950 mb-4">Cara Pesan</h3>
+                    <ol class="space-y-4 text-sm text-gray-600">
+                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">1</span><span>Pilih produk atau layanan yang sesuai kebutuhan Anda.</span></li>
+                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">2</span><span>Klik tombol WhatsApp untuk mengirim pesan cepat.</span></li>
+                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">3</span><span>Konfirmasi alamat, jumlah, dan waktu pengantaran.</span></li>
+                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">4</span><span>Lapak desa akan membantu proses pesanan sampai selesai.</span></li>
                     </ol>
                 </div>
-                <div class="bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-3xl p-8 shadow-xl">
-                    <h3 class="font-semibold text-xl text-emerald-900 mb-4">Alamat & Lokasi</h3>
-                    <p class="text-gray-600 text-sm mb-4">Desa Kasomalang Kulon, Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat.</p>
-                    <div class="rounded-3xl overflow-hidden border border-emerald-100">
+                <div class="bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-[2rem] p-8 shadow-xl border border-emerald-100">
+                    <h3 class="font-semibold text-xl text-emerald-950 mb-4">Lokasi & Jam Buka</h3>
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">Desa Kasomalang Kulon, Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat. Lapak online aktif setiap saat, pemrosesan pesanan mengikuti jam layanan warga.</p>
+                    <div class="rounded-[1.5rem] overflow-hidden border border-emerald-100 shadow-lg">
                         <iframe class="w-full h-72" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=Desa+Kasomalang+Kulon,Jawa+Barat"></iframe>
                     </div>
                 </div>
