@@ -79,6 +79,20 @@ function initNavigation() {
     });
 }
 
+function initNavigationLoader() {
+    document.querySelectorAll('a[href$=".html"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+            e.preventDefault();
+            PageLoader.show('Memuat halaman...');
+            setTimeout(() => {
+                window.location.href = href;
+            }, 220);
+        });
+    });
+}
+
 // Format currency
 function formatCurrency(value) {
     return new Intl.NumberFormat('id-ID', {
@@ -123,6 +137,7 @@ window.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     initGalleryLightbox();
     initNavigation();
+    initNavigationLoader();
     PageLoader.hide();
     lucide.createIcons();
 });

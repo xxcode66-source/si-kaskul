@@ -261,6 +261,36 @@ body {
     overflow: hidden;
 }
 
+.hero-highlight {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-highlight::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -40px;
+    width: 180px;
+    height: 180px;
+    background: rgba(16, 185, 129, 0.16);
+    border-radius: 50%;
+    filter: blur(24px);
+    z-index: -1;
+}
+
+.hero-card {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(16,185,129,0.12);
+    box-shadow: 0 30px 70px rgba(15, 86, 56, 0.08);
+}
+
+.map-card iframe {
+    min-height: 340px;
+    width: 100%;
+    border: none;
+}
+
 .btn-hover-glow:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);

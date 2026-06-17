@@ -31,6 +31,8 @@
                 <li><a href="gallery.html" class="text-emerald-600 font-semibold transition">Galeri</a></li>
                 <li><a href="pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
                 <li><a href="bansos.html" class="hover:text-emerald-600 transition">Bansos</a></li>
+                <li><a href="pengaduan.html" class="hover:text-emerald-600 transition">Pengaduan</a></li>
+                <li><a href="lapak-desa.html" class="hover:text-emerald-600 transition">Lapak Desa</a></li>
                 <li><a href="login.html" class="hover:text-emerald-600 transition">Login</a></li>
             </ul>
         </div>
@@ -40,6 +42,8 @@
             <li><a href="gallery.html" class="block py-1">Galeri</a></li>
             <li><a href="pbb.html" class="block py-1">PBB</a></li>
             <li><a href="bansos.html" class="block py-1">Bansos</a></li>
+            <li><a href="pengaduan.html" class="block py-1">Pengaduan</a></li>
+            <li><a href="lapak-desa.html" class="block py-1">Lapak Desa</a></li>
             <li><a href="login.html" class="block py-1">Login</a></li>
         </ul>
     </nav>
@@ -57,11 +61,11 @@
         <div class="max-w-7xl mx-auto">
             <!-- Filter Buttons -->
             <div class="mb-12 flex flex-wrap gap-3 justify-center fade-in">
-                <button onclick="filterGallery('semua')" class="filter-btn-animated active px-6 py-2 rounded-full font-medium text-sm transition bg-emerald-600 text-white">Semua</button>
-                <button onclick="filterGallery('kegiatan')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Kegiatan</button>
-                <button onclick="filterGallery('acara')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Acara</button>
-                <button onclick="filterGallery('infrastruktur')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Infrastruktur</button>
-                <button onclick="filterGallery('lainnya')" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Lainnya</button>
+                <button onclick="filterGallery('semua', this)" class="filter-btn-animated active px-6 py-2 rounded-full font-medium text-sm transition bg-emerald-600 text-white">Semua</button>
+                <button onclick="filterGallery('kegiatan', this)" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Kegiatan</button>
+                <button onclick="filterGallery('acara', this)" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Acara</button>
+                <button onclick="filterGallery('infrastruktur', this)" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Infrastruktur</button>
+                <button onclick="filterGallery('lainnya', this)" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition bg-gray-200 text-gray-700 hover:bg-gray-300">Lainnya</button>
             </div>
 
             <!-- Gallery Grid -->
@@ -132,7 +136,7 @@
             });
         }
 
-        function filterGallery(category) {
+        function filterGallery(category, button) {
             currentFilter = category;
             
             // Update button styles
@@ -141,8 +145,10 @@
                 btn.classList.add('bg-gray-200', 'text-gray-700');
             });
 
-            event.target.classList.remove('bg-gray-200', 'text-gray-700');
-            event.target.classList.add('bg-emerald-600', 'text-white', 'active');
+            if (button) {
+                button.classList.remove('bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-emerald-600', 'text-white', 'active');
+            }
 
             renderGallery();
         }

@@ -31,6 +31,8 @@
                 <li><a href="pages/gallery.html" class="hover:text-emerald-600 transition">Galeri</a></li>
                 <li><a href="pages/pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
                 <li><a href="pages/bansos.html" class="hover:text-emerald-600 transition">Bansos</a></li>
+                <li><a href="pages/pengaduan.html" class="hover:text-emerald-600 transition">Pengaduan</a></li>
+                <li><a href="pages/lapak-desa.html" class="hover:text-emerald-600 transition">Lapak Desa</a></li>
                 <li><a href="pages/login.html" class="hover:text-emerald-600 transition">Login</a></li>
             </ul>
         </div>
@@ -40,6 +42,8 @@
             <li><a href="pages/gallery.html" class="block py-1">Galeri</a></li>
             <li><a href="pages/pbb.html" class="block py-1">PBB</a></li>
             <li><a href="pages/bansos.html" class="block py-1">Bansos</a></li>
+            <li><a href="pages/pengaduan.html" class="block py-1">Pengaduan</a></li>
+            <li><a href="pages/lapak-desa.html" class="block py-1">Lapak Desa</a></li>
             <li><a href="pages/login.html" class="block py-1">Login</a></li>
         </ul>
     </nav>
@@ -138,6 +142,54 @@
                     <h3 class="font-semibold text-gray-800 mb-2">Bansos</h3>
                     <p class="text-sm text-gray-600">Program Bantuan Sosial</p>
                 </a>
+
+                <a href="pages/pengaduan.html" class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition hover:-translate-y-2 text-center cursor-pointer group">
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-200 transition">
+                        <i data-lucide="alert-circle" style="width:32px;height:32px;color:#059669"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Pengaduan</h3>
+                    <p class="text-sm text-gray-600">Laporkan kebutuhan atau keluhan desa</p>
+                </a>
+
+                <a href="pages/lapak-desa.html" class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition hover:-translate-y-2 text-center cursor-pointer group">
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-200 transition">
+                        <i data-lucide="shopping-bag" style="width:32px;height:32px;color:#059669"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800 mb-2">Lapak Desa</h3>
+                    <p class="text-sm text-gray-600">Produk lokal langsung lewat WA</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+            <div class="space-y-6 fade-in">
+                <p class="text-sm uppercase tracking-[0.3em] text-emerald-700">Analitik Penduduk</p>
+                <h2 class="font-display text-4xl text-emerald-900 font-bold">Data Penduduk & Peta Desa</h2>
+                <p class="text-gray-600 leading-relaxed">Lihat distribusi penduduk desa, tingkat kepadatan, dan lokasi desa langsung di peta untuk mendukung perencanaan program masyarakat.</p>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="bg-emerald-50 p-6 rounded-3xl shadow-sm border border-emerald-100">
+                        <p class="text-sm text-gray-500">Total Penduduk</p>
+                        <p class="text-3xl font-semibold text-emerald-900">3.245</p>
+                    </div>
+                    <div class="bg-emerald-50 p-6 rounded-3xl shadow-sm border border-emerald-100">
+                        <p class="text-sm text-gray-500">Total KK</p>
+                        <p class="text-3xl font-semibold text-emerald-900">856</p>
+                    </div>
+                    <div class="bg-emerald-50 p-6 rounded-3xl shadow-sm border border-emerald-100">
+                        <p class="text-sm text-gray-500">Kepadatan Penduduk</p>
+                        <p class="text-3xl font-semibold text-emerald-900">120 / km²</p>
+                    </div>
+                    <div class="bg-emerald-50 p-6 rounded-3xl shadow-sm border border-emerald-100">
+                        <p class="text-sm text-gray-500">Kenaikan Tahun Ini</p>
+                        <p class="text-3xl font-semibold text-emerald-900">+4.2%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="fade-in rounded-3xl overflow-hidden shadow-xl border border-emerald-100">
+                <iframe class="w-full h-96" src="https://maps.google.com/maps?q=Desa%20Kasomalang%20Kulon&z=14&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>

@@ -30,7 +30,8 @@ const database = {
   bansos: [
     { id: 1, no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', program: 'PKH + BPNT', status: 'Aktif' },
     { id: 2, no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', program: 'BPNT', status: 'Aktif' }
-  ]
+  ],
+  pengaduan: []
 };
 
 // ==================== AUTH ROUTES ====================
@@ -164,6 +165,28 @@ app.get('/api/bansos/rt/:rt', (req, res) => {
   res.json({ success: true, data: filtered });
 });
 
+// ==================== PENGADUAN ROUTES ====================
+
+// Submit pengaduan
+app.post('/api/pengaduan', (req, res) => {
+  const { name, contact, type, message } = req.body;
+  const newComplaint = {
+    id: database.pengaduan.length + 1,
+    name,
+    contact,
+    type,
+    message,
+    submittedAt: new Date().toISOString()
+  };
+  database.pengaduan.push(newComplaint);
+  res.status(201).json({ success: true, data: newComplaint });
+});
+
+// Get all pengaduan
+app.get('/api/pengaduan', (req, res) => {
+  res.json({ success: true, data: database.pengaduan });
+});
+
 // ==================== DASHBOARD ROUTES ====================
 
 // Get dashboard statistics
@@ -216,5 +239,7 @@ app.listen(PORT, () => {
   console.log(`   - GET  /api/pbb                    (Get all PBB)`);
   console.log(`   - POST /api/pbb/check              (Check PBB)`);
   console.log(`   - GET  /api/bansos                 (Get all Bansos)`);
+  console.log(`   - POST /api/pengaduan              (Submit pengaduan)`);
+  console.log(`   - GET  /api/pengaduan              (Get all pengaduan)`);
   console.log(`   - GET  /api/dashboard/stats        (Get statistics)`);
 });
