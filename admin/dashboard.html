@@ -26,27 +26,31 @@
         </div>
 
         <nav class="p-6 space-y-2">
-            <a href="#dashboard" onclick="switchPage('dashboard')" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
+            <a href="#dashboard" id="nav-dashboard" onclick="switchPage('dashboard', this)" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
                 <i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>
                 Dashboard
             </a>
-            <a href="#berita" onclick="switchPage('berita')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#berita" id="nav-berita" onclick="switchPage('berita', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="newspaper" style="width:20px;height:20px"></i>
                 Kelola Berita
             </a>
-            <a href="#pbb" onclick="switchPage('pbb')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#pbb" id="nav-pbb" onclick="switchPage('pbb', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="building2" style="width:20px;height:20px"></i>
                 Kelola PBB
             </a>
-            <a href="#bansos" onclick="switchPage('bansos')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#approvals" id="nav-approvals" onclick="switchPage('approvals', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="check-circle" style="width:20px;height:20px"></i>
+                Riwayat Approve
+            </a>
+            <a href="#bansos" id="nav-bansos" onclick="switchPage('bansos', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
                 Kelola Bansos
             </a>
-            <a href="#galeri" onclick="switchPage('galeri')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#galeri" id="nav-galeri" onclick="switchPage('galeri', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="images" style="width:20px;height:20px"></i>
                 Kelola Galeri
             </a>
-            <a href="#pengguna" onclick="switchPage('pengguna')" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#pengguna" id="nav-pengguna" onclick="switchPage('pengguna', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="users" style="width:20px;height:20px"></i>
                 Kelola Pengguna
             </a>
@@ -55,7 +59,8 @@
         <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-emerald-800 bg-emerald-950">
             <div class="mb-4 pb-4 border-b border-emerald-800">
                 <p class="text-xs text-emerald-300 mb-2">Logged in as</p>
-                <p class="font-semibold text-white">Admin User</p>
+                <p id="user-name" class="font-semibold text-white">Admin User</p>
+                <p id="user-role" class="text-xs text-emerald-300">Administrator</p>
             </div>
             <button onclick="logout()" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition flex items-center justify-center gap-2">
                 <i data-lucide="log-out" style="width:18px;height:18px"></i>
@@ -222,19 +227,84 @@
 
             <!-- PBB Page -->
             <div id="pbb-page" class="page-content hidden">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Kelola PBB</h3>
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Kelola PBB</h3>
+                        <p id="pbb-subtitle" class="text-sm text-gray-600 mt-1">Menampilkan data sesuai peran Anda.</p>
+                    </div>
+                    <button id="open-proof-form-button" onclick="openProofForm(null)" class="hidden px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Kirim Bukti Pembayaran</button>
+                </div>
+
+                <div id="proof-form-container" class="hidden mb-6 bg-white rounded-2xl p-6 shadow-lg">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Kirim Bukti Pembayaran</h4>
+                    <form id="proof-form" class="space-y-4">
+                        <input type="hidden" id="proof-pbb-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">NOP</label>
+                            <input id="proof-nop" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
+                            <textarea id="proof-note" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="4" placeholder="Deskripsi pembayaran atau bukti" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Bukti (opsional)</label>
+                            <input id="proof-url" type="url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://...">
+                        </div>
+                        <div class="flex gap-3">
+                            <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Kirim Bukti</button>
+                            <button type="button" onclick="closeProofForm()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <table class="w-full">
                         <thead>
                             <tr class="bg-emerald-700 text-white">
                                 <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Tahun</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Pajak</th>
                                 <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="pbb-table" class="divide-y divide-gray-200">
                             <!-- Table rows will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Approval Page -->
+            <div id="approvals-page" class="page-content hidden">
+                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Riwayat Approve</h3>
+                        <p class="text-sm text-gray-600 mt-1">Lihat bukti pembayaran yang telah disetujui atau ditolak.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input id="approval-date" type="date" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                        <button onclick="filterApprovals()" class="px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Filter</button>
+                        <button onclick="exportApprovalCSV()" class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Export CSV</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Disetujui Oleh</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvals-table" class="divide-y divide-gray-200">
+                            <!-- Approval rows will be loaded here -->
                         </tbody>
                     </table>
                 </div>
@@ -273,26 +343,60 @@
 
     <script src="../assets/script.js"></script>
     <script>
-        // Check authentication
+        function getLoggedUser() {
+            try {
+                return JSON.parse(localStorage.getItem('loggedUser') || 'null');
+            } catch (error) {
+                return null;
+            }
+        }
+
         function checkAuth() {
-            if (!localStorage.getItem('adminToken')) {
-                window.location.href = 'login.html';
+            const user = getLoggedUser();
+            if (!user) {
+                window.location.href = '../pages/login.html';
+                return;
+            }
+
+            const userNameEl = document.getElementById('user-name');
+            const userRoleEl = document.getElementById('user-role');
+            if (userNameEl) userNameEl.textContent = user.name || 'Pengguna';
+            if (userRoleEl) userRoleEl.textContent = user.role === 'admin' ? 'Administrator' : user.role === 'collector' ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : 'Pengguna';
+
+            setRoleNavigation(user.role);
+            loadDashboardStats();
+        }
+
+        function setRoleNavigation(role) {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = role === 'admin' ? 'flex' : 'none';
+            });
+
+            if (role === 'collector' || role === 'rt') {
+                const openProofButton = document.getElementById('open-proof-form-button');
+                if (openProofButton) openProofButton.classList.remove('hidden');
+            } else {
+                const openProofButton = document.getElementById('open-proof-form-button');
+                if (openProofButton) openProofButton.classList.add('hidden');
             }
         }
 
         // Page switching
-        function switchPage(page) {
+        function switchPage(page, element) {
             document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(page + '-page').classList.remove('hidden');
+            const pageContent = document.getElementById(page + '-page');
+            if (pageContent) pageContent.classList.remove('hidden');
             document.getElementById('page-title').textContent = getPageTitle(page);
             
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-emerald-800', 'text-white'));
-            event.target.closest('.nav-item').classList.add('active', 'bg-emerald-800', 'text-white');
+            if (element) {
+                element.closest('.nav-item').classList.add('active', 'bg-emerald-800', 'text-white');
+            }
 
-            // Load data for specific pages
             if (page === 'berita') loadBeritaData();
             if (page === 'pbb') loadPbbData();
             if (page === 'bansos') loadBansosData();
+            if (page === 'approvals') loadApprovals();
         }
 
         function getPageTitle(page) {
@@ -302,12 +406,27 @@
                 'pbb': 'Kelola PBB',
                 'bansos': 'Kelola Bansos',
                 'galeri': 'Kelola Galeri',
-                'pengguna': 'Kelola Pengguna'
+                'pengguna': 'Kelola Pengguna',
+                'approvals': 'Riwayat Approve'
             };
             return titles[page] || page;
         }
 
-        // Berita Functions
+        function loadDashboardStats() {
+            fetchWithLoader('http://localhost:3000/api/dashboard/stats')
+                .then(response => {
+                    if (!response.success) throw new Error('Gagal memuat statistik');
+                    const data = response.data;
+                    document.getElementById('stat-berita').textContent = data.totalBerita;
+                    document.getElementById('stat-pbb').textContent = data.totalPBB;
+                    document.getElementById('stat-bansos').textContent = data.totalBansos;
+                    document.getElementById('berita-count').textContent = data.totalBerita;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
         function openBeritaForm() {
             document.getElementById('berita-form-container').classList.remove('hidden');
             document.getElementById('berita-form').reset();
@@ -319,7 +438,6 @@
         }
 
         function loadBeritaData() {
-            // Simulate API call
             const data = [
                 { id: 1, title: 'Program Pelatihan', category: 'program', date: '2024-01-15' },
                 { id: 2, title: 'Pengumuman Bansos', category: 'pengumuman', date: '2024-01-10' }
@@ -329,6 +447,7 @@
             document.getElementById('berita-count').textContent = data.length;
 
             const tbody = document.getElementById('berita-table');
+            if (!tbody) return;
             tbody.innerHTML = '';
             data.forEach(item => {
                 const row = document.createElement('tr');
@@ -348,7 +467,6 @@
 
         function editBerita(id) {
             openBeritaForm();
-            // Load data into form
             document.getElementById('berita-id').value = id;
             document.getElementById('berita-title').value = 'Sample Title';
             document.getElementById('berita-category').value = 'program';
@@ -361,72 +479,172 @@
             }
         }
 
+        function openProofForm(pbbId = null, nop = '') {
+            const formContainer = document.getElementById('proof-form-container');
+            if (!formContainer) return;
+            formContainer.classList.remove('hidden');
+            document.getElementById('proof-pbb-id').value = pbbId || '';
+            document.getElementById('proof-nop').value = nop || '';
+            document.getElementById('proof-note').value = '';
+            document.getElementById('proof-url').value = '';
+        }
+
+        function closeProofForm() {
+            const formContainer = document.getElementById('proof-form-container');
+            if (!formContainer) return;
+            formContainer.classList.add('hidden');
+        }
+
         function loadPbbData() {
-            const data = [
-                { nop: '1234567890123456', nama: 'Budi Santoso', pajak: 'Rp 500.000', status: 'Lunas' },
-                { nop: '1234567890123457', nama: 'Siti Nurhaliza', pajak: 'Rp 650.000', status: 'Lunas' }
-            ];
+            const user = getLoggedUser();
+            if (!user) return;
 
-            document.getElementById('stat-pbb').textContent = data.length;
+            fetchWithLoader('http://localhost:3000/api/pbb/accessible', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id })
+            })
+                .then(response => {
+                    if (!response.success) throw new Error('Gagal memuat data PBB');
+                    const data = response.data || [];
+                    const subtitle = document.getElementById('pbb-subtitle');
+                    if (subtitle) subtitle.textContent = `Data PBB untuk peran ${user.role.toUpperCase()}`;
+                    const tbody = document.getElementById('pbb-table');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
 
-            const tbody = document.getElementById('pbb-table');
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition';
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.pajak}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${item.status}</span>
-                    </td>
-                `;
-                tbody.appendChild(row);
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 transition';
+                        const proofButton = (user.role === 'collector' || user.role === 'rt') ? `<button onclick="openProofForm(${item.id}, '${item.nop}')" class="px-3 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700">Bukti</button>` : '';
+                        const approveButton = user.role === 'admin' ? `<button onclick="approvePbb(${item.id}, '${item.nop}')" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Approve</button>` : '';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.year || '-'}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">Rp ${Number(item.pajak).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${item.status.toLowerCase() === 'lunas' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${item.status}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">${proofButton}${approveButton}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error(error));
+        }
+
+        function approvePbb(pbbId, nop) {
+            const note = prompt(`Beri catatan untuk NOP ${nop} (opsional)`);
+            if (note === null) return;
+            const user = getLoggedUser();
+            if (!user) return;
+            fetchWithLoader(`http://localhost:3000/api/pbb/${pbbId}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: user.id, approveStatus: 'Disetujui', note })
+            })
+                .then(() => {
+                    alert('Pembayaran diproses dan disetujui.');
+                    loadPbbData();
+                })
+                .catch(error => console.error(error));
+        }
+
+        const proofForm = document.getElementById('proof-form');
+        if (proofForm) {
+            proofForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const pbbId = document.getElementById('proof-pbb-id').value;
+                const note = document.getElementById('proof-note').value;
+                const proofUrl = document.getElementById('proof-url').value;
+                const user = getLoggedUser();
+                if (!user || !pbbId) return;
+
+                fetchWithLoader(`http://localhost:3000/api/pbb/${pbbId}/proof`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, note, proofUrl })
+                })
+                    .then(() => {
+                        alert('Bukti pembayaran dikirim. Tunggu approval admin.');
+                        closeProofForm();
+                        loadPbbData();
+                    })
+                    .catch(error => console.error(error));
             });
         }
 
-        function loadBansosData() {
-            const data = [
-                { nama: 'Siti Nurhaliza', rt: '01/01', program: 'PKH + BPNT', status: 'Aktif' },
-                { nama: 'Ahmad Sutisna', rt: '01/01', program: 'BPNT', status: 'Aktif' }
-            ];
-
-            document.getElementById('stat-bansos').textContent = data.length;
-            document.getElementById('bansos-count').textContent = data.length;
-
-            const tbody = document.getElementById('bansos-table');
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition';
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.rt}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.program}</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">${item.status}</span>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+        function loadApprovals(date = '') {
+            const url = date ? `http://localhost:3000/api/pbb/approvals?date=${date}` : 'http://localhost:3000/api/pbb/approvals';
+            fetchWithLoader(url)
+                .then(response => {
+                    if (!response.success) throw new Error('Gagal memuat approvals');
+                    const tbody = document.getElementById('approvals-table');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+                    response.data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50 transition';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-sm text-gray-700">${new Date(item.approvedAt).toLocaleString('id-ID')}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.approvedBy}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.approveStatus}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${item.note}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error(error));
         }
 
-        // Berita form submit
-        document.getElementById('berita-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Berita berhasil disimpan!');
-            closeBeritaForm();
-            loadBeritaData();
-        });
+        function filterApprovals() {
+            const date = document.getElementById('approval-date').value;
+            loadApprovals(date);
+        }
 
-        // Logout
+        function exportApprovalCSV() {
+            window.location.href = 'http://localhost:3000/api/pbb/approvals/export';
+        }
+
+        function uploadPbbData() {
+            const rawData = document.getElementById('pbb-upload-data').value;
+            let payload;
+            try {
+                payload = JSON.parse(rawData);
+            } catch (err) {
+                return alert('Format data tidak valid. Gunakan JSON array.');
+            }
+            fetchWithLoader('http://localhost:3000/api/pbb/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: payload })
+            })
+                .then(response => {
+                    if (!response.success) throw new Error('Upload gagal');
+                    alert('Data PBB berhasil diunggah.');
+                    document.getElementById('pbb-upload-data').value = '';
+                    loadPbbData();
+                })
+                .catch(error => console.error(error));
+        }
+
+        function prefillPbbUploadData() {
+            const sample = [
+                { nop: '1234567890123458', nama: 'Rudi Hadi', alamat: 'Jl. Merdeka No. 21', rt: '01/01', rw: '01', year: 2024, pajak: 450000, status: 'Nunggak' },
+                { nop: '1234567890123459', nama: 'Dewi Kurnia', alamat: 'Jl. Melati No. 9', rt: '02/01', rw: '01', year: 2025, pajak: 550000, status: 'Lunas' }
+            ];
+            document.getElementById('pbb-upload-data').value = JSON.stringify(sample, null, 2);
+        }
+
         function logout() {
+            localStorage.removeItem('loggedUser');
             localStorage.removeItem('adminToken');
             window.location.href = '../pages/login.html';
         }
 
-        // Initialize
         window.addEventListener('DOMContentLoaded', () => {
             checkAuth();
             loadBeritaData();

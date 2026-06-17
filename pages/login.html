@@ -34,14 +34,14 @@
 
                 <!-- Tab Navigation -->
                 <div class="grid grid-cols-2 gap-2 mb-6">
-                    <button onclick="switchTab('admin')" id="admin-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white">Admin</button>
-                    <button onclick="switchTab('user')" id="user-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-gray-200 text-gray-700">Penduduk</button>
+                    <button onclick="switchTab('petugas')" id="admin-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white">Petugas</button>
+                    <button onclick="switchTab('penduduk')" id="user-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-gray-200 text-gray-700">Penduduk</button>
                 </div>
 
-                <!-- Admin Login Form -->
+                <!-- Petugas Login Form -->
                 <form id="admin-form" class="space-y-5 block">
                     <div>
-                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-2">Email Admin</label>
+                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-2">Email Petugas</label>
                         <input id="admin-email" type="email" placeholder="admin@kasomalangkulon.id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
                     </div>
                     <div>
@@ -113,7 +113,7 @@
 
     <script src="../assets/script.js"></script>
     <script>
-        let currentTab = 'admin';
+        let currentTab = 'petugas';
 
         function switchTab(tab) {
             currentTab = tab;
@@ -122,7 +122,7 @@
             const adminTab = document.getElementById('admin-tab');
             const userTab = document.getElementById('user-tab');
 
-            if (tab === 'admin') {
+            if (tab === 'petugas') {
                 adminForm.classList.remove('hidden');
                 userForm.classList.add('hidden');
                 adminTab.classList.add('bg-emerald-600', 'text-white');
@@ -149,53 +149,66 @@
             }
         }
 
-        // Admin Form Submit
-        document.getElementById('admin-form').addEventListener('submit', (e) => {
+        // Petugas Form Submit
+        document.getElementById('admin-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('admin-email').value;
             const password = document.getElementById('admin-password').value;
-            
-            PageLoader.show('Memverifikasi kredensial...');
 
-            // Simulate API call
-            setTimeout(() => {
-                if (email === 'admin@kasomalangkulon.id' && password === 'admin123') {
-                    localStorage.setItem('adminToken', 'token123');
+            PageLoader.show('Memverifikasi kredensial...');
+            try {
+                const response = await fetchWithLoader(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.success) {
+                    localStorage.setItem('loggedUser', JSON.stringify(response.user));
                     showMessage('Login berhasil! Mengalihkan ke dashboard...', 'success');
                     PageLoader.hide();
                     setTimeout(() => {
                         window.location.href = '../admin/dashboard.html';
-                    }, 1500);
+                    }, 1200);
                 } else {
-                    showMessage('Email atau password salah', 'error');
+                    showMessage(response.message || 'Login gagal', 'error');
                     PageLoader.hide();
                 }
-            }, 1500);
+            } catch (error) {
+                showMessage('Gagal terhubung ke server login', 'error');
+                PageLoader.hide();
+            }
         });
 
-        // User Form Submit
-        document.getElementById('user-form').addEventListener('submit', (e) => {
+        // Penduduk Form Submit
+        document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nik = document.getElementById('user-nik').value;
             const password = document.getElementById('user-password').value;
 
             PageLoader.show('Memverifikasi NIK...');
+            try {
+                const response = await fetchWithLoader(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nik, password })
+                });
 
-            // Simulate API call
-            setTimeout(() => {
-                if (nik === '1234567890123456' && password === '123456') {
-                    localStorage.setItem('userToken', 'token456');
-                    localStorage.setItem('userNik', nik);
+                if (response.success) {
+                    localStorage.setItem('loggedUser', JSON.stringify(response.user));
                     showMessage('Login berhasil! Mengalihkan ke portal penduduk...', 'success');
                     PageLoader.hide();
                     setTimeout(() => {
                         window.location.href = '../pages/user-portal.html';
-                    }, 1500);
+                    }, 1200);
                 } else {
-                    showMessage('NIK atau password salah', 'error');
+                    showMessage(response.message || 'Login gagal', 'error');
                     PageLoader.hide();
                 }
-            }, 1500);
+            } catch (error) {
+                showMessage('Gagal terhubung ke server login', 'error');
+                PageLoader.hide();
+            }
         });
 
         function showMessage(msg, type) {

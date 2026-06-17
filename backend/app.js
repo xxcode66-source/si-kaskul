@@ -16,56 +16,66 @@ const PORT = process.env.PORT || 3000;
 // Sample Database (In-Memory)
 const database = {
   users: [
-    { id: 1, name: 'Admin', email: 'admin@kasomalangkulon.id', password: 'admin123', role: 'admin' },
-    { id: 2, name: 'Budi Santoso', nik: '1234567890123456', password: '123456', role: 'user' }
+    { id: 1, name: 'Admin Desa', email: 'admin@kasomalangkulon.id', password: 'admin123', role: 'admin' },
+    { id: 2, name: 'Kolektor Desa', email: 'kolektor@kasomalangkulon.id', password: 'kolektor123', role: 'collector' },
+    { id: 3, name: 'Ketua RT 1', email: 'rt1@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '01/01', rw: '01' },
+    { id: 4, name: 'Ketua RT 2', email: 'rt2@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '02/01', rw: '01' },
+    { id: 5, name: 'Budi Santoso', nik: '1234567890123456', password: '123456', role: 'penduduk' }
+  ],
+  penduduk: [
+    { id: 1, nik: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01' }
   ],
   berita: [
     { id: 1, title: 'Program Pelatihan Kewirausahaan', category: 'program', date: '2024-01-15', content: 'Desa mengadakan pelatihan kewirausahaan...' },
     { id: 2, title: 'Pengumuman Pendaftaran Bansos', category: 'pengumuman', date: '2024-01-10', content: 'Dibuka pendaftaran bantuan sosial...' }
   ],
   pbb: [
-    { id: 1, nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', pajak: 500000, status: 'Lunas' },
-    { id: 2, nop: '1234567890123457', nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 15', pajak: 650000, status: 'Lunas' }
+    { id: 1, nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2020, pajak: 500000, status: 'Nunggak', proofs: [] },
+    { id: 2, nop: '1234567890123457', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2021, pajak: 520000, status: 'Nunggak', proofs: [] },
+    { id: 3, nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2022, pajak: 530000, status: 'Lunas', proofs: [] },
+    { id: 4, nop: '1234567890123458', nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 15', rt: '01/01', rw: '01', year: 2023, pajak: 650000, status: 'Lunas', proofs: [] },
+    { id: 5, nop: '1234567890123459', nama: 'Rudi Hadi', alamat: 'Jl. Merdeka No. 21', rt: '02/01', rw: '01', year: 2024, pajak: 450000, status: 'Nunggak', proofs: [] },
+    { id: 6, nop: '1234567890123460', nama: 'Dewi Kurnia', alamat: 'Jl. Melati No. 9', rt: '02/01', rw: '01', year: 2025, pajak: 550000, status: 'Lunas', proofs: [] }
   ],
   bansos: [
     { id: 1, no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', program: 'PKH + BPNT', status: 'Aktif' },
     { id: 2, no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', program: 'BPNT', status: 'Aktif' }
   ],
-  pengaduan: []
+  pengaduan: [],
+  approvals: []
 };
 
 // ==================== AUTH ROUTES ====================
 
-// Admin Login
-app.post('/api/auth/admin-login', (req, res) => {
-  const { email, password } = req.body;
-  const user = database.users.find(u => u.email === email && u.password === password && u.role === 'admin');
-  
-  if (user) {
-    res.json({ 
-      success: true, 
-      token: 'admin_token_' + Date.now(),
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
-    });
-  } else {
-    res.status(401).json({ success: false, message: 'Email atau password salah' });
-  }
-});
+function findUserByCredentials({ email, nik, password }) {
+  return database.users.find(u => {
+    if (email && u.email === email && u.password === password) return true;
+    if (nik && u.nik === nik && u.password === password) return true;
+    return false;
+  });
+}
 
-// User Login
-app.post('/api/auth/user-login', (req, res) => {
-  const { nik, password } = req.body;
-  const user = database.users.find(u => u.nik === nik && u.password === password && u.role === 'user');
-  
-  if (user) {
-    res.json({ 
-      success: true, 
-      token: 'user_token_' + Date.now(),
-      user: { id: user.id, name: user.name, nik: user.nik, role: user.role }
-    });
-  } else {
-    res.status(401).json({ success: false, message: 'NIK atau password salah' });
+app.post('/api/auth/login', (req, res) => {
+  const { email, nik, password } = req.body;
+  const user = findUserByCredentials({ email, nik, password });
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Kredensial tidak valid' });
   }
+
+  res.json({
+    success: true,
+    token: `${user.role}_token_${Date.now()}`,
+    user: {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      email: user.email || null,
+      nik: user.nik || null,
+      rt: user.rt || null,
+      rw: user.rw || null
+    }
+  });
 });
 
 // ==================== BERITA ROUTES ====================
@@ -131,6 +141,14 @@ app.get('/api/pbb', (req, res) => {
   res.json({ success: true, data: database.pbb });
 });
 
+// Get PBB summary counts
+app.get('/api/pbb/summary', (req, res) => {
+  const total = database.pbb.length;
+  const lunas = database.pbb.filter(p => p.status.toLowerCase() === 'lunas').length;
+  const nunggak = database.pbb.filter(p => p.status.toLowerCase() !== 'lunas').length;
+  res.json({ success: true, data: { total, lunas, nunggak } });
+});
+
 // Check PBB by NOP
 app.post('/api/pbb/check', (req, res) => {
   const { nop, nama } = req.body;
@@ -144,12 +162,148 @@ app.post('/api/pbb/check', (req, res) => {
         nama: pbbData.nama,
         alamat: pbbData.alamat,
         pajak: pbbData.pajak,
-        status: pbbData.status
+        status: pbbData.status,
+        year: pbbData.year,
+        proofs: pbbData.proofs
       }
     });
   } else {
     res.status(404).json({ success: false, message: 'Data PBB tidak ditemukan' });
   }
+});
+
+app.post('/api/pbb/accessible', (req, res) => {
+  const { userId } = req.body;
+  const user = database.users.find(u => u.id === Number(userId));
+
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'User tidak ditemukan' });
+  }
+
+  let data = [];
+  if (user.role === 'admin' || user.role === 'collector') {
+    data = database.pbb;
+  } else if (user.role === 'rt') {
+    data = database.pbb.filter(p => p.rt === user.rt && p.rw === user.rw);
+  } else if (user.role === 'penduduk') {
+    data = database.pbb.filter(p => p.nop === user.nik || p.nik === user.nik);
+  }
+
+  res.json({ success: true, data, user: { id: user.id, role: user.role, rt: user.rt || null, rw: user.rw || null } });
+});
+
+app.post('/api/pbb/upload', (req, res) => {
+  const { data } = req.body;
+  if (!Array.isArray(data) || data.length === 0) {
+    return res.status(400).json({ success: false, message: 'Data upload PBB tidak valid' });
+  }
+
+  const added = data.map(item => {
+    const id = Math.max(...database.pbb.map(p => p.id), 0) + 1;
+    const record = {
+      id,
+      nop: item.nop,
+      nama: item.nama,
+      alamat: item.alamat,
+      rt: item.rt,
+      rw: item.rw,
+      year: item.year,
+      pajak: Number(item.pajak) || 0,
+      status: item.status || 'Nunggak',
+      proofs: []
+    };
+    database.pbb.push(record);
+    return record;
+  });
+
+  res.status(201).json({ success: true, data: added });
+});
+
+app.post('/api/pbb/:id/proof', (req, res) => {
+  const { id } = req.params;
+  const { userId, note, proofUrl } = req.body;
+  const user = database.users.find(u => u.id === Number(userId));
+  const pbbData = database.pbb.find(p => p.id === Number(id));
+
+  if (!user || !pbbData) {
+    return res.status(404).json({ success: false, message: 'User atau data PBB tidak ditemukan' });
+  }
+
+  if (user.role !== 'collector' && user.role !== 'rt') {
+    return res.status(403).json({ success: false, message: 'Akses terbatas: hanya kolektor atau RT dapat mengirim bukti' });
+  }
+
+  const proof = {
+    timestamp: new Date().toISOString(),
+    uploader: user.name,
+    role: user.role,
+    note: note || '',
+    proofUrl: proofUrl || null,
+    status: 'Menunggu Persetujuan'
+  };
+
+  pbbData.proofs.push(proof);
+  pbbData.status = 'Menunggu Persetujuan';
+
+  res.status(201).json({ success: true, data: proof });
+});
+
+app.post('/api/pbb/:id/approve', (req, res) => {
+  const { id } = req.params;
+  const { userId, approveStatus, note } = req.body;
+  const user = database.users.find(u => u.id === Number(userId));
+  const pbbData = database.pbb.find(p => p.id === Number(id));
+
+  if (!user || !pbbData) {
+    return res.status(404).json({ success: false, message: 'User atau data PBB tidak ditemukan' });
+  }
+
+  if (user.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Akses terbatas: hanya admin dapat menyetujui bukti pembayaran' });
+  }
+
+  const approval = {
+    id: database.approvals.length + 1,
+    pbbId: pbbData.id,
+    nop: pbbData.nop,
+    nama: pbbData.nama,
+    approvedBy: user.name,
+    approveStatus: approveStatus || 'Disetujui',
+    note: note || '',
+    approvedAt: new Date().toISOString()
+  };
+
+  database.approvals.push(approval);
+  pbbData.status = approveStatus === 'Ditolak' ? 'Nunggak' : 'Lunas';
+
+  res.json({ success: true, data: approval });
+});
+
+app.get('/api/pbb/approvals', (req, res) => {
+  const { date } = req.query;
+  let approvals = [...database.approvals];
+
+  if (date) {
+    approvals = approvals.filter(a => a.approvedAt.startsWith(date));
+  }
+
+  res.json({ success: true, data: approvals });
+});
+
+app.get('/api/pbb/approvals/export', (req, res) => {
+  const rows = [
+    ['ID', 'PBB ID', 'NOP', 'Nama', 'Approved By', 'Status', 'Note', 'Approved At']
+  ];
+
+  database.approvals.forEach(a => {
+    rows.push([a.id, a.pbbId, a.nop, a.nama, a.approvedBy, a.approveStatus, a.note, a.approvedAt]);
+  });
+
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="approval-history.csv"');
+  res.send(csv);
 });
 
 // ==================== BANSOS ROUTES ====================
@@ -191,18 +345,26 @@ app.get('/api/pengaduan', (req, res) => {
 
 // Get dashboard statistics
 app.get('/api/dashboard/stats', (req, res) => {
+  const totalPenduduk = database.penduduk.length;
+  const totalKK = Math.max(1, Math.floor(totalPenduduk / 4));
+  const totalRW = [...new Set(database.penduduk.map(p => p.rw))].length;
+  const totalPajakTerkumpul = database.pbb.reduce((sum, item) => item.status.toLowerCase() === 'lunas' ? sum + item.pajak : sum, 0);
+  const totalPBB = database.pbb.length;
+  const lunasCount = database.pbb.filter(item => item.status.toLowerCase() === 'lunas').length;
+  const nunggakCount = totalPBB - lunasCount;
+
   res.json({
     success: true,
     data: {
-      totalPenduduk: 3245,
-      totalKK: 856,
-      totalRW: 4,
+      totalPenduduk,
+      totalKK,
+      totalRW,
       totalBerita: database.berita.length,
-      totalPBB: database.pbb.length,
+      totalPBB,
       totalBansos: database.bansos.length,
-      totalPajakTerkumpul: 2500000000,
-      tingkatPembayaranPBB: 87,
-      pajakMenunggak: 111
+      totalPajakTerkumpul,
+      tingkatPembayaranPBB: totalPBB ? Math.round((lunasCount / totalPBB) * 100) : 0,
+      pajakMenunggak: nunggakCount
     }
   });
 });
