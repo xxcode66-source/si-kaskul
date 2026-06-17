@@ -325,6 +325,22 @@ body {
     background: rgba(255, 255, 255, 0.88);
 }
 
+.rt-chip {
+    border: 1px solid #d1fae5;
+    background: #ffffff;
+    color: #065f46;
+    border-radius: 9999px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.rt-chip:hover {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
 .map-card iframe {
     min-height: 340px;
     width: 100%;
