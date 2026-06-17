@@ -422,7 +422,7 @@
         }
 
         function loadDashboardStats() {
-            fetchWithLoader('http://localhost:3000/api/dashboard/stats')
+            fetchWithLoader(`${API_BASE_URL}/dashboard/stats`)
                 .then(response => {
                     if (!response.success) throw new Error('Gagal memuat statistik');
                     const data = response.data;
@@ -508,7 +508,7 @@
             const user = getLoggedUser();
             if (!user) return;
 
-            fetchWithLoader('http://localhost:3000/api/pbb/accessible', {
+            fetchWithLoader(`${API_BASE_URL}/pbb/accessible`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id })
@@ -548,7 +548,7 @@
             if (note === null) return;
             const user = getLoggedUser();
             if (!user) return;
-            fetchWithLoader(`http://localhost:3000/api/pbb/${pbbId}/approve`, {
+            fetchWithLoader(`${API_BASE_URL}/pbb/${pbbId}/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: user.id, approveStatus: 'Disetujui', note })
@@ -570,7 +570,7 @@
                 const user = getLoggedUser();
                 if (!user || !pbbId) return;
 
-                fetchWithLoader(`http://localhost:3000/api/pbb/${pbbId}/proof`, {
+                fetchWithLoader(`${API_BASE_URL}/pbb/${pbbId}/proof`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ userId: user.id, note, proofUrl })
@@ -585,7 +585,7 @@
         }
 
         function loadApprovals(date = '') {
-            const url = date ? `http://localhost:3000/api/pbb/approvals?date=${date}` : 'http://localhost:3000/api/pbb/approvals';
+            const url = date ? `${API_BASE_URL}/pbb/approvals?date=${date}` : `${API_BASE_URL}/pbb/approvals`;
             fetchWithLoader(url)
                 .then(response => {
                     if (!response.success) throw new Error('Gagal memuat approvals');
@@ -615,7 +615,7 @@
         }
 
         function exportApprovalCSV() {
-            window.location.href = 'http://localhost:3000/api/pbb/approvals/export';
+            window.location.href = `${API_BASE_URL}/pbb/approvals/export`;
         }
 
         function uploadPbbData() {
@@ -626,7 +626,7 @@
             } catch (err) {
                 return alert('Format data tidak valid. Gunakan JSON array.');
             }
-            fetchWithLoader('http://localhost:3000/api/pbb/upload', {
+            fetchWithLoader(`${API_BASE_URL}/pbb/upload`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ data: payload })

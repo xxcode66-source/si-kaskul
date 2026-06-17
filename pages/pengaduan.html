@@ -157,7 +157,7 @@
             PageLoader.show('Mengirim pengaduan...');
 
             try {
-                const result = await fetchWithLoader('http://localhost:3000/api/pengaduan', {
+                const result = await fetchWithLoader(`${API_BASE_URL}/pengaduan`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, contact, type, message })

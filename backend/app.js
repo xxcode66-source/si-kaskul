@@ -399,18 +399,22 @@ app.use((err, req, res, next) => {
 
 // ==================== Start Server ====================
 
-app.listen(PORT, () => {
-  console.log(`✅ Backend API Desa Kasomalang Kulon berjalan di http://localhost:${PORT}`);
-  console.log(`📚 API Documentation:`);
-  console.log(`   - GET  /api/health                 (Health check)`);
-  console.log(`   - POST /api/auth/admin-login       (Admin login)`);
-  console.log(`   - POST /api/auth/user-login        (User login)`);
-  console.log(`   - GET  /api/berita                 (Get all news)`);
-  console.log(`   - POST /api/berita                 (Create news)`);
-  console.log(`   - GET  /api/pbb                    (Get all PBB)`);
-  console.log(`   - POST /api/pbb/check              (Check PBB)`);
-  console.log(`   - GET  /api/bansos                 (Get all Bansos)`);
-  console.log(`   - POST /api/pengaduan              (Submit pengaduan)`);
-  console.log(`   - GET  /api/pengaduan              (Get all pengaduan)`);
-  console.log(`   - GET  /api/dashboard/stats        (Get statistics)`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Backend API Desa Kasomalang Kulon berjalan di http://localhost:${PORT}`);
+    console.log(`📚 API Documentation:`);
+    console.log(`   - GET  /api/health                 (Health check)`);
+    console.log(`   - POST /api/auth/admin-login       (Admin login)`);
+    console.log(`   - POST /api/auth/user-login        (User login)`);
+    console.log(`   - GET  /api/berita                 (Get all news)`);
+    console.log(`   - POST /api/berita                 (Create news)`);
+    console.log(`   - GET  /api/pbb                    (Get all PBB)`);
+    console.log(`   - POST /api/pbb/check              (Check PBB)`);
+    console.log(`   - GET  /api/bansos                 (Get all Bansos)`);
+    console.log(`   - POST /api/pengaduan              (Submit pengaduan)`);
+    console.log(`   - GET  /api/pengaduan              (Get all pengaduan)`);
+    console.log(`   - GET  /api/dashboard/stats        (Get statistics)`);
+  });
+}
+
+module.exports = app;
