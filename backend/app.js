@@ -91,9 +91,9 @@ function handleLogin(req, res) {
   });
 }
 
-app.post('/api/auth/login', handleLogin);
-app.post('/api/auth/admin-login', handleLogin);
-app.post('/api/auth/user-login', handleLogin);
+app.post(['/api/auth/login', '/auth/login'], handleLogin);
+app.post(['/api/auth/admin-login', '/auth/admin-login'], handleLogin);
+app.post(['/api/auth/user-login', '/auth/user-login'], handleLogin);
 
 // ==================== BERITA ROUTES ====================
 
@@ -388,7 +388,7 @@ app.get('/api/dashboard/stats', (req, res) => {
 
 // ==================== HEALTH CHECK ====================
 
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({ success: true, message: 'API Backend Desa Kasomalang Kulon - Running OK' });
 });
 
