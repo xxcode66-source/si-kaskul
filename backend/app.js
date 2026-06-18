@@ -2,6 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const {
+  createSeedDatabase,
+  hasSupabaseDatabase,
+  createPool,
+  ensureSchema,
+  seedIfEmpty,
+  loadDatabase,
+  syncDatabase
+} = require('./supabase-store');
 
 const app = express();
 
@@ -22,37 +31,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Port Configuration
 const PORT = process.env.PORT || 3000;
 
-// Sample Database (In-Memory)
-const database = {
-  users: [
-    { id: 1, name: 'Admin Desa', email: 'admin@kasomalangkulon.id', password: 'admin123', role: 'admin' },
-    { id: 2, name: 'Kolektor Desa', email: 'kolektor@kasomalangkulon.id', password: 'kolektor123', role: 'kolektor' },
-    { id: 3, name: 'Ketua RT 1', email: 'rt1@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '01/01', rw: '01' },
-    { id: 4, name: 'Ketua RT 2', email: 'rt2@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: '02/01', rw: '01' },
-    { id: 5, name: 'Budi Santoso', nik: '1234567890123456', password: '123456', role: 'penduduk' }
-  ],
-  penduduk: [
-    { id: 1, nik: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01' }
-  ],
-  berita: [
-    { id: 1, title: 'Program Pelatihan Kewirausahaan', category: 'program', date: '2024-01-15', content: 'Desa mengadakan pelatihan kewirausahaan...' },
-    { id: 2, title: 'Pengumuman Pendaftaran Bansos', category: 'pengumuman', date: '2024-01-10', content: 'Dibuka pendaftaran bantuan sosial...' }
-  ],
-  pbb: [
-    { id: 1, nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2020, pajak: 500000, status: 'Nunggak', proofs: [] },
-    { id: 2, nop: '1234567890123457', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2021, pajak: 520000, status: 'Nunggak', proofs: [] },
-    { id: 3, nop: '1234567890123456', nama: 'Budi Santoso', alamat: 'Jl. Raya No. 12', rt: '01/01', rw: '01', year: 2022, pajak: 530000, status: 'Lunas', proofs: [] },
-    { id: 4, nop: '1234567890123458', nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 15', rt: '01/01', rw: '01', year: 2023, pajak: 650000, status: 'Lunas', proofs: [] },
-    { id: 5, nop: '1234567890123459', nama: 'Rudi Hadi', alamat: 'Jl. Merdeka No. 21', rt: '02/01', rw: '01', year: 2024, pajak: 450000, status: 'Nunggak', proofs: [] },
-    { id: 6, nop: '1234567890123460', nama: 'Dewi Kurnia', alamat: 'Jl. Melati No. 9', rt: '02/01', rw: '01', year: 2025, pajak: 550000, status: 'Lunas', proofs: [] }
-  ],
-  bansos: [
-    { id: 1, no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', program: 'PKH + BPNT', status: 'Aktif' },
-    { id: 2, no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', program: 'BPNT', status: 'Aktif' }
-  ],
-  pengaduan: [],
-  approvals: []
-};
+const pool = createPool();
+let database = createSeedDatabase();
+
+async function persistDatabase() {
+  if (!pool || !hasSupabaseDatabase()) {
+    return;
+  }
+
+  await syncDatabase(pool, database);
+}
+
+async function bootstrapDatabase() {
+  if (!pool || !hasSupabaseDatabase()) {
+    return;
+  }
+
+  await ensureSchema(pool);
+  await seedIfEmpty(pool, database);
+  database = await loadDatabase(pool);
+}
 
 // ==================== AUTH ROUTES ====================
 
@@ -113,7 +111,7 @@ app.get('/api/berita/:id', (req, res) => {
 });
 
 // Create news
-app.post('/api/berita', (req, res) => {
+app.post('/api/berita', async (req, res) => {
   const { title, category, content } = req.body;
   const newBerita = {
     id: Math.max(...database.berita.map(b => b.id), 0) + 1,
@@ -123,16 +121,18 @@ app.post('/api/berita', (req, res) => {
     content
   };
   database.berita.push(newBerita);
+  await persistDatabase();
   res.status(201).json({ success: true, data: newBerita });
 });
 
 // Update news
-app.put('/api/berita/:id', (req, res) => {
+app.put('/api/berita/:id', async (req, res) => {
   const { title, category, content } = req.body;
   const index = database.berita.findIndex(b => b.id == req.params.id);
   
   if (index !== -1) {
     database.berita[index] = { ...database.berita[index], title, category, content };
+    await persistDatabase();
     res.json({ success: true, data: database.berita[index] });
   } else {
     res.status(404).json({ success: false, message: 'Berita tidak ditemukan' });
@@ -140,11 +140,12 @@ app.put('/api/berita/:id', (req, res) => {
 });
 
 // Delete news
-app.delete('/api/berita/:id', (req, res) => {
+app.delete('/api/berita/:id', async (req, res) => {
   const index = database.berita.findIndex(b => b.id == req.params.id);
   
   if (index !== -1) {
     const deleted = database.berita.splice(index, 1);
+    await persistDatabase();
     res.json({ success: true, message: 'Berita dihapus', data: deleted[0] });
   } else {
     res.status(404).json({ success: false, message: 'Berita tidak ditemukan' });
@@ -209,7 +210,7 @@ app.post('/api/pbb/accessible', (req, res) => {
   res.json({ success: true, data, user: { id: user.id, role: user.role, rt: user.rt || null, rw: user.rw || null } });
 });
 
-app.post('/api/pbb/upload', (req, res) => {
+app.post('/api/pbb/upload', async (req, res) => {
   const { data } = req.body;
   if (!Array.isArray(data) || data.length === 0) {
     return res.status(400).json({ success: false, message: 'Data upload PBB tidak valid' });
@@ -233,10 +234,11 @@ app.post('/api/pbb/upload', (req, res) => {
     return record;
   });
 
+  await persistDatabase();
   res.status(201).json({ success: true, data: added });
 });
 
-app.post('/api/pbb/:id/proof', (req, res) => {
+app.post('/api/pbb/:id/proof', async (req, res) => {
   const { id } = req.params;
   const { userId, note, proofUrl } = req.body;
   const user = database.users.find(u => u.id === Number(userId));
@@ -262,10 +264,11 @@ app.post('/api/pbb/:id/proof', (req, res) => {
   pbbData.proofs.push(proof);
   pbbData.status = 'Menunggu Persetujuan';
 
+  await persistDatabase();
   res.status(201).json({ success: true, data: proof });
 });
 
-app.post('/api/pbb/:id/approve', (req, res) => {
+app.post('/api/pbb/:id/approve', async (req, res) => {
   const { id } = req.params;
   const { userId, approveStatus, note } = req.body;
   const user = database.users.find(u => u.id === Number(userId));
@@ -293,6 +296,7 @@ app.post('/api/pbb/:id/approve', (req, res) => {
   database.approvals.push(approval);
   pbbData.status = approveStatus === 'Ditolak' ? 'Nunggak' : 'Lunas';
 
+  await persistDatabase();
   res.json({ success: true, data: approval });
 });
 
@@ -339,7 +343,7 @@ app.get('/api/bansos/rt/:rt', (req, res) => {
 // ==================== PENGADUAN ROUTES ====================
 
 // Submit pengaduan
-app.post('/api/pengaduan', (req, res) => {
+app.post('/api/pengaduan', async (req, res) => {
   const { name, contact, type, message } = req.body;
   const newComplaint = {
     id: database.pengaduan.length + 1,
@@ -350,6 +354,7 @@ app.post('/api/pengaduan', (req, res) => {
     submittedAt: new Date().toISOString()
   };
   database.pengaduan.push(newComplaint);
+  await persistDatabase();
   res.status(201).json({ success: true, data: newComplaint });
 });
 
@@ -408,21 +413,30 @@ app.use((err, req, res, next) => {
 // ==================== Start Server ====================
 
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`✅ Backend API Desa Kasomalang Kulon berjalan di http://localhost:${PORT}`);
-    console.log(`📚 API Documentation:`);
-    console.log(`   - GET  /api/health                 (Health check)`);
-    console.log(`   - POST /api/auth/admin-login       (Admin login)`);
-    console.log(`   - POST /api/auth/user-login        (User login)`);
-    console.log(`   - GET  /api/berita                 (Get all news)`);
-    console.log(`   - POST /api/berita                 (Create news)`);
-    console.log(`   - GET  /api/pbb                    (Get all PBB)`);
-    console.log(`   - POST /api/pbb/check              (Check PBB)`);
-    console.log(`   - GET  /api/bansos                 (Get all Bansos)`);
-    console.log(`   - POST /api/pengaduan              (Submit pengaduan)`);
-    console.log(`   - GET  /api/pengaduan              (Get all pengaduan)`);
-    console.log(`   - GET  /api/dashboard/stats        (Get statistics)`);
-  });
+  bootstrapDatabase()
+    .catch(error => {
+      console.error('Gagal inisialisasi Supabase, memakai data seed lokal:', error.message);
+    })
+    .finally(() => {
+      app.listen(PORT, () => {
+        console.log(`✅ Backend API Desa Kasomalang Kulon berjalan di http://localhost:${PORT}`);
+        if (hasSupabaseDatabase()) {
+          console.log('🗄️  Database aktif melalui Supabase Postgres');
+        }
+        console.log(`📚 API Documentation:`);
+        console.log(`   - GET  /api/health                 (Health check)`);
+        console.log(`   - POST /api/auth/admin-login       (Admin login)`);
+        console.log(`   - POST /api/auth/user-login        (User login)`);
+        console.log(`   - GET  /api/berita                 (Get all news)`);
+        console.log(`   - POST /api/berita                 (Create news)`);
+        console.log(`   - GET  /api/pbb                    (Get all PBB)`);
+        console.log(`   - POST /api/pbb/check              (Check PBB)`);
+        console.log(`   - GET  /api/bansos                 (Get all Bansos)`);
+        console.log(`   - POST /api/pengaduan              (Submit pengaduan)`);
+        console.log(`   - GET  /api/pengaduan              (Get all pengaduan)`);
+        console.log(`   - GET  /api/dashboard/stats        (Get statistics)`);
+      });
+    });
 }
 
 module.exports = app;
