@@ -57,14 +57,18 @@ const database = {
 // ==================== AUTH ROUTES ====================
 
 function findUserByCredentials({ email, nik, password }) {
+  const normalizedEmail = email ? String(email).trim().toLowerCase() : '';
+  const normalizedNik = nik ? String(nik).trim() : '';
+  const normalizedPassword = password ? String(password) : '';
+
   return database.users.find(u => {
-    if (email && u.email === email && u.password === password) return true;
-    if (nik && u.nik === nik && u.password === password) return true;
+    if (normalizedEmail && u.email && u.email.toLowerCase() === normalizedEmail && u.password === normalizedPassword) return true;
+    if (normalizedNik && u.nik && String(u.nik) === normalizedNik && u.password === normalizedPassword) return true;
     return false;
   });
 }
 
-app.post('/api/auth/login', (req, res) => {
+function handleLogin(req, res) {
   const { email, nik, password } = req.body;
   const user = findUserByCredentials({ email, nik, password });
 
@@ -85,7 +89,11 @@ app.post('/api/auth/login', (req, res) => {
       rw: user.rw || null
     }
   });
-});
+}
+
+app.post('/api/auth/login', handleLogin);
+app.post('/api/auth/admin-login', handleLogin);
+app.post('/api/auth/user-login', handleLogin);
 
 // ==================== BERITA ROUTES ====================
 
