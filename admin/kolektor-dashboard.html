@@ -1,0 +1,1107 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kolektor - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/script.js"></script>
+    <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .toast-notif { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 1rem 1.5rem; border-radius: 0.75rem; color: white; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast-notif.show { transform: translateX(0); }
+        .toast-notif.success { background: #059669; }
+        .toast-notif.error { background: #dc2626; }
+        .toast-notif.info { background: #2563eb; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+        .badge-lunas { background: #d1fae5; color: #065f46; }
+        .badge-belum { background: #fee2e2; color: #991b1b; }
+        .search-result-card { cursor: pointer; transition: all 0.2s; }
+        .search-result-card:hover { border-color: #059669; background: #f0fdf4; }
+        @media (max-width: 768px) { .sidebar-mobile { transform: translateX(-100%); } .sidebar-mobile.open { transform: translateX(0); } }
+    </style>
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p id="loader-text" class="loader-text">Memuat dashboard kolektor...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notif"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-emerald-900 text-white shadow-xl overflow-y-auto z-40">
+        <div class="p-6 border-b border-emerald-800">
+            <h1 class="font-display text-2xl font-bold">Kolektor Panel</h1>
+            <p class="text-emerald-200 text-xs mt-1">Desa Kasomalang Kulon</p>
+        </div>
+
+        <nav class="p-4 space-y-1">
+            <a href="#dashboard" id="nav-dashboard" onclick="switchPage('dashboard', this)" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
+                <i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>
+                Dashboard
+            </a>
+            <a href="#input-pembayaran" id="nav-input-pembayaran" onclick="switchPage('input-pembayaran', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="wallet" style="width:20px;height:20px"></i>
+                Input Pembayaran
+            </a>
+            <a href="#riwayat" id="nav-riwayat" onclick="switchPage('riwayat', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="history" style="width:20px;height:20px"></i>
+                Riwayat Input
+            </a>
+            <a href="#panduan" id="nav-panduan" onclick="switchPage('panduan', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="book-open" style="width:20px;height:20px"></i>
+                Panduan
+            </a>
+        </nav>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-emerald-800 bg-emerald-950">
+            <div class="mb-3 pb-3 border-b border-emerald-800">
+                <p class="text-xs text-emerald-300 mb-1">Logged in as</p>
+                <p id="user-name" class="font-semibold text-white text-sm">-</p>
+                <p id="user-role" class="text-xs text-emerald-300">-</p>
+            </div>
+            <button onclick="logout()" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="log-out" style="width:18px;height:18px"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button id="mobile-menu-btn" onclick="toggleSidebar()" class="fixed top-4 left-4 z-50 lg:hidden bg-emerald-900 text-white p-2 rounded-lg">
+        <i data-lucide="menu" style="width:24px;height:24px"></i>
+    </button>
+
+    <!-- Main Content -->
+    <main id="main-content" class="lg:ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <nav class="bg-white shadow-md sticky top-0 z-30">
+            <div class="px-4 lg:px-8 py-4 flex items-center justify-between">
+                <h2 id="page-title" class="text-xl lg:text-2xl font-bold text-gray-800">Dashboard Kolektor</h2>
+                <div class="flex items-center gap-3">
+                    <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
+                    <div class="hidden sm:block">
+                        <p id="topbar-name" class="text-sm font-semibold text-gray-800">-</p>
+                        <p id="topbar-role" class="text-xs text-gray-500">-</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="p-4 lg:p-8">
+
+            <!-- ==================== DASHBOARD PAGE ==================== -->
+            <div id="dashboard-page" class="page-content">
+
+                <!-- Kolektor Info Banner -->
+                <div class="bg-emerald-100 border-l-4 border-emerald-600 rounded-xl p-4 mb-6 flex items-center gap-3">
+                    <i data-lucide="badge-check" style="width:24px;height:24px;color:#059669"></i>
+                    <div>
+                        <p class="font-semibold text-emerald-800 text-sm">Kolektor PBB - <span id="kolektor-name-banner">-</span></p>
+                        <p class="text-xs text-emerald-600">Anda bertugas mencatat dan menginput pembayaran PBB dari warga</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Input Saya</span>
+                            <i data-lucide="upload" style="width:24px;height:24px;color:#10b981"></i>
+                        </div>
+                        <p id="stat-total-input" class="text-3xl font-bold text-emerald-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Disetujui</span>
+                            <i data-lucide="check-circle" style="width:24px;height:24px;color:#3b82f6"></i>
+                        </div>
+                        <p id="stat-approved" class="text-3xl font-bold text-blue-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Pending</span>
+                            <i data-lucide="clock" style="width:24px;height:24px;color:#f59e0b"></i>
+                        </div>
+                        <p id="stat-pending" class="text-3xl font-bold text-amber-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Ditolak</span>
+                            <i data-lucide="x-circle" style="width:24px;height:24px;color:#ef4444"></i>
+                        </div>
+                        <p id="stat-rejected" class="text-3xl font-bold text-red-600">-</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Aktivitas Terbaru</h3>
+                        <div id="aktivitas-list" class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Total Input Saya</span>
+                                <span class="text-lg font-bold text-emerald-600" id="aktivitas-total">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Disetujui</span>
+                                <span class="text-lg font-bold text-blue-600" id="aktivitas-approved">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Pending</span>
+                                <span class="text-lg font-bold text-amber-600" id="aktivitas-pending">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Ditolak</span>
+                                <span class="text-lg font-bold text-red-600" id="aktivitas-rejected">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Akses Cepat</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="switchPage('input-pembayaran', document.getElementById('nav-input-pembayaran'))" class="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl text-left transition">
+                                <i data-lucide="wallet" style="width:24px;height:24px;color:#059669" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Input Pembayaran</p>
+                            </button>
+                            <button onclick="switchPage('riwayat', document.getElementById('nav-riwayat'))" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition">
+                                <i data-lucide="history" style="width:24px;height:24px;color:#2563eb" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Riwayat Input</p>
+                            </button>
+                            <button onclick="switchPage('panduan', document.getElementById('nav-panduan'))" class="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-left transition">
+                                <i data-lucide="book-open" style="width:24px;height:24px;color:#d97706" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Panduan</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== INPUT PEMBAYARAN PAGE ==================== -->
+            <div id="input-pembayaran-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Input Pembayaran PBB</h3>
+                    <p class="text-sm text-gray-600 mt-1">Cari warga berdasarkan NOP atau nama, lalu input pembayaran PBB.</p>
+                </div>
+
+                <!-- Search Section -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cari Wajib Pajak</label>
+                            <div class="relative">
+                                <i data-lucide="search" style="width:18px;height:18px;position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af"></i>
+                                <input id="pencarian-input" type="text" placeholder="Cari NOP atau Nama Warga..." oninput="cariWajibPajak()" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="search-results-container">
+                        <div id="search-loading" class="hidden text-center py-4 text-gray-500 text-sm">Mencari data...</div>
+                        <div id="search-empty" class="hidden text-center py-8">
+                            <i data-lucide="search-x" style="width:48px;height:48px;color:#d1d5db;margin:0 auto 0.5rem;display:block"></i>
+                            <p class="text-gray-500 text-sm">Ketik NOP atau nama warga untuk mencari</p>
+                        </div>
+                        <div id="search-results" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <!-- Payment Form (hidden until a wajib pajak is selected) -->
+                <div id="payment-form-container" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-800">Form Pembayaran</h4>
+                                <p class="text-sm text-gray-500">Isi detail pembayaran untuk warga yang dipilih</p>
+                            </div>
+                            <button onclick="batalPilihWarga()" class="text-sm text-red-600 hover:text-red-700 flex items-center gap-1">
+                                <i data-lucide="x" style="width:16px;height:16px"></i> Batal
+                            </button>
+                        </div>
+
+                        <!-- Selected Warga Info -->
+                        <div id="selected-warga-info" class="bg-emerald-50 rounded-xl p-4 mb-6 border border-emerald-200">
+                            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                <div>
+                                    <p class="text-xs text-gray-500">NOP</p>
+                                    <p id="form-nop" class="font-mono font-semibold text-gray-800 text-sm">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Nama</p>
+                                    <p id="form-nama" class="font-semibold text-gray-800 text-sm">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Alamat</p>
+                                    <p id="form-alamat" class="text-sm text-gray-600">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500">Dusun / RW / RT</p>
+                                    <p id="form-dusun" class="text-sm text-gray-600">-</p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="form-pbb-id" value="">
+                        </div>
+
+                        <form id="payment-form" class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Pajak <span class="text-red-500">*</span></label>
+                                    <select id="form-tahun" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" required>
+                                        <option value="">Pilih Tahun...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Dibayar (Rp) <span class="text-red-500">*</span></label>
+                                    <input id="form-jumlah" type="number" min="0" placeholder="Masukkan jumlah pembayaran..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Upload Bukti Pembayaran</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-emerald-400 transition">
+                                    <div class="space-y-1 text-center">
+                                        <i data-lucide="upload" style="width:32px;height:32px;color:#9ca3af;margin:0 auto"></i>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="form-bukti" class="relative cursor-pointer rounded-md font-medium text-emerald-600 hover:text-emerald-500 focus-within:outline-none">
+                                                <span>Upload file bukti</span>
+                                                <input id="form-bukti" type="file" accept="image/*,.pdf" class="sr-only">
+                                            </label>
+                                            <p class="pl-1">atau drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, PDF (maks. 5MB)</p>
+                                        <div id="file-name-display" class="hidden text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full inline-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Catatan / Keterangan</label>
+                                <textarea id="form-catatan" rows="3" placeholder="Tambahkan catatan jika diperlukan..." class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm"></textarea>
+                            </div>
+                            <div class="flex gap-2 justify-end pt-2">
+                                <button type="button" onclick="batalPilihWarga()" class="px-6 py-2.5 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-sm font-medium">Batal</button>
+                                <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium flex items-center gap-2">
+                                    <i data-lucide="send" style="width:18px;height:18px"></i>
+                                    Submit Pembayaran
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== RIWAYAT PAGE ==================== -->
+            <div id="riwayat-page" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Riwayat Input Pembayaran</h3>
+                        <p class="text-sm text-gray-600 mt-1">Semua pembayaran PBB yang telah Anda input.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="riwayat-filter-status" onchange="loadRiwayat()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                            <option value="">Semua Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="disetujui">Disetujui</option>
+                            <option value="ditolak">Ditolak</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="riwayat-loading" class="text-center py-8 text-gray-500">Memuat riwayat...</div>
+                <div id="riwayat-empty" class="hidden text-center py-8">
+                    <i data-lucide="inbox" style="width:48px;height:48px;color:#d1d5db;margin:0 auto 0.5rem;display:block"></i>
+                    <p class="text-gray-500 text-sm">Belum ada riwayat input pembayaran.</p>
+                </div>
+                <div id="riwayat-list" class="space-y-4"></div>
+            </div>
+
+            <!-- ==================== PANDUAN PAGE ==================== -->
+            <div id="panduan-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Panduan Input Pembayaran PBB</h3>
+                    <p class="text-sm text-gray-600 mt-1">Petunjuk lengkap untuk menginput pembayaran PBB sebagai Kolektor.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-700 font-bold text-lg">1</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800">Cari Wajib Pajak</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Masukkan <strong>NOP (Nomor Objek Pajak)</strong> atau <strong>Nama Warga</strong> 
+                                pada kolom pencarian di halaman <strong>Input Pembayaran</strong>. 
+                                Sistem akan menampilkan daftar wajib pajak yang sesuai.
+                            </p>
+                            <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                <p class="text-xs text-blue-700 flex items-center gap-1">
+                                    <i data-lucide="info" style="width:14px;height:14px"></i>
+                                    Tips: Gunakan NOP untuk hasil yang lebih akurat.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-700 font-bold text-lg">2</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800">Pilih Data Warga</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Klik pada kartu hasil pencarian yang menampilkan data warga yang akan 
+                                melakukan pembayaran. Pastikan <strong>NOP, Nama, dan Alamat</strong> sesuai.
+                            </p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-700 font-bold text-lg">3</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800">Isi Form Pembayaran</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Isi detail pembayaran:
+                            </p>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="circle" style="width:6px;height:6px;color:#059669;margin-top:6px;flex-shrink:0"></i>
+                                    <span><strong>Tahun Pajak</strong> — Pilih tahun pembayaran (2020-2026)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="circle" style="width:6px;height:6px;color:#059669;margin-top:6px;flex-shrink:0"></i>
+                                    <span><strong>Jumlah Dibayar</strong> — Masukkan nominal pembayaran dalam Rupiah</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="circle" style="width:6px;height:6px;color:#059669;margin-top:6px;flex-shrink:0"></i>
+                                    <span><strong>Upload Bukti</strong> — Lampirkan foto/scan bukti pembayaran (opsional)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="circle" style="width:6px;height:6px;color:#059669;margin-top:6px;flex-shrink:0"></i>
+                                    <span><strong>Catatan</strong> — Tambahkan keterangan jika diperlukan (opsional)</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-700 font-bold text-lg">4</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800">Submit Pembayaran</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Klik tombol <strong>"Submit Pembayaran"</strong> untuk mengirim data. 
+                                Status pembayaran akan berubah menjadi <strong>"Pending"</strong> dan 
+                                menunggu persetujuan dari Admin.
+                            </p>
+                            <div class="mt-3 p-3 bg-amber-50 rounded-lg">
+                                <p class="text-xs text-amber-700 flex items-center gap-1">
+                                    <i data-lucide="clock" style="width:14px;height:14px"></i>
+                                    Pembayaran yang sudah disubmit akan diverifikasi oleh Admin.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-700 font-bold text-lg">5</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800">Cek Status di Riwayat</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 leading-relaxed">
+                                Pantau status pembayaran yang telah Anda input melalui halaman 
+                                <strong>Riwayat Input</strong>. Status dapat berupa:
+                            </p>
+                            <div class="mt-3 space-y-2">
+                                <div class="flex items-center gap-2 p-2 bg-yellow-50 rounded-lg">
+                                    <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                                    <span class="text-sm text-gray-700">Pending — Menunggu verifikasi Admin</span>
+                                </div>
+                                <div class="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                                    <span class="text-sm text-gray-700">Disetujui — Pembayaran telah diverifikasi</span>
+                                </div>
+                                <div class="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
+                                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span class="text-sm text-gray-700">Ditolak — Pembayaran ditolak (lihat alasan)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-emerald-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <i data-lucide="shield-check" style="width:24px;height:24px;color:#059669"></i>
+                                <h4 class="font-bold text-gray-800">Penting untuk Kolektor</h4>
+                            </div>
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" style="width:16px;height:16px;color:#059669;flex-shrink:0;margin-top:2px"></i>
+                                    <span>Pastikan data warga <strong>valid</strong> sebelum menginput pembayaran.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" style="width:16px;height:16px;color:#059669;flex-shrink:0;margin-top:2px"></i>
+                                    <span>Simpan bukti pembayaran fisik sebagai arsip.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" style="width:16px;height:16px;color:#059669;flex-shrink:0;margin-top:2px"></i>
+                                    <span>Jika ada kendala, hubungi Admin Desa.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" style="width:16px;height:16px;color:#059669;flex-shrink:0;margin-top:2px"></i>
+                                    <span>Jangan menginput data <strong>ganda</strong> untuk pembayaran yang sama.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // =============================
+        // AUTH CHECK
+        // =============================
+        function getAdminUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem('adminUser') || 'null');
+                return user;
+            } catch { return null; }
+        }
+
+        function getAdminToken() {
+            return localStorage.getItem('adminToken') || null;
+        }
+
+        function checkAuth() {
+            const user = getAdminUser();
+            const token = getAdminToken();
+            if (!user || !token) {
+                window.location.href = '../pages/login.html';
+                return;
+            }
+            if (user.role !== 'kolektor') {
+                window.location.href = '../pages/login.html';
+                return;
+            }
+            // Set user info
+            const displayName = user.name || user.email || 'Kolektor';
+            const displayRole = 'Kolektor';
+            for (const id of ['user-name', 'topbar-name']) document.getElementById(id).textContent = displayName;
+            for (const id of ['user-role', 'topbar-role']) document.getElementById(id).textContent = displayRole;
+            document.getElementById('kolektor-name-banner').textContent = displayName;
+        }
+
+        // =============================
+        // API HELPERS
+        // =============================
+        function apiHeaders() {
+            const token = getAdminToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            return headers;
+        }
+
+        async function apiGet(url) {
+            return fetchWithLoader(url, { headers: apiHeaders() });
+        }
+
+        async function apiPost(url, body) {
+            return fetchWithLoader(url, {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify(body)
+            });
+        }
+
+        // =============================
+        // PAGE LOADER
+        // =============================
+        function showLoader(text) {
+            const loader = document.getElementById('page-loader');
+            document.getElementById('loader-text').textContent = text || 'Memuat...';
+            loader.style.display = 'flex';
+        }
+
+        function hideLoader() {
+            document.getElementById('page-loader').style.display = 'none';
+        }
+
+        // =============================
+        // TOAST NOTIFICATION
+        // =============================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast-notif ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // =============================
+        // MODAL HELPERS
+        // =============================
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // =============================
+        // PAGE SWITCHING
+        // =============================
+        function switchPage(page, element) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            const pageContent = document.getElementById(page + '-page');
+            if (pageContent) pageContent.classList.remove('hidden');
+
+            const titles = {
+                'dashboard': 'Dashboard Kolektor',
+                'input-pembayaran': 'Input Pembayaran PBB',
+                'riwayat': 'Riwayat Input',
+                'panduan': 'Panduan'
+            };
+            document.getElementById('page-title').textContent = titles[page] || page;
+
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-emerald-800', 'text-white');
+                el.classList.add('text-emerald-200');
+            });
+            if (element) {
+                element.classList.add('active', 'bg-emerald-800', 'text-white');
+                element.classList.remove('text-emerald-200');
+            }
+
+            // Load data based on page
+            if (page === 'dashboard') loadDashboardStats();
+            else if (page === 'riwayat') loadRiwayat();
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // =============================
+        // DASHBOARD STATS
+        // =============================
+        async function loadDashboardStats() {
+            try {
+                const user = getAdminUser();
+                const res = await apiGet(API_BASE_URL + '/pbb');
+                if (!res.success) throw new Error(res.message || 'Gagal memuat data');
+
+                const allData = res.data || [];
+
+                // Filter records submitted by this kolektor
+                const myInputs = allData.filter(item =>
+                    item.kolektorId === user.id ||
+                    (item.payments || []).some(p => p.userId === user.id)
+                );
+
+                let total = myInputs.length;
+                let approved = 0;
+                let pending = 0;
+                let rejected = 0;
+
+                // Also check payments array
+                myInputs.forEach(item => {
+                    const payments = item.payments || [];
+                    if (payments.length > 0) {
+                        payments.forEach(p => {
+                            if (p.userId === user.id) {
+                                const status = (p.status || item.status || '').toLowerCase();
+                                if (status === 'disetujui' || status === 'approved' || status === 'lunas') approved++;
+                                else if (status === 'ditolak' || status === 'rejected') rejected++;
+                                else pending++;
+                            }
+                        });
+                    } else {
+                        const status = (item.status || '').toLowerCase();
+                        if (status === 'disetujui' || status === 'approved' || status === 'lunas') approved++;
+                        else if (status === 'ditolak' || status === 'rejected') rejected++;
+                        else if (status === 'pending') pending++;
+                    }
+                });
+
+                // If we couldn't identify by kolektorId, count all
+                if (total === 0) {
+                    total = allData.length;
+                    allData.forEach(item => {
+                        const status = (item.status || '').toLowerCase();
+                        if (status === 'disetujui' || status === 'approved' || status === 'lunas') approved++;
+                        else if (status === 'ditolak' || status === 'rejected') rejected++;
+                        else if (status === 'pending') pending++;
+                    });
+                }
+
+                const setText = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = val ?? '-';
+                };
+
+                setText('stat-total-input', total);
+                setText('stat-approved', approved);
+                setText('stat-pending', pending);
+                setText('stat-rejected', rejected);
+
+                setText('aktivitas-total', total);
+                setText('aktivitas-approved', approved);
+                setText('aktivitas-pending', pending);
+                setText('aktivitas-rejected', rejected);
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Dashboard stats error:', err);
+                showToast('Gagal memuat statistik dashboard', 'error');
+            }
+        }
+
+        // =============================
+        // CARI WAJIB PAJAK (Input Pembayaran)
+        // =============================
+        let selectedWajibPajak = null;
+        let allPbbData = [];
+
+        function cariWajibPajak() {
+            const query = document.getElementById('pencarian-input').value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('search-results');
+            const loading = document.getElementById('search-loading');
+            const empty = document.getElementById('search-empty');
+
+            resultsContainer.innerHTML = '';
+            empty.classList.add('hidden');
+
+            if (query.length < 2) {
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+                empty.querySelector('p').textContent = 'Ketik minimal 2 karakter untuk mencari';
+                return;
+            }
+
+            loading.classList.remove('hidden');
+
+            // Debounce: use the closure pattern
+            clearTimeout(window._cariTimeout);
+            window._cariTimeout = setTimeout(async () => {
+                try {
+                    // Try to search via API
+                    let data = [];
+                    const res = await apiGet(API_BASE_URL + '/pbb?search=' + encodeURIComponent(query));
+                    if (res.success) {
+                        data = res.data || [];
+                    }
+
+                    // If API returns no results, fall back to local filter
+                    if (data.length === 0 && allPbbData.length > 0) {
+                        data = allPbbData.filter(item =>
+                            (item.nop || '').toLowerCase().includes(query) ||
+                            (item.nama || '').toLowerCase().includes(query) ||
+                            (item.alamat || '').toLowerCase().includes(query)
+                        );
+                    }
+
+                    // If we still don't have data, try full fetch
+                    if (data.length === 0 && allPbbData.length === 0) {
+                        const fullRes = await apiGet(API_BASE_URL + '/pbb');
+                        if (fullRes.success) {
+                            allPbbData = fullRes.data || [];
+                            data = allPbbData.filter(item =>
+                                (item.nop || '').toLowerCase().includes(query) ||
+                                (item.nama || '').toLowerCase().includes(query) ||
+                                (item.alamat || '').toLowerCase().includes(query)
+                            );
+                        }
+                    }
+
+                    loading.classList.add('hidden');
+                    resultsContainer.innerHTML = '';
+
+                    if (data.length === 0) {
+                        empty.classList.remove('hidden');
+                        empty.querySelector('p').textContent = 'Tidak ditemukan data dengan kata kunci "' + escapeHtml(query) + '"';
+                        lucide.createIcons();
+                        return;
+                    }
+
+                    // Store allPbbData for later use
+                    allPbbData = data.length > allPbbData.length ? allPbbData : data;
+
+                    data.slice(0, 10).forEach(item => {
+                        const card = document.createElement('div');
+                        const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'badge-lunas' :
+                                            (item.status || '').toLowerCase() === 'pending' ? 'badge-pending' :
+                                            'badge-belum';
+                        const statusLabel = item.status || 'Belum Bayar';
+                        card.className = 'search-result-card bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md';
+                        card.innerHTML = `
+                            <div class="flex items-start justify-between gap-4" onclick="pilihWajibPajak(${item.id})">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-mono font-bold text-emerald-700 text-sm">${escapeHtml(item.nop || '-')}</span>
+                                        <span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusClass}">${escapeHtml(statusLabel)}</span>
+                                    </div>
+                                    <p class="font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</p>
+                                    <p class="text-sm text-gray-500 truncate">${escapeHtml(item.alamat || '-')}</p>
+                                    <div class="flex gap-3 mt-1 text-xs text-gray-400">
+                                        <span>Dusun: ${escapeHtml(item.dusun || '-')}</span>
+                                        <span>RW ${item.rw || '-'}/RT ${item.rt || '-'}</span>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="chevron-right" style="width:20px;height:20px;color:#9ca3af"></i>
+                                </div>
+                            </div>
+                        `;
+                        resultsContainer.appendChild(card);
+                    });
+                    lucide.createIcons();
+                } catch (err) {
+                    console.error('Search error:', err);
+                    loading.classList.add('hidden');
+                    empty.classList.remove('hidden');
+                    empty.querySelector('p').textContent = 'Gagal mencari data. Silakan coba lagi.';
+                }
+            }, 300);
+        }
+
+        function pilihWajibPajak(id) {
+            // Find the data either from search results or allPbbData
+            let item = null;
+            if (allPbbData.length > 0) {
+                item = allPbbData.find(d => d.id === id);
+            }
+            if (!item) {
+                // Try to fetch from API
+                apiGet(API_BASE_URL + '/pbb/' + id)
+                    .then(res => {
+                        if (res.success && res.data) {
+                            showPaymentForm(res.data);
+                        } else {
+                            showToast('Data wajib pajak tidak ditemukan', 'error');
+                        }
+                    })
+                    .catch(() => showToast('Gagal memuat data wajib pajak', 'error'));
+                return;
+            }
+            showPaymentForm(item);
+        }
+
+        function showPaymentForm(data) {
+            selectedWajibPajak = data;
+            document.getElementById('form-pbb-id').value = data.id || '';
+            document.getElementById('form-nop').textContent = data.nop || '-';
+            document.getElementById('form-nama').textContent = data.nama || '-';
+            document.getElementById('form-alamat').textContent = data.alamat || '-';
+            document.getElementById('form-dusun').textContent = (data.dusun || '-') + ' / RW ' + (data.rw || '-') + ' / RT ' + (data.rt || '-');
+
+            document.getElementById('payment-form-container').classList.remove('hidden');
+            document.getElementById('payment-form').reset();
+            document.getElementById('file-name-display').classList.add('hidden');
+
+            // Scroll to form
+            document.getElementById('payment-form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            lucide.createIcons();
+        }
+
+        function batalPilihWarga() {
+            selectedWajibPajak = null;
+            document.getElementById('payment-form-container').classList.add('hidden');
+            document.getElementById('payment-form').reset();
+            document.getElementById('file-name-display').classList.add('hidden');
+        }
+
+        // File upload display
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('form-bukti');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    const display = document.getElementById('file-name-display');
+                    if (this.files && this.files.length > 0) {
+                        const file = this.files[0];
+                        // Check file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                            showToast('Ukuran file maksimal 5MB', 'error');
+                            this.value = '';
+                            display.classList.add('hidden');
+                            return;
+                        }
+                        display.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                        display.classList.remove('hidden');
+                    } else {
+                        display.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // SUBMIT PAYMENT
+        // =============================
+        document.addEventListener('DOMContentLoaded', () => {
+            const paymentForm = document.getElementById('payment-form');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const pbbId = document.getElementById('form-pbb-id').value;
+                    if (!pbbId) {
+                        showToast('Silakan pilih wajib pajak terlebih dahulu', 'error');
+                        return;
+                    }
+
+                    const tahun = document.getElementById('form-tahun').value;
+                    const jumlah = document.getElementById('form-jumlah').value;
+                    const catatan = document.getElementById('form-catatan').value;
+                    const fileInput = document.getElementById('form-bukti');
+
+                    if (!tahun) {
+                        showToast('Pilih tahun pajak', 'error');
+                        return;
+                    }
+                    if (!jumlah || parseInt(jumlah) <= 0) {
+                        showToast('Masukkan jumlah pembayaran yang valid', 'error');
+                        return;
+                    }
+
+                    // Get file name as proofUrl (since actual file upload needs backend storage)
+                    let proofUrl = '';
+                    if (fileInput.files && fileInput.files.length > 0) {
+                        proofUrl = fileInput.files[0].name;
+                    }
+
+                    const user = getAdminUser();
+                    if (!user || !user.id) {
+                        showToast('Sesi login tidak valid. Silakan login ulang.', 'error');
+                        return;
+                    }
+
+                    const body = {
+                        userId: user.id,
+                        note: catatan || '',
+                        proofUrl: proofUrl,
+                        tahun: parseInt(tahun),
+                        jumlah: parseInt(jumlah)
+                    };
+
+                    try {
+                        showLoader('Mengirim pembayaran...');
+                        const res = await apiPost(API_BASE_URL + '/pbb/' + pbbId + '/proof', body);
+                        hideLoader();
+
+                        if (res.success) {
+                            showToast('Pembayaran berhasil diinput! Status: Pending');
+                            batalPilihWarga();
+                            loadDashboardStats();
+                        } else {
+                            showToast(res.message || 'Gagal menginput pembayaran', 'error');
+                        }
+                    } catch (err) {
+                        hideLoader();
+                        console.error('Submit payment error:', err);
+                        showToast('Gagal menginput pembayaran', 'error');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // RIWAYAT INPUT
+        // =============================
+        async function loadRiwayat() {
+            const container = document.getElementById('riwayat-list');
+            const loading = document.getElementById('riwayat-loading');
+            const empty = document.getElementById('riwayat-empty');
+            if (!container) return;
+
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            container.innerHTML = '';
+
+            try {
+                const user = getAdminUser();
+                const filterStatus = document.getElementById('riwayat-filter-status')?.value || '';
+
+                const res = await apiGet(API_BASE_URL + '/pbb');
+                if (!res.success) throw new Error(res.message || 'Gagal memuat data');
+
+                const allData = res.data || [];
+
+                // Filter records submitted by this kolektor
+                let myInputs = allData.filter(item =>
+                    item.kolektorId === user.id ||
+                    (item.payments || []).some(p => p.userId === user.id)
+                );
+
+                // Also show all records if none match by kolektorId
+                if (myInputs.length === 0) {
+                    myInputs = allData;
+                }
+
+                // Apply status filter
+                if (filterStatus) {
+                    myInputs = myInputs.filter(item => {
+                        const status = (item.status || '').toLowerCase();
+                        return status === filterStatus.toLowerCase();
+                    });
+                }
+
+                loading.classList.add('hidden');
+
+                if (myInputs.length === 0) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+
+                // Sort by newest first
+                myInputs.sort((a, b) => {
+                    const dateA = a.updatedAt || a.createdAt || '';
+                    const dateB = b.updatedAt || b.createdAt || '';
+                    return dateB.localeCompare(dateA);
+                });
+
+                myInputs.slice(0, 20).forEach(item => {
+                    const status = (item.status || 'Belum Bayar').toLowerCase();
+                    const statusLabel = item.status || 'Belum Bayar';
+                    let statusClass = 'badge-belum';
+                    let statusIcon = 'alert-circle';
+                    if (status === 'lunas' || status === 'disetujui' || status === 'approved') {
+                        statusClass = 'badge-approved';
+                        statusIcon = 'check-circle';
+                    } else if (status === 'pending') {
+                        statusClass = 'badge-pending';
+                        statusIcon = 'clock';
+                    } else if (status === 'ditolak' || status === 'rejected') {
+                        statusClass = 'badge-rejected';
+                        statusIcon = 'x-circle';
+                    }
+
+                    const dateStr = item.updatedAt || item.createdAt
+                        ? new Date(item.updatedAt || item.createdAt).toLocaleString('id-ID')
+                        : '-';
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-2xl shadow-lg p-5 border-l-4 ' +
+                        (status === 'lunas' || status === 'disetujui' || status === 'approved' ? 'border-green-400' :
+                         status === 'pending' ? 'border-yellow-400' :
+                         status === 'ditolak' || status === 'rejected' ? 'border-red-400' :
+                         'border-gray-300');
+
+                    // Get payment info from payments array or item
+                    const payments = item.payments || [];
+                    const myPayments = payments.filter(p => p.userId === user.id);
+                    let jumlahBayar = '';
+                    let tahunBayar = '';
+                    let catatanBayar = '';
+
+                    if (myPayments.length > 0) {
+                        const p = myPayments[0];
+                        jumlahBayar = p.jumlah ? 'Rp ' + Number(p.jumlah).toLocaleString('id-ID') : '';
+                        tahunBayar = p.tahun || '';
+                        catatanBayar = p.note || p.catatan || '';
+                    }
+
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                    <span class="font-mono font-bold text-emerald-700 text-sm">${escapeHtml(item.nop || '-')}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusClass} flex items-center gap-1">
+                                        <i data-lucide="${statusIcon}" style="width:12px;height:12px"></i>
+                                        ${escapeHtml(statusLabel)}
+                                    </span>
+                                </div>
+                                <p class="font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</p>
+                                <p class="text-sm text-gray-500">${escapeHtml(item.alamat || '-')}</p>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <p class="text-xs text-gray-400">${dateStr}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-4 text-sm">
+                            ${tahunBayar ? `<div><span class="text-gray-400">Tahun:</span> <span class="font-medium text-gray-700">${escapeHtml(tahunBayar)}</span></div>` : ''}
+                            ${jumlahBayar ? `<div><span class="text-gray-400">Jumlah:</span> <span class="font-medium text-emerald-700">${escapeHtml(jumlahBayar)}</span></div>` : ''}
+                            ${item.pajak ? `<div><span class="text-gray-400">Tagihan:</span> <span class="font-medium text-gray-700">Rp ${Number(item.pajak).toLocaleString('id-ID')}</span></div>` : ''}
+                        </div>
+                        ${catatanBayar ? `<div class="mt-2 text-sm text-gray-500 italic">"${escapeHtml(catatanBayar)}"</div>` : ''}
+                        ${item.note && !catatanBayar ? `<div class="mt-2 text-sm text-gray-500 italic">"${escapeHtml(item.note)}"</div>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load riwayat error:', err);
+                loading.classList.add('hidden');
+                container.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat riwayat.</div>';
+            }
+        }
+
+        // =============================
+        // LOGOUT
+        // =============================
+        function logout() {
+            if (!confirm('Yakin ingin logout?')) return;
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminToken');
+            window.location.href = '../pages/login.html';
+        }
+
+        // =============================
+        // UTILITY
+        // =============================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =============================
+        // INIT
+        // =============================
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+
+            // Populate year dropdown (2020-2026)
+            const tahunSelect = document.getElementById('form-tahun');
+            if (tahunSelect) {
+                const currentYear = new Date().getFullYear();
+                for (let year = 2020; year <= 2026; year++) {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.textContent = year;
+                    if (year === currentYear) opt.selected = true;
+                    tahunSelect.appendChild(opt);
+                }
+            }
+
+            loadDashboardStats();
+            lucide.createIcons();
+
+            // Hide page loader
+            setTimeout(hideLoader, 300);
+        });
+    </script>
+</body>
+</html>

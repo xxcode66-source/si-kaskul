@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard RT - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+    <script src="../assets/script.js"></script>
+    <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .toast-notif { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 1rem 1.5rem; border-radius: 0.75rem; color: white; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast-notif.show { transform: translateX(0); }
+        .toast-notif.success { background: #059669; }
+        .toast-notif.error { background: #dc2626; }
+        .toast-notif.info { background: #2563eb; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+        .status-lunas { background: #d1fae5; color: #065f46; }
+        .status-belum { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        @media (max-width: 768px) { .sidebar-mobile { transform: translateX(-100%); } .sidebar-mobile.open { transform: translateX(0); } }
+    </style>
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p id="loader-text" class="loader-text">Memuat dashboard RT...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notif"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-emerald-900 text-white shadow-xl overflow-y-auto z-40">
+        <div class="p-6 border-b border-emerald-800">
+            <h1 class="font-display text-2xl font-bold">RT Panel</h1>
+            <p class="text-emerald-200 text-xs mt-1">Desa Kasomalang Kulon</p>
+        </div>
+
+        <nav class="p-4 space-y-1">
+            <a href="#dashboard" id="nav-dashboard" onclick="switchPage('dashboard', this)" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
+                <i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>
+                Dashboard
+            </a>
+            <a href="#warga" id="nav-warga" onclick="switchPage('warga', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="users" style="width:20px;height:20px"></i>
+                Data Warga
+            </a>
+            <a href="#pbb" id="nav-pbb" onclick="switchPage('pbb', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="building2" style="width:20px;height:20px"></i>
+                Status PBB Warga
+            </a>
+            <a href="#usulan" id="nav-usulan" onclick="switchPage('usulan', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
+                Usulan Bansos
+            </a>
+        </nav>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-emerald-800 bg-emerald-950">
+            <div class="mb-3 pb-3 border-b border-emerald-800">
+                <p class="text-xs text-emerald-300 mb-1">Logged in as</p>
+                <p id="user-name" class="font-semibold text-white text-sm">-</p>
+                <p id="user-role" class="text-xs text-emerald-300">-</p>
+            </div>
+            <button onclick="logout()" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="log-out" style="width:18px;height:18px"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button id="mobile-menu-btn" onclick="toggleSidebar()" class="fixed top-4 left-4 z-50 lg:hidden bg-emerald-900 text-white p-2 rounded-lg">
+        <i data-lucide="menu" style="width:24px;height:24px"></i>
+    </button>
+
+    <!-- Main Content -->
+    <main id="main-content" class="lg:ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <nav class="bg-white shadow-md sticky top-0 z-30">
+            <div class="px-4 lg:px-8 py-4 flex items-center justify-between">
+                <h2 id="page-title" class="text-xl lg:text-2xl font-bold text-gray-800">Dashboard RT</h2>
+                <div class="flex items-center gap-3">
+                    <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
+                    <div class="hidden sm:block">
+                        <p id="topbar-name" class="text-sm font-semibold text-gray-800">-</p>
+                        <p id="topbar-role" class="text-xs text-gray-500">-</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="p-4 lg:p-8">
+
+            <!-- ==================== DASHBOARD PAGE ==================== -->
+            <div id="dashboard-page" class="page-content">
+                <!-- RT Info Banner -->
+                <div id="rt-info-banner" class="bg-emerald-100 border-l-4 border-emerald-600 rounded-xl p-4 mb-6 flex items-center gap-3">
+                    <i data-lucide="home" style="width:24px;height:24px;color:#059669"></i>
+                    <div>
+                        <p class="font-semibold text-emerald-800 text-sm">Wilayah RT <span id="rt-banner-id">-</span></p>
+                        <p class="text-xs text-emerald-600">Data yang ditampilkan khusus untuk wilayah RT Anda</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Warga</span>
+                            <i data-lucide="users" style="width:24px;height:24px;color:#10b981"></i>
+                        </div>
+                        <p id="stat-warga" class="text-3xl font-bold text-emerald-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">PBB Lunas</span>
+                            <i data-lucide="check-circle" style="width:24px;height:24px;color:#3b82f6"></i>
+                        </div>
+                        <p id="stat-lunas" class="text-3xl font-bold text-blue-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">PBB Belum Bayar</span>
+                            <i data-lucide="alert-triangle" style="width:24px;height:24px;color:#f59e0b"></i>
+                        </div>
+                        <p id="stat-belum" class="text-3xl font-bold text-amber-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Bansos</span>
+                            <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#ec4899"></i>
+                        </div>
+                        <p id="stat-bansos" class="text-3xl font-bold text-pink-600">-</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Tingkat Kepatuhan PBB</span>
+                            <i data-lucide="percent" style="width:24px;height:24px;color:#8b5cf6"></i>
+                        </div>
+                        <p id="stat-kepatuhan" class="text-3xl font-bold text-purple-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Pajak Terkumpul</span>
+                            <i data-lucide="wallet" style="width:24px;height:24px;color:#0891b2"></i>
+                        </div>
+                        <p id="stat-pajak" class="text-2xl font-bold text-cyan-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Pending PBB</span>
+                            <i data-lucide="clock" style="width:24px;height:24px;color:#dc2626"></i>
+                        </div>
+                        <p id="stat-pending" class="text-3xl font-bold text-red-600">-</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Ringkasan Wilayah RT</h3>
+                        <div id="ringkasan-list" class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Total Warga</span>
+                                <span class="text-lg font-bold text-emerald-600" id="ringkasan-warga">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                                <span class="text-sm text-gray-700">PBB Lunas</span>
+                                <span class="text-lg font-bold text-blue-600" id="ringkasan-lunas">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                                <span class="text-sm text-gray-700">PBB Belum Bayar</span>
+                                <span class="text-lg font-bold text-amber-600" id="ringkasan-belum">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-pink-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Penerima Bansos</span>
+                                <span class="text-lg font-bold text-pink-600" id="ringkasan-bansos">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Pending PBB</span>
+                                <span class="text-lg font-bold text-yellow-600" id="ringkasan-pending">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Akses Cepat</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="switchPage('warga', document.getElementById('nav-warga'))" class="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl text-left transition">
+                                <i data-lucide="users" style="width:24px;height:24px;color:#059669" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Data Warga</p>
+                            </button>
+                            <button onclick="switchPage('pbb', document.getElementById('nav-pbb'))" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition">
+                                <i data-lucide="building2" style="width:24px;height:24px;color:#2563eb" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Status PBB Warga</p>
+                            </button>
+                            <button onclick="switchPage('usulan', document.getElementById('nav-usulan'))" class="p-4 bg-pink-50 hover:bg-pink-100 rounded-xl text-left transition">
+                                <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#db2777" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Usulan Bansos</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== WARGA PAGE ==================== -->
+            <div id="warga-page" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Data Warga</h3>
+                        <p class="text-sm text-gray-600 mt-1">Daftar warga di wilayah RT <span id="warga-rt-label" class="font-semibold">-</span></p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <input id="warga-search" type="text" placeholder="Cari NOP atau Nama..." oninput="loadWargaData()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm w-full sm:w-64">
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Dusun</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RW/RT</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-right font-semibold text-sm">Total Pajak</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warga-table" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PBB PAGE ==================== -->
+            <div id="pbb-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Status PBB Warga</h3>
+                    <p class="text-sm text-gray-600 mt-1">Status pembayaran PBB untuk setiap warga di wilayah RT <span id="pbb-rt-label" class="font-semibold">-</span></p>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-white rounded-2xl p-4 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                <i data-lucide="check" style="width:20px;height:20px;color:#059669"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Lunas</p>
+                                <p id="pbb-sum-lunas" class="text-xl font-bold text-green-600">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                                <i data-lucide="clock" style="width:20px;height:20px;color:#d97706"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Pending</p>
+                                <p id="pbb-sum-pending" class="text-xl font-bold text-yellow-600">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 shadow-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                                <i data-lucide="x" style="width:20px;height:20px;color:#dc2626"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Belum Bayar</p>
+                                <p id="pbb-sum-belum" class="text-xl font-bold text-red-600">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RW/RT</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-right font-semibold text-sm">Total Pajak</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Cek NOP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pbb-table" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== USULAN BANSOS PAGE ==================== -->
+            <div id="usulan-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Usulan Bansos</h3>
+                    <p class="text-sm text-gray-600 mt-1">Ajukan usulan warga untuk menerima bantuan sosial (Bansos). Usulan akan ditinjau oleh Admin Desa.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Form Usulan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h4 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="form-input" style="width:22px;height:22px;color:#059669"></i>
+                            Form Usulan Baru
+                        </h4>
+                        <form id="usulan-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Warga <span class="text-red-500">*</span></label>
+                                <input id="usulan-nama" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama lengkap warga" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alamat <span class="text-red-500">*</span></label>
+                                <textarea id="usulan-alamat" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Alamat lengkap" required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NOP (Nomor Objek Pajak)</label>
+                                <div class="flex gap-2">
+                                    <input id="usulan-nop" type="text" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Cari berdasarkan NOP (opsional)">
+                                    <button type="button" onclick="checkNopUsulan()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium">
+                                        Cari
+                                    </button>
+                                </div>
+                                <div id="nop-result" class="mt-2 text-xs hidden"></div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Pengajuan <span class="text-red-500">*</span></label>
+                                <textarea id="usulan-alasan" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Jelaskan alasan mengapa warga ini layak menerima bansos..." required></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                <select id="usulan-kategori" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <option value="Sangat Miskin">Sangat Miskin</option>
+                                    <option value="Miskin">Miskin</option>
+                                    <option value="Lansia">Lansia</option>
+                                    <option value="Disabilitas">Disabilitas</option>
+                                    <option value="Yatim/Piatu">Yatim/Piatu</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold flex items-center justify-center gap-2">
+                                <i data-lucide="send" style="width:18px;height:18px"></i>
+                                Kirim Usulan
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Daftar Usulan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h4 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="list" style="width:22px;height:22px;color:#059669"></i>
+                            Riwayat Usulan Saya
+                        </h4>
+                        <div id="usulan-list">
+                            <div class="text-center py-8 text-gray-500">
+                                <i data-lucide="inbox" style="width:40px;height:40px;color:#9ca3af;display:block;margin:0 auto 12px"></i>
+                                <p class="text-sm">Belum ada usulan bansos yang diajukan.</p>
+                                <p class="text-xs text-gray-400 mt-1">Usulan yang Anda kirim akan muncul di sini.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ==================== MODAL CEK NOP RESULT ==================== -->
+    <div id="nop-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-lg font-bold text-gray-800">Data NOP</h4>
+                <button onclick="closeModal('nop-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <div id="nop-modal-body" class="space-y-3">
+                <p class="text-gray-500">Memuat data...</p>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button onclick="closeModal('nop-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================
+        // STATE
+        // =============================
+        let usulanData = [];
+        let wargaData = [];
+
+        // =============================
+        // AUTH CHECK
+        // =============================
+        function getAdminUser() {
+            try {
+                const user = JSON.parse(localStorage.getItem('adminUser') || 'null');
+                return user;
+            } catch { return null; }
+        }
+
+        function getAdminToken() {
+            return localStorage.getItem('adminToken') || null;
+        }
+
+        function getRtId() {
+            const user = getAdminUser();
+            if (!user) return null;
+            // The rt field can be a number or string, normalize it
+            const rt = user.rt;
+            if (rt === undefined || rt === null || rt === '') return null;
+            // Convert to string for consistent comparison, then pad if needed
+            return String(rt).trim();
+        }
+
+        function checkAuth() {
+            const user = getAdminUser();
+            const token = getAdminToken();
+            if (!user || !token) {
+                window.location.href = '../pages/login.html';
+                return;
+            }
+            // Set user info
+            const displayName = user.name || user.email || 'RT';
+            const rtLabel = user.rt ? 'RT ' + user.rt : '-';
+            const displayRole = 'Ketua RT ' + rtLabel;
+            for (const id of ['user-name', 'topbar-name']) document.getElementById(id).textContent = displayName;
+            for (const id of ['user-role', 'topbar-role']) document.getElementById(id).textContent = displayRole;
+
+            // Set RT info
+            const rtId = getRtId();
+            if (rtId) {
+                for (const id of ['rt-banner-id', 'warga-rt-label', 'pbb-rt-label']) {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = rtId;
+                }
+            }
+        }
+
+        // =============================
+        // API HELPERS
+        // =============================
+        function apiHeaders() {
+            const token = getAdminToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            return headers;
+        }
+
+        async function apiGet(url) {
+            return fetchWithLoader(url, { headers: apiHeaders() });
+        }
+
+        async function apiPost(url, body) {
+            return fetchWithLoader(url, {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify(body)
+            });
+        }
+
+        async function apiPut(url, body) {
+            return fetchWithLoader(url, {
+                method: 'PUT',
+                headers: apiHeaders(),
+                body: JSON.stringify(body)
+            });
+        }
+
+        async function apiDelete(url) {
+            return fetchWithLoader(url, {
+                method: 'DELETE',
+                headers: apiHeaders()
+            });
+        }
+
+        // =============================
+        // TOAST NOTIFICATION
+        // =============================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast-notif ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // =============================
+        // MODAL HELPERS
+        // =============================
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // =============================
+        // PAGE SWITCHING
+        // =============================
+        function switchPage(page, element) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            const pageContent = document.getElementById(page + '-page');
+            if (pageContent) pageContent.classList.remove('hidden');
+            
+            const titles = {
+                'dashboard': 'Dashboard RT',
+                'warga': 'Data Warga',
+                'pbb': 'Status PBB Warga',
+                'usulan': 'Usulan Bansos'
+            };
+            document.getElementById('page-title').textContent = titles[page] || page;
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-emerald-800', 'text-white');
+                el.classList.add('text-emerald-200');
+            });
+            if (element) {
+                element.classList.add('active', 'bg-emerald-800', 'text-white');
+                element.classList.remove('text-emerald-200');
+            }
+
+            // Load data based on page
+            if (page === 'dashboard') loadDashboardStats();
+            else if (page === 'warga') loadWargaData();
+            else if (page === 'pbb') loadPbbStatus();
+            else if (page === 'usulan') loadUsulanList();
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // =============================
+        // FILTER BY RT
+        // =============================
+        function filterByRt(items, rtField) {
+            const rtId = getRtId();
+            if (!rtId || !items) return items || [];
+            return items.filter(item => {
+                const itemRt = item[rtField || 'rt'];
+                if (itemRt === undefined || itemRt === null) return false;
+                return String(itemRt).trim() === rtId;
+            });
+        }
+
+        // =============================
+        // DASHBOARD STATS
+        // =============================
+        async function loadDashboardStats() {
+            try {
+                const rtId = getRtId();
+
+                // Fetch PBB stats overview
+                const pbbRes = await apiGet(API_BASE_URL + '/pbb/stats/overview');
+                let overviewData = null;
+                if (pbbRes.success && pbbRes.data) {
+                    overviewData = pbbRes.data;
+                }
+
+                // Fetch all PBB data to filter by RT
+                const allPbbRes = await apiGet(API_BASE_URL + '/pbb');
+                let allPbb = allPbbRes.success ? (allPbbRes.data || []) : [];
+
+                // Filter by RT if we have an RT user
+                let rtPbb = allPbb;
+                if (rtId) {
+                    rtPbb = filterByRt(allPbb, 'rt');
+                }
+
+                // Calculate stats from RT-filtered PBB data
+                const totalWarga = rtPbb.length;
+                const lunas = rtPbb.filter(w => (w.status || '').toLowerCase() === 'lunas').length;
+                const belumBayar = rtPbb.filter(w => (w.status || '').toLowerCase() === 'belum bayar' || w.status === 'Belum' || (w.status || '').toLowerCase() === 'belum').length;
+                const pending = rtPbb.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+                const totalPajak = rtPbb.reduce((sum, w) => sum + (Number(w.pajak || w.totalPajak || 0)), 0);
+                const tingkatKepatuhan = totalWarga > 0 ? Math.round((lunas / totalWarga) * 100) : 0;
+
+                // Fetch bansos data for RT
+                let bansosCount = 0;
+                try {
+                    const bansosRes = await apiGet(API_BASE_URL + '/bansos');
+                    const bansosData = bansosRes.success ? (bansosRes.data || []) : [];
+                    const rtBansos = rtId ? filterByRt(bansosData, 'rt') : bansosData;
+                    bansosCount = rtBansos.length;
+                } catch (e) {
+                    console.error('Bansos fetch error:', e);
+                }
+
+                const setText = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = val ?? '-';
+                };
+
+                setText('stat-warga', totalWarga);
+                setText('stat-lunas', lunas);
+                setText('stat-belum', belumBayar + pending);
+                setText('stat-bansos', bansosCount);
+                setText('stat-kepatuhan', tingkatKepatuhan + '%');
+                setText('stat-pajak', totalPajak > 0 ? 'Rp ' + totalPajak.toLocaleString('id-ID') : 'Rp 0');
+                setText('stat-pending', pending);
+
+                setText('ringkasan-warga', totalWarga);
+                setText('ringkasan-lunas', lunas);
+                setText('ringkasan-belum', belumBayar + pending);
+                setText('ringkasan-bansos', bansosCount);
+                setText('ringkasan-pending', pending);
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Dashboard stats error:', err);
+                showToast('Gagal memuat statistik dashboard', 'error');
+            }
+        }
+
+        // =============================
+        // WARGA DATA
+        // =============================
+        async function loadWargaData() {
+            const tbody = document.getElementById('warga-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const search = document.getElementById('warga-search')?.value || '';
+                const res = await apiGet(API_BASE_URL + '/pbb');
+                let data = res.success ? (res.data || []) : [];
+
+                // Filter by RT
+                const rtId = getRtId();
+                if (rtId) {
+                    data = filterByRt(data, 'rt');
+                }
+
+                // Apply search filter
+                if (search) {
+                    const q = search.toLowerCase();
+                    data = data.filter(item =>
+                        (item.nop || '').toLowerCase().includes(q) ||
+                        (item.nama || '').toLowerCase().includes(q) ||
+                        (item.alamat || '').toLowerCase().includes(q)
+                    );
+                }
+
+                wargaData = data;
+
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">' +
+                        (search ? 'Tidak ditemukan data dengan kata kunci "' + escapeHtml(search) + '".' : 'Belum ada data warga di wilayah RT ini.') +
+                        '</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'status-lunas' : 
+                                        (item.status || '').toLowerCase() === 'pending' ? 'status-pending' :
+                                        'status-belum';
+                    const statusLabel = item.status || 'Belum';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusun || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusLabel}</span></td>
+                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${item.pajak || item.totalPajak ? 'Rp ' + Number(item.pajak || item.totalPajak).toLocaleString('id-ID') : '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load warga error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data warga.</td></tr>';
+            }
+        }
+
+        // =============================
+        // STATUS PBB WARGA
+        // =============================
+        async function loadPbbStatus() {
+            const tbody = document.getElementById('pbb-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/pbb');
+                let data = res.success ? (res.data || []) : [];
+
+                // Filter by RT
+                const rtId = getRtId();
+                if (rtId) {
+                    data = filterByRt(data, 'rt');
+                }
+
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada data PBB di wilayah RT ini.</td></tr>';
+                    return;
+                }
+
+                // Update summary counts
+                const lunas = data.filter(w => (w.status || '').toLowerCase() === 'lunas').length;
+                const pending = data.filter(w => (w.status || '').toLowerCase() === 'pending').length;
+                const belum = data.length - lunas - pending;
+                document.getElementById('pbb-sum-lunas').textContent = lunas;
+                document.getElementById('pbb-sum-pending').textContent = pending;
+                document.getElementById('pbb-sum-belum').textContent = belum;
+
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'status-lunas' : 
+                                        (item.status || '').toLowerCase() === 'pending' ? 'status-pending' :
+                                        'status-belum';
+                    const statusLabel = item.status || 'Belum';
+                    const pajakVal = item.pajak || item.totalPajak;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusLabel}</span></td>
+                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${pajakVal ? 'Rp ' + Number(pajakVal).toLocaleString('id-ID') : '-'}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="checkNopDetail('${escapeHtml(item.nop || '')}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700 flex items-center gap-1 mx-auto">
+                                <i data-lucide="search" style="width:14px;height:14px"></i> Detail
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load PBB status error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
+            }
+        }
+
+        // =============================
+        // CHECK NOP
+        // =============================
+        async function checkNopDetail(nop) {
+            if (!nop) {
+                showToast('NOP tidak valid', 'error');
+                return;
+            }
+            try {
+                const res = await apiPost(API_BASE_URL + '/pbb/check-nop', { nop });
+                const body = document.getElementById('nop-modal-body');
+                if (!res.success || !res.data) {
+                    body.innerHTML = '<p class="text-red-500">Data tidak ditemukan untuk NOP: ' + escapeHtml(nop) + '</p>';
+                } else {
+                    const d = res.data;
+                    body.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">NOP</p>
+                                <p class="font-mono font-semibold text-gray-800">${escapeHtml(d.nop || nop)}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">Nama</p>
+                                <p class="font-semibold text-gray-800">${escapeHtml(d.nama || '-')}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg col-span-2">
+                                <p class="text-xs text-gray-500">Alamat</p>
+                                <p class="text-sm text-gray-700">${escapeHtml(d.alamat || '-')}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">Dusun</p>
+                                <p class="text-sm text-gray-800">${escapeHtml(d.dusun || '-')}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">RW/RT</p>
+                                <p class="text-sm text-gray-800">${d.rw || '-'}/${d.rt || '-'}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">Status</p>
+                                <p class="text-sm font-semibold ${(d.status || '').toLowerCase() === 'lunas' ? 'text-green-600' : 'text-red-600'}">${d.status || '-'}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">Total Pajak</p>
+                                <p class="text-sm font-semibold text-gray-800">${d.pajak || d.totalPajak ? 'Rp ' + Number(d.pajak || d.totalPajak).toLocaleString('id-ID') : '-'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+                openModal('nop-modal');
+            } catch (err) {
+                console.error('Check NOP error:', err);
+                showToast('Gagal mengecek NOP', 'error');
+            }
+        }
+
+        async function checkNopUsulan() {
+            const nop = document.getElementById('usulan-nop').value.trim();
+            if (!nop) {
+                showToast('Masukkan NOP terlebih dahulu', 'error');
+                return;
+            }
+            const resultDiv = document.getElementById('nop-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = '<span class="text-gray-500">Mengecek...</span>';
+            try {
+                const res = await apiPost(API_BASE_URL + '/pbb/check-nop', { nop });
+                if (res.success && res.data) {
+                    const d = res.data;
+                    resultDiv.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-2 text-green-700">
+                            <span class="font-medium">${escapeHtml(d.nama || '-')}</span> — ${escapeHtml(d.alamat || '')} (RW ${d.rw || '-'}/RT ${d.rt || '-'})
+                            <br><span class="text-xs">Status PBB: ${d.status || '-'}</span>
+                        </div>
+                    `;
+                    // Auto-fill nama & alamat if empty
+                    if (!document.getElementById('usulan-nama').value && d.nama) {
+                        document.getElementById('usulan-nama').value = d.nama;
+                    }
+                    if (!document.getElementById('usulan-alamat').value && d.alamat) {
+                        document.getElementById('usulan-alamat').value = d.alamat;
+                    }
+                } else {
+                    resultDiv.innerHTML = '<span class="text-red-500">Data tidak ditemukan untuk NOP: ' + escapeHtml(nop) + '</span>';
+                }
+            } catch (err) {
+                resultDiv.innerHTML = '<span class="text-red-500">Gagal mengecek NOP</span>';
+            }
+        }
+
+        // =============================
+        // USULAN BANSOS
+        // =============================
+        function loadUsulanList() {
+            const container = document.getElementById('usulan-list');
+            if (!container) return;
+
+            // Load from localStorage (mock storage since no API)
+            const stored = localStorage.getItem('rtUsulanBansos');
+            usulanData = stored ? JSON.parse(stored) : [];
+
+            // Filter by this RT user
+            const rtId = getRtId();
+            if (rtId) {
+                usulanData = usulanData.filter(u => String(u.rtId) === rtId);
+            }
+
+            if (usulanData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i data-lucide="inbox" style="width:40px;height:40px;color:#9ca3af;display:block;margin:0 auto 12px"></i>
+                        <p class="text-sm">Belum ada usulan bansos yang diajukan.</p>
+                        <p class="text-xs text-gray-400 mt-1">Usulan yang Anda kirim akan muncul di sini.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            let html = '';
+            usulanData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach((item, idx) => {
+                const statusClass = item.status === 'Disetujui' ? 'badge-approved' : 
+                                    item.status === 'Ditolak' ? 'badge-rejected' : 'badge-pending';
+                const statusLabel = item.status || 'Menunggu';
+                html += `
+                    <div class="p-4 border border-gray-200 rounded-xl mb-3 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</h5>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusLabel}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-1">${escapeHtml(item.alamat || '')}</p>
+                        ${item.kategori ? '<p class="text-xs text-gray-500 mb-1">Kategori: ' + escapeHtml(item.kategori) + '</p>' : ''}
+                        <p class="text-sm text-gray-700 mt-2 bg-gray-50 p-2 rounded">"${escapeHtml(item.alasan || '')}"</p>
+                        <p class="text-xs text-gray-400 mt-2">Diajukan: ${new Date(item.createdAt).toLocaleDateString('id-ID')}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const usulanForm = document.getElementById('usulan-form');
+            if (usulanForm) {
+                usulanForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nama = document.getElementById('usulan-nama').value.trim();
+                    const alamat = document.getElementById('usulan-alamat').value.trim();
+                    const nop = document.getElementById('usulan-nop').value.trim();
+                    const alasan = document.getElementById('usulan-alasan').value.trim();
+                    const kategori = document.getElementById('usulan-kategori').value;
+                    const user = getAdminUser();
+
+                    if (!nama || !alamat || !alasan) {
+                        showToast('Harap isi semua field yang wajib', 'error');
+                        return;
+                    }
+
+                    const usulan = {
+                        id: Date.now(),
+                        nama: nama,
+                        alamat: alamat,
+                        nop: nop,
+                        alasan: alasan,
+                        kategori: kategori,
+                        status: 'Menunggu',
+                        rtId: user?.rt || '',
+                        rtName: user?.name || '',
+                        createdAt: new Date().toISOString()
+                    };
+
+                    // Store in localStorage (mock since no backend endpoint yet)
+                    const stored = JSON.parse(localStorage.getItem('rtUsulanBansos') || '[]');
+                    stored.push(usulan);
+                    localStorage.setItem('rtUsulanBansos', JSON.stringify(stored));
+
+                    showToast('Usulan bansos berhasil dikirim! Menunggu persetujuan admin.');
+                    usulanForm.reset();
+                    document.getElementById('nop-result').classList.add('hidden');
+                    loadUsulanList();
+                });
+            }
+        });
+
+        // =============================
+        // LOGOUT
+        // =============================
+        function logout() {
+            if (!confirm('Yakin ingin logout?')) return;
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminToken');
+            window.location.href = '../pages/login.html';
+        }
+
+        // =============================
+        // UTILITY
+        // =============================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =============================
+        // INIT
+        // =============================
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadDashboardStats();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

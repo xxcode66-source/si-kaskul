@@ -8,29 +8,49 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/style.css">
+    <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .toast-notif { position: fixed; top: 1rem; right: 1rem; z-index: 100; padding: 1rem 1.5rem; border-radius: 0.75rem; color: white; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast-notif.show { transform: translateX(0); }
+        .toast-notif.success { background: #059669; }
+        .toast-notif.error { background: #dc2626; }
+        .toast-notif.info { background: #2563eb; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 768px) { .sidebar-mobile { transform: translateX(-100%); } .sidebar-mobile.open { transform: translateX(0); } }
+    </style>
 </head>
 <body class="w-full min-h-screen bg-gray-50">
+
     <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <p class="loader-text">Memuat dashboard...</p>
+            <p id="loader-text" class="loader-text">Memuat dashboard...</p>
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notif"></div>
+
     <!-- Sidebar -->
-    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-emerald-900 text-white shadow-xl overflow-y-auto">
+    <aside id="sidebar" class="fixed left-0 top-0 w-64 h-screen bg-emerald-900 text-white shadow-xl overflow-y-auto z-40">
         <div class="p-6 border-b border-emerald-800">
             <h1 class="font-display text-2xl font-bold">Admin Panel</h1>
             <p class="text-emerald-200 text-xs mt-1">Desa Kasomalang Kulon</p>
         </div>
 
-        <nav class="p-6 space-y-2">
+        <nav class="p-4 space-y-1">
             <a href="#dashboard" id="nav-dashboard" onclick="switchPage('dashboard', this)" class="nav-item active p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 bg-emerald-800 text-white">
                 <i data-lucide="layout-dashboard" style="width:20px;height:20px"></i>
                 Dashboard
             </a>
-            <a href="#berita" id="nav-berita" onclick="switchPage('berita', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#berita" id="nav-berita" onclick="switchPage('berita', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="newspaper" style="width:20px;height:20px"></i>
                 Kelola Berita
             </a>
@@ -38,29 +58,30 @@
                 <i data-lucide="building2" style="width:20px;height:20px"></i>
                 Kelola PBB
             </a>
-            <a href="#approvals" id="nav-approvals" onclick="switchPage('approvals', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#approvals" id="nav-approvals" onclick="switchPage('approvals', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="check-circle" style="width:20px;height:20px"></i>
-                Riwayat Approve
+                Persetujuan PBB
+                <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
             </a>
-            <a href="#bansos" id="nav-bansos" onclick="switchPage('bansos', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#bansos" id="nav-bansos" onclick="switchPage('bansos', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
                 Kelola Bansos
             </a>
-            <a href="#galeri" id="nav-galeri" onclick="switchPage('galeri', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
-                <i data-lucide="images" style="width:20px;height:20px"></i>
-                Kelola Galeri
+            <a href="#pengaduan" id="nav-pengaduan" onclick="switchPage('pengaduan', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="message-square" style="width:20px;height:20px"></i>
+                Pengaduan
             </a>
-            <a href="#pengguna" id="nav-pengguna" onclick="switchPage('pengguna', this)" class="nav-item admin-only p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+            <a href="#pengguna" id="nav-pengguna" onclick="switchPage('pengguna', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="users" style="width:20px;height:20px"></i>
                 Kelola Pengguna
             </a>
         </nav>
 
-        <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-emerald-800 bg-emerald-950">
-            <div class="mb-4 pb-4 border-b border-emerald-800">
-                <p class="text-xs text-emerald-300 mb-2">Logged in as</p>
-                <p id="user-name" class="font-semibold text-white">Admin User</p>
-                <p id="user-role" class="text-xs text-emerald-300">Administrator</p>
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-emerald-800 bg-emerald-950">
+            <div class="mb-3 pb-3 border-b border-emerald-800">
+                <p class="text-xs text-emerald-300 mb-1">Logged in as</p>
+                <p id="user-name" class="font-semibold text-white text-sm">-</p>
+                <p id="user-role" class="text-xs text-emerald-300">-</p>
             </div>
             <button onclick="logout()" class="w-full p-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium text-sm transition flex items-center justify-center gap-2">
                 <i data-lucide="log-out" style="width:18px;height:18px"></i>
@@ -69,594 +90,1241 @@
         </div>
     </aside>
 
+    <!-- Mobile sidebar toggle -->
+    <button id="mobile-menu-btn" onclick="toggleSidebar()" class="fixed top-4 left-4 z-50 lg:hidden bg-emerald-900 text-white p-2 rounded-lg">
+        <i data-lucide="menu" style="width:24px;height:24px"></i>
+    </button>
+
     <!-- Main Content -->
-    <main class="ml-64 min-h-screen">
+    <main id="main-content" class="lg:ml-64 min-h-screen">
         <!-- Top Bar -->
-        <nav class="bg-white shadow-md sticky top-0 z-40">
-            <div class="px-8 py-4 flex items-center justify-between">
-                <h2 id="page-title" class="text-2xl font-bold text-gray-800">Dashboard</h2>
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleMobileMenu()" class="lg:hidden text-gray-600">
-                        <i data-lucide="menu" style="width:24px;height:24px"></i>
-                    </button>
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">Admin</p>
-                            <p class="text-xs text-gray-500">Administrator</p>
-                        </div>
+        <nav class="bg-white shadow-md sticky top-0 z-30">
+            <div class="px-4 lg:px-8 py-4 flex items-center justify-between">
+                <h2 id="page-title" class="text-xl lg:text-2xl font-bold text-gray-800">Dashboard</h2>
+                <div class="flex items-center gap-3">
+                    <i data-lucide="user-circle" style="width:32px;height:32px;color:#10b981"></i>
+                    <div class="hidden sm:block">
+                        <p id="topbar-name" class="text-sm font-semibold text-gray-800">-</p>
+                        <p id="topbar-role" class="text-xs text-gray-500">-</p>
                     </div>
                 </div>
             </div>
         </nav>
 
         <!-- Content Area -->
-        <div class="p-8">
-            <!-- Dashboard Page -->
+        <div class="p-4 lg:p-8">
+
+            <!-- ==================== DASHBOARD PAGE ==================== -->
             <div id="dashboard-page" class="page-content">
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-600 text-sm font-medium">Total Penduduk</span>
                             <i data-lucide="users" style="width:24px;height:24px;color:#10b981"></i>
                         </div>
-                        <p class="text-3xl font-bold text-emerald-600">3,245</p>
+                        <p id="stat-penduduk" class="text-3xl font-bold text-emerald-600">-</p>
                     </div>
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-600 text-sm font-medium">Total Berita</span>
                             <i data-lucide="newspaper" style="width:24px;height:24px;color:#3b82f6"></i>
                         </div>
-                        <p id="stat-berita" class="text-3xl font-bold text-blue-600">0</p>
+                        <p id="stat-berita" class="text-3xl font-bold text-blue-600">-</p>
                     </div>
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-600 text-sm font-medium">Total PBB</span>
                             <i data-lucide="building2" style="width:24px;height:24px;color:#f59e0b"></i>
                         </div>
-                        <p id="stat-pbb" class="text-3xl font-bold text-amber-600">0</p>
+                        <p id="stat-pbb" class="text-3xl font-bold text-amber-600">-</p>
                     </div>
-                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg hover:shadow-xl transition">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-gray-600 text-sm font-medium">Total Bansos</span>
                             <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#ec4899"></i>
                         </div>
-                        <p id="stat-bansos" class="text-3xl font-bold text-pink-600">0</p>
+                        <p id="stat-bansos" class="text-3xl font-bold text-pink-600">-</p>
                     </div>
                 </div>
 
-                <div class="grid lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6">
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Total Pajak Terkumpul</span>
+                            <i data-lucide="wallet" style="width:24px;height:24px;color:#8b5cf6"></i>
+                        </div>
+                        <p id="stat-pajak" class="text-2xl font-bold text-purple-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Tingkat Pembayaran PBB</span>
+                            <i data-lucide="percent" style="width:24px;height:24px;color:#0891b2"></i>
+                        </div>
+                        <p id="stat-tingkat" class="text-3xl font-bold text-cyan-600">-</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-600 text-sm font-medium">Pending PBB</span>
+                            <i data-lucide="clock" style="width:24px;height:24px;color:#dc2626"></i>
+                        </div>
+                        <p id="stat-pending" class="text-3xl font-bold text-red-600">-</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
                     <div class="bg-white rounded-2xl shadow-lg p-6">
                         <h3 class="font-bold text-lg text-gray-800 mb-4">Ringkasan Aktivitas</h3>
-                        <div class="space-y-4">
+                        <div id="aktivitas-list" class="space-y-3">
                             <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
-                                <span class="text-sm text-gray-700">Berita Terbaru</span>
-                                <span class="text-lg font-bold text-emerald-600" id="berita-count">0</span>
+                                <span class="text-sm text-gray-700">Total Penduduk</span>
+                                <span class="text-lg font-bold text-emerald-600" id="aktivitas-penduduk">-</span>
                             </div>
                             <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                                <span class="text-sm text-gray-700">Objektif Pajak</span>
-                                <span class="text-lg font-bold text-blue-600">856</span>
+                                <span class="text-sm text-gray-700">Total Berita</span>
+                                <span class="text-lg font-bold text-blue-600" id="aktivitas-berita">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Total PBB</span>
+                                <span class="text-lg font-bold text-amber-600" id="aktivitas-pbb">-</span>
                             </div>
                             <div class="flex items-center justify-between p-3 bg-pink-50 rounded-lg">
-                                <span class="text-sm text-gray-700">Penerima Bansos</span>
-                                <span class="text-lg font-bold text-pink-600" id="bansos-count">0</span>
+                                <span class="text-sm text-gray-700">Total Bansos</span>
+                                <span class="text-lg font-bold text-pink-600" id="aktivitas-bansos">-</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Pending PBB</span>
+                                <span class="text-lg font-bold text-yellow-600" id="aktivitas-pending">-</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-2xl shadow-lg p-6">
-                        <h3 class="font-bold text-lg text-gray-800 mb-4">Informasi Penting</h3>
-                        <div class="space-y-3 text-sm text-gray-600">
-                            <p class="flex gap-2">
-                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
-                                <span>Sistem berjalan normal dan siap digunakan</span>
-                            </p>
-                            <p class="flex gap-2">
-                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
-                                <span>Data backup otomatis setiap hari</span>
-                            </p>
-                            <p class="flex gap-2">
-                                <i data-lucide="check-circle" style="width:20px;height:20px;color:#10b981" class="flex-shrink-0"></i>
-                                <span>Semua fitur terintegrasi dengan baik</span>
-                            </p>
+                        <h3 class="font-bold text-lg text-gray-800 mb-4">Akses Cepat</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="switchPage('berita', document.getElementById('nav-berita'))" class="p-4 bg-emerald-50 hover:bg-emerald-100 rounded-xl text-left transition">
+                                <i data-lucide="newspaper" style="width:24px;height:24px;color:#059669" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Kelola Berita</p>
+                            </button>
+                            <button onclick="switchPage('approvals', document.getElementById('nav-approvals'))" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition">
+                                <i data-lucide="check-circle" style="width:24px;height:24px;color:#2563eb" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Persetujuan PBB</p>
+                            </button>
+                            <button onclick="switchPage('bansos', document.getElementById('nav-bansos'))" class="p-4 bg-pink-50 hover:bg-pink-100 rounded-xl text-left transition">
+                                <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#db2777" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Kelola Bansos</p>
+                            </button>
+                            <button onclick="switchPage('pengaduan', document.getElementById('nav-pengaduan'))" class="p-4 bg-amber-50 hover:bg-amber-100 rounded-xl text-left transition">
+                                <i data-lucide="message-square" style="width:24px;height:24px;color:#d97706" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Pengaduan</p>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Berita Page -->
+            <!-- ==================== BERITA PAGE ==================== -->
             <div id="berita-page" class="page-content hidden">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Kelola Berita</h3>
-                    <button onclick="openBeritaForm()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                    <button onclick="openBeritaModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
                         <i data-lucide="plus" style="width:20px;height:20px"></i>
                         Tambah Berita
                     </button>
                 </div>
-
-                <!-- Berita Form (Modal) -->
-                <div id="berita-form-container" class="hidden mb-6 bg-white rounded-2xl p-6 shadow-lg">
-                    <form id="berita-form" class="space-y-4">
-                        <input type="hidden" id="berita-id">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Judul</label>
-                            <input id="berita-title" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
-                                <select id="berita-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                                    <option value="pengumuman">Pengumuman</option>
-                                    <option value="program">Program</option>
-                                    <option value="acara">Acara</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal</label>
-                                <input id="berita-date" type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Konten</label>
-                            <textarea id="berita-content" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="5" required></textarea>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
-                            <button type="button" onclick="closeBeritaForm()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Berita Table -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <table class="w-full">
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[700px]">
                         <thead>
                             <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">ID</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Judul</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Kategori</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Konten</th>
                                 <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="berita-table" class="divide-y divide-gray-200">
-                            <!-- Table rows will be loaded here -->
-                        </tbody>
+                        <tbody id="berita-table" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- PBB Page -->
+            <!-- ==================== PBB PAGE ==================== -->
             <div id="pbb-page" class="page-content hidden">
-                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">Kelola PBB</h3>
-                        <p id="pbb-subtitle" class="text-sm text-gray-600 mt-1">Menampilkan data sesuai peran Anda.</p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Kelola PBB</h3>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        <input id="pbb-search" type="text" placeholder="Cari NOP atau Nama..." oninput="loadPbbData()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm w-full sm:w-64">
                     </div>
-                    <button id="open-proof-form-button" onclick="openProofForm(null)" class="hidden px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Kirim Bukti Pembayaran</button>
                 </div>
-
-                <div id="proof-form-container" class="hidden mb-6 bg-white rounded-2xl p-6 shadow-lg">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4">Kirim Bukti Pembayaran</h4>
-                    <form id="proof-form" class="space-y-4">
-                        <input type="hidden" id="proof-pbb-id">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">NOP</label>
-                            <input id="proof-nop" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" readonly>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Catatan</label>
-                            <textarea id="proof-note" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="4" placeholder="Deskripsi pembayaran atau bukti" required></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Bukti (opsional)</label>
-                            <input id="proof-url" type="url" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="https://...">
-                        </div>
-                        <div class="flex gap-3">
-                            <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Kirim Bukti</button>
-                            <button type="button" onclick="closeProofForm()" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <table class="w-full">
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
                         <thead>
                             <tr class="bg-emerald-700 text-white">
                                 <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Tahun</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Pajak</th>
-                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
-                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pbb-table" class="divide-y divide-gray-200">
-                            <!-- Table rows will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Approval Page -->
-            <div id="approvals-page" class="page-content hidden">
-                <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">Riwayat Approve</h3>
-                        <p class="text-sm text-gray-600 mt-1">Lihat bukti pembayaran yang telah disetujui atau ditolak.</p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input id="approval-date" type="date" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
-                        <button onclick="filterApprovals()" class="px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Filter</button>
-                        <button onclick="exportApprovalCSV()" class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Export CSV</button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-emerald-700 text-white">
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Disetujui Oleh</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Dusun</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RW/RT</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Status</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Catatan</th>
+                                <th class="px-6 py-4 text-right font-semibold text-sm">Total Pajak</th>
                             </tr>
                         </thead>
-                        <tbody id="approvals-table" class="divide-y divide-gray-200">
-                            <!-- Approval rows will be loaded here -->
-                        </tbody>
+                        <tbody id="pbb-table" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Bansos Page -->
+            <!-- ==================== APPROVALS PAGE ==================== -->
+            <div id="approvals-page" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Persetujuan PBB</h3>
+                        <p class="text-sm text-gray-600 mt-1">Setujui atau tolak pembayaran PBB yang menunggu.</p>
+                    </div>
+                </div>
+                <div id="approvals-loading" class="text-center py-8 text-gray-500">Memuat data persetujuan...</div>
+                <div id="approvals-empty" class="hidden text-center py-8 text-gray-500">Tidak ada data PBB menunggu persetujuan.</div>
+                <div id="approvals-list" class="space-y-4"></div>
+            </div>
+
+            <!-- ==================== BANSOS PAGE ==================== -->
             <div id="bansos-page" class="page-content hidden">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Kelola Bansos</h3>
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <table class="w-full">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Kelola Bansos</h3>
+                    <button onclick="openBansosModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                        <i data-lucide="plus" style="width:20px;height:20px"></i>
+                        Tambah Penerima
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[700px]">
                         <thead>
                             <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">No</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">RT/RW</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RT</th>
                                 <th class="px-6 py-4 text-left font-semibold text-sm">Program</th>
                                 <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="bansos-table" class="divide-y divide-gray-200">
-                            <!-- Table rows will be loaded here -->
-                        </tbody>
+                        <tbody id="bansos-table" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Other Pages (Placeholder) -->
-            <div id="galeri-page" class="page-content hidden text-center text-gray-500">
-                <p class="text-lg">Fitur Kelola Galeri akan segera hadir</p>
+            <!-- ==================== PENGADUAN PAGE ==================== -->
+            <div id="pengaduan-page" class="page-content hidden">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Pengaduan Masyarakat</h3>
+                    <p class="text-sm text-gray-600 mt-1">Kelola dan tanggapi pengaduan warga.</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Kontak</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Jenis</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Pesan</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pengaduan-table" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div id="pengguna-page" class="page-content hidden text-center text-gray-500">
-                <p class="text-lg">Fitur Kelola Pengguna akan segera hadir</p>
+            <!-- ==================== PENGGUNA PAGE ==================== -->
+            <div id="pengguna-page" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Kelola Pengguna</h3>
+                    <button onclick="openUserModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                        <i data-lucide="user-plus" style="width:20px;height:20px"></i>
+                        Tambah User
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full min-w-[700px]">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white">
+                                <th class="px-6 py-4 text-left font-semibold text-sm">ID</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Email</th>
+                                <th class="px-6 py-4 text-left font-semibold text-sm">Role</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RT</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">RW</th>
+                                <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table" class="divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </main>
 
+    <!-- ==================== MODAL BERITA ==================== -->
+    <div id="berita-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 id="berita-modal-title" class="text-lg font-bold text-gray-800">Tambah Berita</h4>
+                <button onclick="closeModal('berita-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="berita-form" class="space-y-4">
+                <input type="hidden" id="berita-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul</label>
+                    <input id="berita-title" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                    <select id="berita-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        <option value="program">Program</option>
+                        <option value="pengumuman">Pengumuman</option>
+                        <option value="pembangunan">Pembangunan</option>
+                        <option value="wisata">Wisata</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Konten</label>
+                    <textarea id="berita-content" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="5" required></textarea>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeModal('berita-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL BANSOS ==================== -->
+    <div id="bansos-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 id="bansos-modal-title" class="text-lg font-bold text-gray-800">Tambah Penerima Bansos</h4>
+                <button onclick="closeModal('bansos-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="bansos-form" class="space-y-4">
+                <input type="hidden" id="bansos-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                    <input id="bansos-nama" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                    <input id="bansos-alamat" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">RT</label>
+                        <input id="bansos-rt" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                        <select id="bansos-program" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            <option value="">Pilih Program...</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="bansos-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Nonaktif">Nonaktif</option>
+                        <option value="Menunggu">Menunggu</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeModal('bansos-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL USER ==================== -->
+    <div id="user-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 id="user-modal-title" class="text-lg font-bold text-gray-800">Tambah User</h4>
+                <button onclick="closeModal('user-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="user-form" class="space-y-4">
+                <input type="hidden" id="user-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                    <input id="user-name" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input id="user-email" type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password <span id="user-pw-hint" class="text-xs text-gray-400">(kosongkan jika tidak diubah)</span></label>
+                    <input id="user-password" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <select id="user-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            <option value="admin">Admin</option>
+                            <option value="kolektor">Kolektor</option>
+                            <option value="rt">RT</option>
+                            <option value="rw">RW</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">RT</label>
+                        <input id="user-rt" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">RW</label>
+                        <input id="user-rw" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeModal('user-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL PENGADUAN REPLY ==================== -->
+    <div id="pengaduan-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-lg font-bold text-gray-800">Tanggapi Pengaduan</h4>
+                <button onclick="closeModal('pengaduan-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="pengaduan-form" class="space-y-4">
+                <input type="hidden" id="pengaduan-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="pengaduan-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        <option value="Diterima">Diterima</option>
+                        <option value="Diproses">Diproses</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Balasan</label>
+                    <textarea id="pengaduan-balasan" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="4" placeholder="Tulis balasan untuk pengadu..."></textarea>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeModal('pengaduan-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../assets/script.js"></script>
     <script>
-        function getLoggedUser() {
+        // =============================
+        // AUTH CHECK
+        // =============================
+        function getAdminUser() {
             try {
-                const user = JSON.parse(localStorage.getItem('loggedUser') || 'null');
-                if (user && user.role === 'collector') {
-                    user.role = 'kolektor';
-                    localStorage.setItem('loggedUser', JSON.stringify(user));
-                }
+                const user = JSON.parse(localStorage.getItem('adminUser') || 'null');
                 return user;
-            } catch (error) {
-                return null;
-            }
+            } catch { return null; }
         }
 
-        function isKolektorRole(role) {
-            return role === 'kolektor' || role === 'collector';
+        function getAdminToken() {
+            return localStorage.getItem('adminToken') || null;
         }
 
         function checkAuth() {
-            const user = getLoggedUser();
-            if (!user) {
+            const user = getAdminUser();
+            const token = getAdminToken();
+            if (!user || !token) {
                 window.location.href = '../pages/login.html';
                 return;
             }
-
-            const userNameEl = document.getElementById('user-name');
-            const userRoleEl = document.getElementById('user-role');
-            if (userNameEl) userNameEl.textContent = user.name || 'Pengguna';
-            if (userRoleEl) userRoleEl.textContent = user.role === 'admin' ? 'Administrator' : isKolektorRole(user.role) ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : 'Pengguna';
-
-            setRoleNavigation(user.role);
-            loadDashboardStats();
+            // Set user info
+            const displayName = user.name || user.email || 'Admin';
+            const displayRole = user.role === 'admin' ? 'Administrator' : user.role === 'kolektor' ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : user.role === 'rw' ? 'Ketua RW' : user.role || '-';
+            for (const id of ['user-name', 'topbar-name']) document.getElementById(id).textContent = displayName;
+            for (const id of ['user-role', 'topbar-role']) document.getElementById(id).textContent = displayRole;
         }
 
-        function setRoleNavigation(role) {
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = role === 'admin' ? 'flex' : 'none';
+        // =============================
+        // API HELPERS
+        // =============================
+        function apiHeaders() {
+            const token = getAdminToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            return headers;
+        }
+
+        async function apiGet(url) {
+            return fetchWithLoader(url, { headers: apiHeaders() });
+        }
+
+        async function apiPost(url, body) {
+            return fetchWithLoader(url, {
+                method: 'POST',
+                headers: apiHeaders(),
+                body: JSON.stringify(body)
             });
-
-            if (isKolektorRole(role) || role === 'rt') {
-                const openProofButton = document.getElementById('open-proof-form-button');
-                if (openProofButton) openProofButton.classList.remove('hidden');
-            } else {
-                const openProofButton = document.getElementById('open-proof-form-button');
-                if (openProofButton) openProofButton.classList.add('hidden');
-            }
         }
 
-        // Page switching
+        async function apiPut(url, body) {
+            return fetchWithLoader(url, {
+                method: 'PUT',
+                headers: apiHeaders(),
+                body: JSON.stringify(body)
+            });
+        }
+
+        async function apiDelete(url) {
+            return fetchWithLoader(url, {
+                method: 'DELETE',
+                headers: apiHeaders()
+            });
+        }
+
+        // =============================
+        // TOAST NOTIFICATION
+        // =============================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast-notif ' + type + ' show';
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // =============================
+        // MODAL HELPERS
+        // =============================
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // =============================
+        // PAGE SWITCHING
+        // =============================
         function switchPage(page, element) {
             document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
             const pageContent = document.getElementById(page + '-page');
             if (pageContent) pageContent.classList.remove('hidden');
-            document.getElementById('page-title').textContent = getPageTitle(page);
             
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-emerald-800', 'text-white'));
-            if (element) {
-                element.closest('.nav-item').classList.add('active', 'bg-emerald-800', 'text-white');
-            }
-
-            if (page === 'berita') loadBeritaData();
-            if (page === 'pbb') loadPbbData();
-            if (page === 'bansos') loadBansosData();
-            if (page === 'approvals') loadApprovals();
-        }
-
-        function getPageTitle(page) {
             const titles = {
                 'dashboard': 'Dashboard',
                 'berita': 'Kelola Berita',
                 'pbb': 'Kelola PBB',
                 'bansos': 'Kelola Bansos',
-                'galeri': 'Kelola Galeri',
+                'pengaduan': 'Pengaduan Masyarakat',
                 'pengguna': 'Kelola Pengguna',
-                'approvals': 'Riwayat Approve'
+                'approvals': 'Persetujuan PBB'
             };
-            return titles[page] || page;
+            document.getElementById('page-title').textContent = titles[page] || page;
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'bg-emerald-800', 'text-white');
+                el.classList.add('text-emerald-200');
+            });
+            if (element) {
+                element.classList.add('active', 'bg-emerald-800', 'text-white');
+                element.classList.remove('text-emerald-200');
+            }
+
+            // Load data based on page
+            if (page === 'dashboard') loadDashboardStats();
+            else if (page === 'berita') loadBerita();
+            else if (page === 'pbb') loadPbbData();
+            else if (page === 'bansos') { loadBansosPrograms(); loadBansos(); }
+            else if (page === 'pengaduan') loadPengaduan();
+            else if (page === 'pengguna') loadUsers();
+            else if (page === 'approvals') loadPendingApprovals();
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
         }
 
-        function loadDashboardStats() {
-            fetchWithLoader(`${API_BASE_URL}/dashboard/stats`)
-                .then(response => {
-                    if (!response.success) throw new Error('Gagal memuat statistik');
-                    const data = response.data;
-                    document.getElementById('stat-berita').textContent = data.totalBerita;
-                    document.getElementById('stat-pbb').textContent = data.totalPBB;
-                    document.getElementById('stat-bansos').textContent = data.totalBansos;
-                    document.getElementById('berita-count').textContent = data.totalBerita;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
         }
 
-        function openBeritaForm() {
-            document.getElementById('berita-form-container').classList.remove('hidden');
-            document.getElementById('berita-form').reset();
-            document.getElementById('berita-id').value = '';
+        // =============================
+        // DASHBOARD STATS
+        // =============================
+        async function loadDashboardStats() {
+            try {
+                const res = await apiGet(API_BASE_URL + '/dashboard/stats');
+                if (!res.success) throw new Error(res.message || 'Gagal memuat statistik');
+                const d = res.data;
+                
+                const setText = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = val ?? '-';
+                };
+
+                setText('stat-penduduk', d.totalPenduduk ?? '-');
+                setText('stat-berita', d.totalBerita ?? '-');
+                setText('stat-pbb', d.totalPBB ?? '-');
+                setText('stat-bansos', d.totalBansos ?? '-');
+                setText('stat-pajak', d.totalPajakTerkumpul != null ? 'Rp ' + Number(d.totalPajakTerkumpul).toLocaleString('id-ID') : '-');
+                setText('stat-tingkat', d.tingkatPembayaranPBB != null ? d.tingkatPembayaranPBB + '%' : '-');
+                setText('stat-pending', d.pendingPBB ?? '-');
+
+                setText('aktivitas-penduduk', d.totalPenduduk ?? '-');
+                setText('aktivitas-berita', d.totalBerita ?? '-');
+                setText('aktivitas-pbb', d.totalPBB ?? '-');
+                setText('aktivitas-bansos', d.totalBansos ?? '-');
+                setText('aktivitas-pending', d.pendingPBB ?? '-');
+
+                // Pending badge
+                const badge = document.getElementById('pending-badge');
+                if (badge) {
+                    const pending = d.pendingPBB || 0;
+                    if (pending > 0) {
+                        badge.textContent = pending;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Dashboard stats error:', err);
+                showToast('Gagal memuat statistik dashboard', 'error');
+            }
         }
 
-        function closeBeritaForm() {
-            document.getElementById('berita-form-container').classList.add('hidden');
-        }
-
-        function loadBeritaData() {
-            const data = [
-                { id: 1, title: 'Program Pelatihan', category: 'program', date: '2024-01-15' },
-                { id: 2, title: 'Pengumuman Bansos', category: 'pengumuman', date: '2024-01-10' }
-            ];
-
-            document.getElementById('stat-berita').textContent = data.length;
-            document.getElementById('berita-count').textContent = data.length;
-
+        // =============================
+        // BERITA CRUD
+        // =============================
+        async function loadBerita() {
             const tbody = document.getElementById('berita-table');
             if (!tbody) return;
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition';
-                row.innerHTML = `
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.title}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.category}</td>
-                    <td class="px-6 py-4 text-sm text-gray-700">${item.date}</td>
-                    <td class="px-6 py-4 text-center space-x-2">
-                        <button onclick="editBerita(${item.id})" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Edit</button>
-                        <button onclick="deleteBerita(${item.id})" class="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/berita');
+                const data = res.success ? (res.data || []) : [];
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Belum ada berita.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : (item.date || '-');
+                    const contentPreview = (item.content || item.konten || '').substring(0, 80) + ((item.content || item.konten || '').length > 80 ? '...' : '');
+                    const title = item.title || item.judul || '-';
+                    const category = item.category || item.kategori || '-';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600">${item.id || '-'}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(title)}</td>
+                        <td class="px-6 py-4 text-sm"><span class="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">${escapeHtml(category)}</span></td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${escapeHtml(contentPreview)}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editBerita(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Edit</button>
+                            <button onclick="deleteBerita(${item.id})" class="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load berita error:', err);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function openBeritaModal(data) {
+            const modal = document.getElementById('berita-modal');
+            const form = document.getElementById('berita-form');
+            form.reset();
+            document.getElementById('berita-id').value = '';
+            document.getElementById('berita-modal-title').textContent = 'Tambah Berita';
+            if (data) {
+                document.getElementById('berita-modal-title').textContent = 'Edit Berita';
+                document.getElementById('berita-id').value = data.id;
+                document.getElementById('berita-title').value = data.title || data.judul || '';
+                document.getElementById('berita-category').value = data.category || data.kategori || 'program';
+                document.getElementById('berita-content').value = data.content || data.konten || '';
+            }
+            openModal('berita-modal');
         }
 
         function editBerita(id) {
-            openBeritaForm();
-            document.getElementById('berita-id').value = id;
-            document.getElementById('berita-title').value = 'Sample Title';
-            document.getElementById('berita-category').value = 'program';
-        }
-
-        function deleteBerita(id) {
-            if (confirm('Yakin ingin menghapus berita ini?')) {
-                alert('Berita dihapus');
-                loadBeritaData();
-            }
-        }
-
-        function openProofForm(pbbId = null, nop = '') {
-            const formContainer = document.getElementById('proof-form-container');
-            if (!formContainer) return;
-            formContainer.classList.remove('hidden');
-            document.getElementById('proof-pbb-id').value = pbbId || '';
-            document.getElementById('proof-nop').value = nop || '';
-            document.getElementById('proof-note').value = '';
-            document.getElementById('proof-url').value = '';
-        }
-
-        function closeProofForm() {
-            const formContainer = document.getElementById('proof-form-container');
-            if (!formContainer) return;
-            formContainer.classList.add('hidden');
-        }
-
-        function loadPbbData() {
-            const user = getLoggedUser();
-            if (!user) return;
-
-            fetchWithLoader(`${API_BASE_URL}/pbb/accessible`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id })
-            })
-                .then(response => {
-                    if (!response.success) throw new Error('Gagal memuat data PBB');
-                    const data = response.data || [];
-                    const subtitle = document.getElementById('pbb-subtitle');
-                    if (subtitle) subtitle.textContent = `Data PBB untuk peran ${user.role.toUpperCase()}`;
-                    const tbody = document.getElementById('pbb-table');
-                    if (!tbody) return;
-                    tbody.innerHTML = '';
-
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-50 transition';
-                        const proofButton = (isKolektorRole(user.role) || user.role === 'rt') ? `<button onclick="openProofForm(${item.id}, '${item.nop}')" class="px-3 py-1 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700">Bukti</button>` : '';
-                        const approveButton = user.role === 'admin' ? `<button onclick="approvePbb(${item.id}, '${item.nop}')" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Approve</button>` : '';
-                        row.innerHTML = `
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.year || '-'}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">Rp ${Number(item.pajak).toLocaleString('id-ID')}</td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${item.status.toLowerCase() === 'lunas' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${item.status}</span>
-                            </td>
-                            <td class="px-6 py-4 text-center space-x-2">${proofButton}${approveButton}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
+            // Fetch single berita to populate form
+            apiGet(API_BASE_URL + '/berita')
+                .then(res => {
+                    const data = res.data || [];
+                    const item = data.find(b => b.id === id);
+                    if (item) {
+                        openBeritaModal(item);
+                    } else {
+                        showToast('Berita tidak ditemukan', 'error');
+                    }
                 })
-                .catch(error => console.error(error));
+                .catch(() => showToast('Gagal memuat data berita', 'error'));
         }
 
-        function approvePbb(pbbId, nop) {
-            const note = prompt(`Beri catatan untuk NOP ${nop} (opsional)`);
-            if (note === null) return;
-            const user = getLoggedUser();
-            if (!user) return;
-            fetchWithLoader(`${API_BASE_URL}/pbb/${pbbId}/approve`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id, approveStatus: 'Disetujui', note })
-            })
-                .then(() => {
-                    alert('Pembayaran diproses dan disetujui.');
-                    loadPbbData();
-                })
-                .catch(error => console.error(error));
-        }
-
-        const proofForm = document.getElementById('proof-form');
-        if (proofForm) {
-            proofForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const pbbId = document.getElementById('proof-pbb-id').value;
-                const note = document.getElementById('proof-note').value;
-                const proofUrl = document.getElementById('proof-url').value;
-                const user = getLoggedUser();
-                if (!user || !pbbId) return;
-
-                fetchWithLoader(`${API_BASE_URL}/pbb/${pbbId}/proof`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: user.id, note, proofUrl })
-                })
-                    .then(() => {
-                        alert('Bukti pembayaran dikirim. Tunggu approval admin.');
-                        closeProofForm();
-                        loadPbbData();
-                    })
-                    .catch(error => console.error(error));
-            });
-        }
-
-        function loadApprovals(date = '') {
-            const url = date ? `${API_BASE_URL}/pbb/approvals?date=${date}` : `${API_BASE_URL}/pbb/approvals`;
-            fetchWithLoader(url)
-                .then(response => {
-                    if (!response.success) throw new Error('Gagal memuat approvals');
-                    const tbody = document.getElementById('approvals-table');
-                    if (!tbody) return;
-                    tbody.innerHTML = '';
-                    response.data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-50 transition';
-                        row.innerHTML = `
-                            <td class="px-6 py-4 text-sm text-gray-700">${new Date(item.approvedAt).toLocaleString('id-ID')}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.nop}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.nama}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.approvedBy}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.approveStatus}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${item.note}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error(error));
-        }
-
-        function filterApprovals() {
-            const date = document.getElementById('approval-date').value;
-            loadApprovals(date);
-        }
-
-        function exportApprovalCSV() {
-            window.location.href = `${API_BASE_URL}/pbb/approvals/export`;
-        }
-
-        function uploadPbbData() {
-            const rawData = document.getElementById('pbb-upload-data').value;
-            let payload;
+        async function deleteBerita(id) {
+            if (!confirm('Yakin ingin menghapus berita ini?')) return;
             try {
-                payload = JSON.parse(rawData);
+                const res = await apiDelete(API_BASE_URL + '/berita/' + id);
+                if (res.success) {
+                    showToast('Berita berhasil dihapus');
+                    loadBerita();
+                } else {
+                    showToast(res.message || 'Gagal menghapus berita', 'error');
+                }
             } catch (err) {
-                return alert('Format data tidak valid. Gunakan JSON array.');
+                showToast('Gagal menghapus berita', 'error');
             }
-            fetchWithLoader(`${API_BASE_URL}/pbb/upload`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: payload })
-            })
-                .then(response => {
-                    if (!response.success) throw new Error('Upload gagal');
-                    alert('Data PBB berhasil diunggah.');
-                    document.getElementById('pbb-upload-data').value = '';
-                    loadPbbData();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const beritaForm = document.getElementById('berita-form');
+            if (beritaForm) {
+                beritaForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('berita-id').value;
+                    const title = document.getElementById('berita-title').value;
+                    const category = document.getElementById('berita-category').value;
+                    const content = document.getElementById('berita-content').value;
+                    const body = { title, category, content };
+
+                    try {
+                        let res;
+                        if (id) {
+                            res = await apiPut(API_BASE_URL + '/berita/' + id, body);
+                        } else {
+                            res = await apiPost(API_BASE_URL + '/berita', body);
+                        }
+                        if (res.success) {
+                            showToast(id ? 'Berita berhasil diperbarui' : 'Berita berhasil ditambahkan');
+                            closeModal('berita-modal');
+                            loadBerita();
+                        } else {
+                            showToast(res.message || 'Gagal menyimpan berita', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Gagal menyimpan berita', 'error');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // BANSOS CRUD
+        // =============================
+        async function loadBansosPrograms() {
+            const select = document.getElementById('bansos-program');
+            if (!select) return;
+            try {
+                const res = await apiGet(API_BASE_URL + '/bansos/programs');
+                const programs = res.success ? (res.data || []) : [];
+                select.innerHTML = '<option value="">Pilih Program...</option>';
+                programs.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.name || p;
+                    opt.textContent = p.name || p;
+                    select.appendChild(opt);
+                });
+            } catch (err) {
+                console.error('Load programs error:', err);
+            }
+        }
+
+        async function loadBansos() {
+            const tbody = document.getElementById('bansos-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/bansos');
+                const data = res.success ? (res.data || []) : [];
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada data bansos.</td></tr>';
+                    return;
+                }
+                data.forEach((item, idx) => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const statusClass = item.status === 'Aktif' ? 'bg-green-100 text-green-700' : item.status === 'Nonaktif' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600">${idx + 1}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.program || '-')}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editBansos(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Edit</button>
+                            <button onclick="deleteBansos(${item.id})" class="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load bansos error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function openBansosModal(data) {
+            const form = document.getElementById('bansos-form');
+            form.reset();
+            document.getElementById('bansos-id').value = '';
+            document.getElementById('bansos-modal-title').textContent = 'Tambah Penerima Bansos';
+            if (data) {
+                document.getElementById('bansos-modal-title').textContent = 'Edit Penerima Bansos';
+                document.getElementById('bansos-id').value = data.id;
+                document.getElementById('bansos-nama').value = data.nama || '';
+                document.getElementById('bansos-alamat').value = data.alamat || '';
+                document.getElementById('bansos-rt').value = data.rt || '';
+                document.getElementById('bansos-program').value = data.program || '';
+                document.getElementById('bansos-status').value = data.status || 'Aktif';
+            }
+            openModal('bansos-modal');
+        }
+
+        function editBansos(id) {
+            apiGet(API_BASE_URL + '/bansos')
+                .then(res => {
+                    const data = res.data || [];
+                    const item = data.find(b => b.id === id);
+                    if (item) {
+                        openBansosModal(item);
+                    } else {
+                        showToast('Data bansos tidak ditemukan', 'error');
+                    }
                 })
-                .catch(error => console.error(error));
+                .catch(() => showToast('Gagal memuat data bansos', 'error'));
         }
 
-        function prefillPbbUploadData() {
-            const sample = [
-                { nop: '1234567890123458', nama: 'Rudi Hadi', alamat: 'Jl. Merdeka No. 21', rt: '01/01', rw: '01', year: 2024, pajak: 450000, status: 'Nunggak' },
-                { nop: '1234567890123459', nama: 'Dewi Kurnia', alamat: 'Jl. Melati No. 9', rt: '02/01', rw: '01', year: 2025, pajak: 550000, status: 'Lunas' }
-            ];
-            document.getElementById('pbb-upload-data').value = JSON.stringify(sample, null, 2);
+        async function deleteBansos(id) {
+            if (!confirm('Yakin ingin menghapus data bansos ini?')) return;
+            try {
+                const res = await apiDelete(API_BASE_URL + '/bansos/' + id);
+                if (res.success) {
+                    showToast('Data bansos berhasil dihapus');
+                    loadBansos();
+                } else {
+                    showToast(res.message || 'Gagal menghapus data', 'error');
+                }
+            } catch (err) {
+                showToast('Gagal menghapus data bansos', 'error');
+            }
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const bansosForm = document.getElementById('bansos-form');
+            if (bansosForm) {
+                bansosForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('bansos-id').value;
+                    const nama = document.getElementById('bansos-nama').value;
+                    const alamat = document.getElementById('bansos-alamat').value;
+                    const rt = document.getElementById('bansos-rt').value;
+                    const program = document.getElementById('bansos-program').value;
+                    const status = document.getElementById('bansos-status').value;
+                    const body = { nama, alamat, rt, program, status };
+
+                    try {
+                        let res;
+                        if (id) {
+                            res = await apiPut(API_BASE_URL + '/bansos/' + id, body);
+                        } else {
+                            res = await apiPost(API_BASE_URL + '/bansos', body);
+                        }
+                        if (res.success) {
+                            showToast(id ? 'Data bansos berhasil diperbarui' : 'Data bansos berhasil ditambahkan');
+                            closeModal('bansos-modal');
+                            loadBansos();
+                        } else {
+                            showToast(res.message || 'Gagal menyimpan data', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Gagal menyimpan data bansos', 'error');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // PBB DATA
+        // =============================
+        async function loadPbbData() {
+            const tbody = document.getElementById('pbb-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const search = document.getElementById('pbb-search')?.value || '';
+                let url = API_BASE_URL + '/pbb';
+                if (search) url += '?search=' + encodeURIComponent(search);
+                const res = await apiGet(url);
+                const data = res.success ? (res.data || []) : [];
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">' + (search ? 'Tidak ditemukan data dengan kata kunci "' + escapeHtml(search) + '".' : 'Belum ada data PBB.') + '</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'bg-green-100 text-green-700' : 
+                                        (item.status || '').toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusun || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${item.pajak || item.totalPajak ? 'Rp ' + Number(item.pajak || item.totalPajak).toLocaleString('id-ID') : '-'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Load PBB error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
+            }
+        }
+
+        // =============================
+        // PENDING APPROVALS
+        // =============================
+        async function loadPendingApprovals() {
+            const container = document.getElementById('approvals-list');
+            const loading = document.getElementById('approvals-loading');
+            const empty = document.getElementById('approvals-empty');
+            if (!container) return;
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            container.innerHTML = '';
+            try {
+                const res = await apiGet(API_BASE_URL + '/pbb');
+                const allData = res.success ? (res.data || []) : [];
+                const pending = allData.filter(item => (item.status || '').toLowerCase() === 'pending');
+                loading.classList.add('hidden');
+                if (pending.length === 0) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+                pending.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-400';
+                    const dateStr = item.updatedAt ? new Date(item.updatedAt).toLocaleString('id-ID') : (item.createdAt ? new Date(item.createdAt).toLocaleString('id-ID') : '-');
+                    card.innerHTML = `
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <p class="text-xs text-gray-500">NOP</p>
+                                <p class="font-mono font-semibold text-gray-800">${escapeHtml(item.nop || '-')}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Nama</p>
+                                <p class="font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Alamat</p>
+                                <p class="text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Tanggal</p>
+                                <p class="text-sm text-gray-600">${dateStr}</p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500">Catatan Pengaju</p>
+                            <p class="text-sm text-gray-700 italic">"${escapeHtml(item.note || item.catatan || '-')}"</p>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="approvePbb(${item.id}, true)" class="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium flex items-center gap-2">
+                                <i data-lucide="check" style="width:18px;height:18px"></i> Setujui
+                            </button>
+                            <button onclick="approvePbb(${item.id}, false)" class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium flex items-center gap-2">
+                                <i data-lucide="x" style="width:18px;height:18px"></i> Tolak
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Load pending approvals error:', err);
+                loading.classList.add('hidden');
+                container.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat data persetujuan.</div>';
+            }
+        }
+
+        async function approvePbb(pbbId, approve) {
+            const status = approve ? 'Disetujui' : 'Ditolak';
+            let note = '';
+            if (!approve) {
+                note = prompt('Alasan penolakan:');
+                if (note === null) return; // user cancelled
+                if (!note.trim()) {
+                    showToast('Alasan penolakan harus diisi', 'error');
+                    return;
+                }
+            } else {
+                note = prompt('Catatan (opsional):') || '';
+            }
+            try {
+                const user = getAdminUser();
+                const res = await apiPost(API_BASE_URL + '/pbb/' + pbbId + '/approve', {
+                    userId: user?.id || 0,
+                    approveStatus: status,
+                    note: note
+                });
+                if (res.success) {
+                    showToast('Pembayaran berhasil ' + (approve ? 'disetujui' : 'ditolak'));
+                    loadPendingApprovals();
+                    loadDashboardStats();
+                } else {
+                    showToast(res.message || 'Gagal memproses persetujuan', 'error');
+                }
+            } catch (err) {
+                showToast('Gagal memproses persetujuan', 'error');
+            }
+        }
+
+        // =============================
+        // USERS CRUD
+        // =============================
+        async function loadUsers() {
+            const tbody = document.getElementById('users-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/users');
+                const data = res.success ? (res.data || []) : [];
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada pengguna.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const roleClass = item.role === 'admin' ? 'bg-purple-100 text-purple-700' : item.role === 'kolektor' ? 'bg-blue-100 text-blue-700' : item.role === 'rt' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600">${item.id || '-'}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.name || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.email || '-')}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${roleClass}">${item.role || '-'}</span></td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="editUser(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Edit</button>
+                            <button onclick="deleteUser(${item.id})" class="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Load users error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function openUserModal(data) {
+            const form = document.getElementById('user-form');
+            form.reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('user-modal-title').textContent = 'Tambah User';
+            document.getElementById('user-password').required = true;
+            document.getElementById('user-pw-hint').textContent = '(wajib diisi)';
+            if (data) {
+                document.getElementById('user-modal-title').textContent = 'Edit User';
+                document.getElementById('user-id').value = data.id;
+                document.getElementById('user-name').value = data.name || '';
+                document.getElementById('user-email').value = data.email || '';
+                document.getElementById('user-role').value = data.role || 'admin';
+                document.getElementById('user-rt').value = data.rt || '';
+                document.getElementById('user-rw').value = data.rw || '';
+                document.getElementById('user-password').required = false;
+                document.getElementById('user-pw-hint').textContent = '(kosongkan jika tidak diubah)';
+            }
+            openModal('user-modal');
+        }
+
+        function editUser(id) {
+            apiGet(API_BASE_URL + '/users')
+                .then(res => {
+                    const data = res.data || [];
+                    const item = data.find(u => u.id === id);
+                    if (item) {
+                        openUserModal(item);
+                    } else {
+                        showToast('User tidak ditemukan', 'error');
+                    }
+                })
+                .catch(() => showToast('Gagal memuat data user', 'error'));
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('Yakin ingin menghapus user ini?')) return;
+            try {
+                const res = await apiDelete(API_BASE_URL + '/users/' + id);
+                if (res.success) {
+                    showToast('User berhasil dihapus');
+                    loadUsers();
+                } else {
+                    showToast(res.message || 'Gagal menghapus user', 'error');
+                }
+            } catch (err) {
+                showToast('Gagal menghapus user', 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userForm = document.getElementById('user-form');
+            if (userForm) {
+                userForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('user-id').value;
+                    const name = document.getElementById('user-name').value;
+                    const email = document.getElementById('user-email').value;
+                    const password = document.getElementById('user-password').value;
+                    const role = document.getElementById('user-role').value;
+                    const rt = document.getElementById('user-rt').value;
+                    const rw = document.getElementById('user-rw').value;
+                    const body = { name, email, role, rt, rw };
+                    if (password) body.password = password;
+
+                    try {
+                        let res;
+                        if (id) {
+                            res = await apiPut(API_BASE_URL + '/users/' + id, body);
+                        } else {
+                            if (!password) {
+                                showToast('Password wajib diisi untuk user baru', 'error');
+                                return;
+                            }
+                            res = await apiPost(API_BASE_URL + '/users', body);
+                        }
+                        if (res.success) {
+                            showToast(id ? 'User berhasil diperbarui' : 'User berhasil ditambahkan');
+                            closeModal('user-modal');
+                            loadUsers();
+                        } else {
+                            showToast(res.message || 'Gagal menyimpan user', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Gagal menyimpan user', 'error');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // PENGADUAN
+        // =============================
+        async function loadPengaduan() {
+            const tbody = document.getElementById('pengaduan-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/pengaduan');
+                const data = res.success ? (res.data || []) : [];
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada pengaduan.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : (item.tanggal || '-');
+                    const statusClass = item.status === 'Selesai' ? 'bg-green-100 text-green-700' : item.status === 'Diproses' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.name || item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.contact || item.kontak || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.type || item.jenis || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${escapeHtml((item.message || item.pesan || '').substring(0, 60))}${(item.message || item.pesan || '').length > 60 ? '...' : ''}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="openPengaduanModal(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Tanggapi</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Load pengaduan error:', err);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function openPengaduanModal(id) {
+            document.getElementById('pengaduan-id').value = id;
+            document.getElementById('pengaduan-status').value = 'Diproses';
+            document.getElementById('pengaduan-balasan').value = '';
+            openModal('pengaduan-modal');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pengaduanForm = document.getElementById('pengaduan-form');
+            if (pengaduanForm) {
+                pengaduanForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const id = document.getElementById('pengaduan-id').value;
+                    const status = document.getElementById('pengaduan-status').value;
+                    const balasan = document.getElementById('pengaduan-balasan').value;
+                    const body = { status };
+                    if (balasan.trim()) body.balasan = balasan;
+
+                    try {
+                        const res = await apiPut(API_BASE_URL + '/pengaduan/' + id, body);
+                        if (res.success) {
+                            showToast('Pengaduan berhasil diperbarui');
+                            closeModal('pengaduan-modal');
+                            loadPengaduan();
+                        } else {
+                            showToast(res.message || 'Gagal memperbarui pengaduan', 'error');
+                        }
+                    } catch (err) {
+                        showToast('Gagal memperbarui pengaduan', 'error');
+                    }
+                });
+            }
+        });
+
+        // =============================
+        // LOGOUT
+        // =============================
         function logout() {
-            localStorage.removeItem('loggedUser');
+            if (!confirm('Yakin ingin logout?')) return;
+            localStorage.removeItem('adminUser');
             localStorage.removeItem('adminToken');
             window.location.href = '../pages/login.html';
         }
 
+        // =============================
+        // UTILITY
+        // =============================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // =============================
+        // INIT
+        // =============================
         window.addEventListener('DOMContentLoaded', () => {
             checkAuth();
-            loadBeritaData();
+            loadDashboardStats();
+            lucide.createIcons();
         });
     </script>
 </body>

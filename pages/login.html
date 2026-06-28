@@ -162,18 +162,35 @@
 
             PageLoader.show('Memverifikasi kredensial...');
             try {
-                const response = await fetchWithLoader(`${API_BASE_URL}/auth/login`, {
+                const response = await fetchWithLoader(`${API_BASE_URL}/auth/admin-login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
                 if (response.success) {
-                    localStorage.setItem('loggedUser', JSON.stringify(response.user));
+                    // Save auth to localStorage
+                    localStorage.setItem('adminUser', JSON.stringify(response.user));
+                    localStorage.setItem('adminToken', response.token);
+
                     showMessage('Login berhasil! Mengalihkan ke dashboard...', 'success');
                     PageLoader.hide();
+
+                    // Redirect based on role
+                    const role = response.user.role;
+                    let redirectUrl;
+                    if (role === 'admin') {
+                        redirectUrl = '../admin/dashboard.html';
+                    } else if (role === 'rt') {
+                        redirectUrl = '../admin/rt-dashboard.html';
+                    } else if (role === 'kolektor') {
+                        redirectUrl = '../admin/kolektor-dashboard.html';
+                    } else {
+                        redirectUrl = '../admin/dashboard.html';
+                    }
+
                     setTimeout(() => {
-                        window.location.href = '../admin/dashboard.html';
+                        window.location.href = redirectUrl;
                     }, 1200);
                 } else {
                     showMessage(response.message || 'Login gagal', 'error');
@@ -188,41 +205,18 @@
         // Penduduk Form Submit
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nik = document.getElementById('user-nik').value;
-            const password = document.getElementById('user-password').value;
-
-            PageLoader.show('Memverifikasi NIK...');
-            try {
-                const response = await fetchWithLoader(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nik, password })
-                });
-
-                if (response.success) {
-                    localStorage.setItem('loggedUser', JSON.stringify(response.user));
-                    showMessage('Login berhasil! Mengalihkan ke portal penduduk...', 'success');
-                    PageLoader.hide();
-                    setTimeout(() => {
-                        window.location.href = '../pages/user-portal.html';
-                    }, 1200);
-                } else {
-                    showMessage(response.message || 'Login gagal', 'error');
-                    PageLoader.hide();
-                }
-            } catch (error) {
-                showMessage('Gagal terhubung ke server login', 'error');
-                PageLoader.hide();
-            }
+            showMessage('Fitur Segera Hadir', 'info');
         });
 
         function showMessage(msg, type) {
             const msgEl = document.getElementById('login-message');
             msgEl.textContent = msg;
             msgEl.classList.remove('hidden');
-            msgEl.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            msgEl.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
             if (type === 'error') {
                 msgEl.classList.add('bg-red-100', 'text-red-700');
+            } else if (type === 'info') {
+                msgEl.classList.add('bg-blue-100', 'text-blue-700');
             } else {
                 msgEl.classList.add('bg-green-100', 'text-green-700');
             }
