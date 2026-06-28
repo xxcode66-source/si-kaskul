@@ -19,34 +19,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="../index.html" class="font-display text-emerald-800 text-xl font-bold">Desa Kasomalang</a>
-            <button id="mobile-toggle" class="md:hidden text-emerald-800" onclick="toggleMobileMenu()">
-                <i data-lucide="menu" style="width:28px;height:28px"></i>
-            </button>
-            <ul id="nav-links" class="hidden md:flex gap-6 text-sm font-medium text-gray-700">
-                <li><a href="../index.html" class="hover:text-emerald-600 transition">Beranda</a></li>
-                <li><a href="berita.html" class="hover:text-emerald-600 transition">Berita</a></li>
-                <li><a href="gallery.html" class="text-emerald-600 font-semibold transition">Galeri</a></li>
-                <li><a href="pbb.html" class="hover:text-emerald-600 transition">PBB</a></li>
-                <li><a href="bansos.html" class="hover:text-emerald-600 transition">Bansos</a></li>
-                <li><a href="pengaduan.html" class="hover:text-emerald-600 transition">Pengaduan</a></li>
-                <li><a href="lapak-desa.html" class="hover:text-emerald-600 transition">Lapak Desa</a></li>
-                <li><a href="login.html" class="hover:text-emerald-600 transition">Login</a></li>
-            </ul>
-        </div>
-        <ul id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm font-medium text-gray-700">
-            <li><a href="../index.html" class="block py-1">Beranda</a></li>
-            <li><a href="berita.html" class="block py-1">Berita</a></li>
-            <li><a href="gallery.html" class="block py-1">Galeri</a></li>
-            <li><a href="pbb.html" class="block py-1">PBB</a></li>
-            <li><a href="bansos.html" class="block py-1">Bansos</a></li>
-            <li><a href="pengaduan.html" class="block py-1">Pengaduan</a></li>
-            <li><a href="lapak-desa.html" class="block py-1">Lapak Desa</a></li>
-            <li><a href="login.html" class="block py-1">Login</a></li>
-        </ul>
-    </nav>
+        <div id="navbar-container"></div>
 
     <!-- Header -->
     <div class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
@@ -110,6 +83,8 @@
         <img id="lightbox-img" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg">
     </div>
 
+    <script src="../assets/nav-config.js"></script>
+    <script>renderNavbar('galeri', true);</script>
     <script src="../assets/script.js"></script>
     <script>
         // Gallery data

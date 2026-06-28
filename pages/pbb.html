@@ -18,40 +18,11 @@
         </div>
     </div>
 
-    <!-- Top Navigation -->
-    <nav class="sticky top-0 z-40 bg-[#e2eee8] border-b border-white/70 shadow-[0_1px_12px_rgba(15,23,42,0.06)]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-6">
-            <a href="../index.html" class="font-display text-[26px] leading-none text-emerald-900 font-bold tracking-tight shrink-0">Desa Kasomalang</a>
-            <div class="flex items-center gap-3 lg:gap-6">
-                <div class="hidden lg:flex items-center gap-2 text-[15px] font-medium text-slate-700">
-                    <a href="../index.html" class="px-1 py-1 hover:text-emerald-700 transition">Beranda</a>
-                    <a href="berita.html" class="px-1 py-1 hover:text-emerald-700 transition">Berita</a>
-                    <a href="gallery.html" class="px-1 py-1 hover:text-emerald-700 transition">Galeri</a>
-                    <a href="pbb.html" aria-current="page" class="px-1 py-1 text-emerald-700 font-semibold">PBB</a>
-                    <a href="bansos.html" class="px-1 py-1 hover:text-emerald-700 transition">Bansos</a>
-                    <a href="pengaduan.html" class="px-1 py-1 hover:text-emerald-700 transition">Pengaduan</a>
-                    <a href="lapak-desa.html" class="px-1 py-1 hover:text-emerald-700 transition">Lapak Desa</a>
-                    <a href="login.html" class="px-1 py-1 hover:text-emerald-700 transition">Login</a>
-                </div>
-                <button onclick="toggleMobileMenu()" class="lg:hidden text-slate-700" aria-label="Buka menu">
-                    <i data-lucide="menu" style="width:24px;height:24px"></i>
-                </button>
-            </div>
-        </div>
-        <div id="mobile-menu" class="hidden lg:hidden border-t border-white/70 bg-[#edf5f1] px-4 sm:px-6 py-3 text-sm font-medium text-slate-700">
-            <a href="../index.html" class="block py-2 hover:text-emerald-700">Beranda</a>
-            <a href="berita.html" class="block py-2 hover:text-emerald-700">Berita</a>
-            <a href="gallery.html" class="block py-2 hover:text-emerald-700">Galeri</a>
-            <a href="pbb.html" class="block py-2 text-emerald-700 font-semibold">PBB</a>
-            <a href="bansos.html" class="block py-2 hover:text-emerald-700">Bansos</a>
-            <a href="pengaduan.html" class="block py-2 hover:text-emerald-700">Pengaduan</a>
-            <a href="lapak-desa.html" class="block py-2 hover:text-emerald-700">Lapak Desa</a>
-            <a href="login.html" class="block py-2 hover:text-emerald-700">Login</a>
-        </div>
-    </nav>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
 
     <!-- Header -->
-    <header class="pt-10 pb-8 px-4 hero-grid-bg text-white overflow-hidden relative">
+    <header class="pt-28 pb-8 px-4 hero-grid-bg text-white overflow-hidden relative">
         <div class="absolute inset-0 bg-black/10"></div>
         <div class="relative max-w-7xl mx-auto space-y-8">
             <div class="max-w-4xl">
@@ -66,18 +37,18 @@
             <div class="grid gap-5 lg:grid-cols-3 animate-slideUp" style="animation-delay:0.18s">
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
                     <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Wajib Pajak</p>
-                    <p id="header-wp" class="text-5xl font-bold mt-3">621</p>
-                    <p class="text-sm text-emerald-100 mt-2">Tersaring dari filter aktif</p>
+                    <p id="header-wp" class="text-5xl font-bold mt-3">--</p>
+                    <p class="text-sm text-emerald-100 mt-2">Total terdaftar</p>
                 </div>
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl lg:col-span-1">
-                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Tunggakan</p>
-                    <p id="header-total" class="text-4xl md:text-5xl font-bold text-amber-300 mt-3">Rp 36.053.000</p>
-                    <p class="text-sm text-emerald-100 mt-2">Seluruh data desa</p>
+                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Pembayaran</p>
+                    <p id="header-lunas" class="text-4xl md:text-5xl font-bold text-emerald-300 mt-3">--</p>
+                    <p class="text-sm text-emerald-100 mt-2">Sudah dibayar 2020-2026</p>
                 </div>
                 <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
-                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Data Tersaring</p>
-                    <p id="header-filtered" class="text-5xl font-bold mt-3">621</p>
-                    <p class="text-sm text-emerald-100 mt-2">Hasil filter aktif</p>
+                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Tunggakan</p>
+                    <p id="header-tunggakan" class="text-4xl md:text-5xl font-bold text-amber-300 mt-3">--</p>
+                    <p class="text-sm text-emerald-100 mt-2">Belum dibayar + pending</p>
                 </div>
             </div>
         </div>
@@ -86,201 +57,56 @@
     <!-- Content -->
     <section class="px-4 pb-20 -mt-6">
         <div class="max-w-7xl mx-auto space-y-8">
+            <!-- Dusun Cards -->
             <div class="bg-white/95 backdrop-blur rounded-[2rem] shadow-2xl border border-white/60 overflow-hidden fade-in">
-                <div class="grid md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-emerald-100">
+                <div class="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-emerald-100">
                     <button class="p-6 text-left bg-emerald-50 border-b md:border-b-0 border-emerald-100" onclick="setLocationFilter('all')">
                         <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Semua Dusun</p>
-                        <p id="card-all-count" class="text-2xl font-bold text-emerald-950 mt-2">621 WP</p>
-                        <p id="card-all-total" class="text-sm text-gray-500">Rp 36.053.000</p>
+                        <p id="card-all-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
+                        <p id="card-all-total" class="text-sm text-gray-500">Rp --</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun1')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 1</p>
-                        <p id="card-dusun1-count" class="text-2xl font-bold text-emerald-950 mt-2">149 WP</p>
-                        <p id="card-dusun1-total" class="text-sm text-gray-500">RW 01 - RW 02</p>
+                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 01</p>
+                        <p id="card-dusun1-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
+                        <p id="card-dusun1-total" class="text-sm text-gray-500">Rp --</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun2')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 2</p>
-                        <p id="card-dusun2-count" class="text-2xl font-bold text-emerald-950 mt-2">128 WP</p>
-                        <p id="card-dusun2-total" class="text-sm text-gray-500">RW 03 - RW 06</p>
+                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 02</p>
+                        <p id="card-dusun2-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
+                        <p id="card-dusun2-total" class="text-sm text-gray-500">Rp --</p>
                     </button>
                     <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun3')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 3</p>
-                        <p id="card-dusun3-count" class="text-2xl font-bold text-emerald-950 mt-2">198 WP</p>
-                        <p id="card-dusun3-total" class="text-sm text-gray-500">RW 04 - RW 05 - RW 07</p>
-                    </button>
-                    <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('luardesa')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Luar Desa</p>
-                        <p id="card-luardesa-count" class="text-2xl font-bold text-emerald-950 mt-2">146 WP</p>
-                        <p id="card-luardesa-total" class="text-sm text-gray-500">Alamat tidak terdata</p>
+                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 03</p>
+                        <p id="card-dusun3-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
+                        <p id="card-dusun3-total" class="text-sm text-gray-500">Rp --</p>
                     </button>
                 </div>
             </div>
 
             <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-8 items-start">
                 <div class="space-y-8">
+                    <!-- Filter Wilayah -->
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
                         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                             <div>
                                 <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Filter Wilayah</p>
                                 <h2 class="font-display text-3xl font-bold text-emerald-950 mt-2">Dusun > RW > RT</h2>
                             </div>
-                            <div class="text-sm text-gray-500">Klik untuk mempersempit data tunggakan</div>
+                            <div id="filter-info" class="text-sm text-gray-500">Klik untuk mempersempit</div>
                         </div>
-
-                                    <div class="space-y-4">
-                                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
-                                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('dusun1-rw')">
-                                                <div>
-                                                    <p class="font-semibold text-emerald-950">Dusun 1</p>
-                                                    <p class="text-sm text-gray-600">RW 01 dan RW 02</p>
-                                                </div>
-                                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                                            </button>
-                                            <div id="dusun1-rw" class="mt-4 grid sm:grid-cols-2 gap-3">
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun1-rw1-rt'); setRtFilter('dusun1','rw1', 'all')">RW 1</button>
-                                                    <div id="dusun1-rw1-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw1','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun1-rw2-rt'); setRtFilter('dusun1','rw2', 'all')">RW 2</button>
-                                                    <div id="dusun1-rw2-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun1','rw2','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
-                                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('dusun2-rw')">
-                                                <div>
-                                                    <p class="font-semibold text-emerald-950">Dusun 2</p>
-                                                    <p class="text-sm text-gray-600">RW 03 sampai RW 06</p>
-                                                </div>
-                                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                                            </button>
-                                            <div id="dusun2-rw" class="mt-4 grid sm:grid-cols-2 gap-3">
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun2-rw3-rt'); setRtFilter('dusun2','rw3', 'all')">RW 3</button>
-                                                    <div id="dusun2-rw3-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw3','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun2-rw4-rt'); setRtFilter('dusun2','rw4', 'all')">RW 4</button>
-                                                    <div id="dusun2-rw4-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw4','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun2-rw5-rt'); setRtFilter('dusun2','rw5', 'all')">RW 5</button>
-                                                    <div id="dusun2-rw5-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw5','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun2-rw6-rt'); setRtFilter('dusun2','rw6', 'all')">RW 6</button>
-                                                    <div id="dusun2-rw6-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun2','rw6','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
-                                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('dusun3-rw')">
-                                                <div>
-                                                    <p class="font-semibold text-emerald-950">Dusun 3</p>
-                                                    <p class="text-sm text-gray-600">RW 04, RW 05, RW 07</p>
-                                                </div>
-                                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                                            </button>
-                                            <div id="dusun3-rw" class="mt-4 grid sm:grid-cols-3 gap-3">
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun3-rw4-rt'); setRtFilter('dusun3','rw4', 'all')">RW 4</button>
-                                                    <div id="dusun3-rw4-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw4','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun3-rw5-rt'); setRtFilter('dusun3','rw5', 'all')">RW 5</button>
-                                                    <div id="dusun3-rw5-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw5','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('dusun3-rw7-rt'); setRtFilter('dusun3','rw7', 'all')">RW 7</button>
-                                                    <div id="dusun3-rw7-rt" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt1')">RT 1</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt2')">RT 2</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt3')">RT 3</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt4')">RT 4</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt5')">RT 5</button>
-                                                        <button class="rt-chip" onclick="setRtFilter('dusun3','rw7','rt6')">RT 6</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
-                                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('luardesa-rw')">
-                                                <div>
-                                                    <p class="font-semibold text-emerald-950">Luar Desa</p>
-                                                    <p class="text-sm text-gray-600">Alamat di luar wilayah RT/RW</p>
-                                                </div>
-                                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                                            </button>
-                                            <div id="luardesa-rw" class="mt-4 hidden">
-                                                <div class="rounded-2xl bg-white border border-gray-200 p-4 text-left">Gunakan filter ini untuk data yang belum memiliki RT/RW terdaftar.</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div id="wilayah-tree" class="space-y-4">
+                            <!-- Populated by JS -->
+                            <div class="text-center text-gray-400 py-8">Memuat data wilayah...</div>
+                        </div>
                     </div>
 
+                    <!-- NOP Check -->
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
                         <div class="flex items-start justify-between gap-4 mb-6">
                             <div>
                                 <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">🔍 Cari & Filter</p>
                                 <h2 class="font-display text-3xl font-bold text-emerald-950 mt-2">Cek status PBB lewat NOP</h2>
-                                <p class="text-gray-600 mt-2">Masukkan NOP saja. Sistem akan menampilkan status lunas, pending, atau tunggakan otomatis per tahun.</p>
+                                <p class="text-gray-600 mt-2">Masukkan NOP. Sistem akan menampilkan status per tahun 2020-2026.</p>
                             </div>
                             <span class="inline-flex items-center rounded-full bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700">Pencarian NOP</span>
                         </div>
@@ -288,7 +114,7 @@
                         <form id="pbb-check-form" class="space-y-5">
                             <div>
                                 <label for="nop" class="block text-sm font-medium text-gray-700 mb-2">Nomor Objek Pajak (NOP)</label>
-                                <input id="nop" type="text" placeholder="Masukkan NOP (16 digit)" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                                <input id="nop" type="text" placeholder="Contoh: 32.08.120.0000000001" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
                             </div>
                             <button type="submit" class="w-full py-4 rounded-2xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
                                 <i data-lucide="search" style="width:20px;height:20px"></i>
@@ -301,7 +127,7 @@
                                 <i data-lucide="check-circle" style="width:24px;height:24px;color:#059669" class="flex-shrink-0"></i>
                                 <div>
                                     <h3 class="font-semibold text-emerald-950 text-lg">Hasil Pencarian</h3>
-                                    <p class="text-sm text-gray-600">Status pembayaran dan riwayat tunggakan ditampilkan di bawah.</p>
+                                    <p class="text-sm text-gray-600">Status pembayaran dan riwayat ditampilkan di bawah.</p>
                                 </div>
                             </div>
                             <div id="result-content" class="space-y-3 text-sm text-emerald-950"></div>
@@ -309,23 +135,35 @@
 
                         <div id="pbb-error" class="mt-8 hidden p-4 bg-red-50 border border-red-300 rounded-2xl text-red-800 text-sm flex items-center gap-3">
                             <i data-lucide="alert-circle" style="width:20px;height:20px"></i>
-                            <span id="error-message">Data tidak ditemukan. Silakan periksa NOP lalu coba lagi.</span>
+                            <span id="error-message">Data tidak ditemukan. Periksa NOP lalu coba lagi.</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-8">
+                    <!-- Year Chart -->
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Grafik 2020-2026</h3>
-                        <div class="space-y-4" id="year-chart"></div>
+                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-2">Grafik 2020-2026</h3>
+                        <p class="text-sm text-gray-500 mb-5">Klik tahun untuk lihat ringkasan</p>
+                        <div class="space-y-4" id="year-chart">
+                            <div class="text-center text-gray-400 py-8">Memuat data...</div>
+                        </div>
                     </div>
 
+                    <!-- Summary Cards -->
+                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
+                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Ringkasan Status</h3>
+                        <div class="space-y-4" id="summary-cards"></div>
+                        <p class="text-xs text-gray-500 mt-4">Data di atas adalah ringkasan agregat — tidak menampilkan data individu warga.</p>
+                    </div>
+
+                    <!-- Panduan -->
                     <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
                         <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Panduan Singkat</h3>
                         <ul class="space-y-3 text-sm text-gray-600">
                             <li>Masukkan NOP saja untuk melihat status lunas, pending, atau tunggakan otomatis.</li>
                             <li>Pilih dusun, RW, lalu RT untuk mempersempit ringkasan angka.</li>
-                            <li>Gunakan grafik tahunan 2020-2026 untuk membaca tren tunggakan desa.</li>
+                            <li>Gunakan grafik tahunan 2020-2026 untuk membaca tren pembayaran desa.</li>
                         </ul>
                     </div>
                 </div>
@@ -338,42 +176,51 @@
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
     </footer>
 
+    <script src="../assets/nav-config.js"></script>
     <script src="../assets/script.js"></script>
     <script>
-        const pbbData = [
-            { nop: '1234567890123456', alamat: 'Dusun 1 / RW 1 / RT 1', pajak: 500000, year: 2020, status: 'Lunas', dusun: 'dusun1', rw: 'rw1', rt: 'rt1', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Pending', 2024: 'Lunas', 2025: 'Lunas', 2026: 'Menunggak' } },
-            { nop: '1234567890123457', alamat: 'Dusun 1 / RW 1 / RT 2', pajak: 650000, year: 2023, status: 'Menunggak', dusun: 'dusun1', rw: 'rw1', rt: 'rt2', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Pending', 2023: 'Menunggak', 2024: 'Menunggak', 2025: 'Lunas', 2026: 'Pending' } },
-            { nop: '1234567890123458', alamat: 'Dusun 1 / RW 2 / RT 3', pajak: 450000, year: 2024, status: 'Lunas', dusun: 'dusun1', rw: 'rw2', rt: 'rt3', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Lunas', 2024: 'Lunas', 2025: 'Lunas', 2026: 'Lunas' } },
-            { nop: '1234567890123459', alamat: 'Dusun 2 / RW 3 / RT 1', pajak: 550000, year: 2024, status: 'Pending', dusun: 'dusun2', rw: 'rw3', rt: 'rt1', yearly: { 2020: 'Pending', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Pending', 2024: 'Pending', 2025: 'Pending', 2026: 'Lunas' } },
-            { nop: '1234567890123460', alamat: 'Dusun 2 / RW 4 / RT 2', pajak: 600000, year: 2022, status: 'Menunggak', dusun: 'dusun2', rw: 'rw4', rt: 'rt2', yearly: { 2020: 'Lunas', 2021: 'Menunggak', 2022: 'Menunggak', 2023: 'Menunggak', 2024: 'Pending', 2025: 'Lunas', 2026: 'Lunas' } },
-            { nop: '1234567890123461', alamat: 'Dusun 3 / RW 4 / RT 1', pajak: 520000, year: 2024, status: 'Lunas', dusun: 'dusun3', rw: 'rw4', rt: 'rt1', yearly: { 2020: 'Lunas', 2021: 'Lunas', 2022: 'Lunas', 2023: 'Lunas', 2024: 'Lunas', 2025: 'Pending', 2026: 'Pending' } },
-            { nop: '1234567890123462', alamat: 'Dusun 3 / RW 5 / RT 4', pajak: 730000, year: 2021, status: 'Menunggak', dusun: 'dusun3', rw: 'rw5', rt: 'rt4', yearly: { 2020: 'Menunggak', 2021: 'Menunggak', 2022: 'Pending', 2023: 'Menunggak', 2024: 'Menunggak', 2025: 'Pending', 2026: 'Pending' } },
-            { nop: '1234567890123463', alamat: 'Luar Desa', pajak: 410000, year: 2024, status: 'Pending', dusun: 'luardesa', rw: 'luar', rt: 'luar', yearly: { 2020: 'Pending', 2021: 'Pending', 2022: 'Pending', 2023: 'Pending', 2024: 'Pending', 2025: 'Pending', 2026: 'Pending' } }
-        ];
+        // ==============================
+        // NAVBAR
+        // ==============================
+        renderNavbar('pbb', true);
 
-        const yearSeries = [
-            { year: 2020, total: 86, paid: 52, pending: 16, overdue: 18 },
-            { year: 2021, total: 91, paid: 56, pending: 17, overdue: 18 },
-            { year: 2022, total: 95, paid: 58, pending: 18, overdue: 19 },
-            { year: 2023, total: 101, paid: 63, pending: 19, overdue: 19 },
-            { year: 2024, total: 103, paid: 66, pending: 18, overdue: 19 },
-            { year: 2025, total: 109, paid: 71, pending: 19, overdue: 19 },
-            { year: 2026, total: 116, paid: 76, pending: 20, overdue: 20 }
-        ];
+        // ==============================
+        // API BASE
+        // ==============================
+        const API = (() => {
+            const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const base = isLocal ? 'http://localhost:3000/api' : window.location.origin + '/api';
+            return {
+                get: async (path) => {
+                    const r = await fetch(base + path);
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                },
+                post: async (path, body) => {
+                    const r = await fetch(base + path, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                }
+            };
+        })();
 
+        // ==============================
+        // STATE
+        // ==============================
+        let overviewData = null;
         let activeLocation = 'all';
         let activeRw = 'all';
         let activeRt = 'all';
 
-        function toggleFilterGroup(id) {
-            const section = document.getElementById(id);
-            if (section) {
-                section.classList.toggle('hidden');
-            }
-        }
-
-        function formatCurrency(value) {
-            return `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
+        // ==============================
+        // FORMAT HELPERS
+        // ==============================
+        function rp(v) {
+            return 'Rp ' + Number(v || 0).toLocaleString('id-ID');
         }
 
         function getStatusClass(status) {
@@ -382,56 +229,214 @@
             return 'bg-red-100 text-red-700';
         }
 
-        function renderYearChart() {
+        function getStatusLabel(status) {
+            if (status === 'Lunas') return '✅ Lunas';
+            if (status === 'Pending') return '🟡 Pending';
+            return '🔴 Belum Bayar';
+        }
+
+        // ==============================
+        // LOAD DATA
+        // ==============================
+        async function loadPbbData() {
+            try {
+                PageLoader.show('Memuat data PBB...');
+                const result = await API.get('/pbb/stats/overview');
+                overviewData = result.data;
+
+                renderHeaderStats(overviewData.overview);
+                renderDusunCards(overviewData.perDusun);
+                renderYearChart(overviewData.perYear);
+                renderSummaryCards(overviewData.overview);
+                renderWilayahTree(overviewData);
+                renderPbbData();
+                PageLoader.hide();
+            } catch (e) {
+                console.error('Gagal muat data PBB:', e);
+                document.querySelector('#wilayah-tree').innerHTML = '<div class="text-center text-red-500 py-8">Gagal memuat data. Pastikan backend berjalan.</div>';
+                PageLoader.hide();
+            }
+        }
+
+        // ==============================
+        // RENDER FUNCTIONS
+        // ==============================
+        function renderHeaderStats(overview) {
+            setText('header-wp', overview.totalWp + ' WP');
+            setText('header-lunas', rp(overview.totalLunas));
+            setText('header-tunggakan', rp(overview.totalBelumBayar + overview.totalPending));
+        }
+
+        function renderDusunCards(perDusun) {
+            setText('card-all-count', overviewData.overview.totalWp + ' WP');
+            setText('card-all-total', rp(overviewData.overview.totalPajak));
+
+            for (const d of perDusun) {
+                const countEl = document.getElementById('card-' + d.dusun + '-count');
+                const totalEl = document.getElementById('card-' + d.dusun + '-total');
+                if (countEl) countEl.textContent = d.count + ' WP';
+                if (totalEl) totalEl.textContent = rp(d.totalPajak);
+            }
+        }
+
+        function renderYearChart(perYear) {
             const container = document.getElementById('year-chart');
             if (!container) return;
-            const maxTotal = Math.max(...yearSeries.map(item => item.total));
+            const maxTotal = Math.max(...perYear.map(item => item.total));
 
-            container.innerHTML = yearSeries.map(item => {
-                const width = Math.max(24, Math.round((item.total / maxTotal) * 100));
+            container.innerHTML = perYear.map(item => {
+                const pct = Math.max(20, Math.round((item.total / maxTotal) * 100));
                 return `
                     <button class="w-full text-left rounded-[1.5rem] border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-4 transition hover:shadow-lg hover:border-emerald-300" onclick="focusYear(${item.year})">
                         <div class="flex items-center justify-between gap-4 mb-3">
                             <div>
                                 <p class="text-xs uppercase tracking-[0.2em] text-gray-500">Tahun ${item.year}</p>
-                                <p class="font-bold text-emerald-950 mt-1">${item.total} data</p>
+                                <p class="font-bold text-emerald-950 mt-1">${rp(item.total)}</p>
                             </div>
                             <div class="text-right text-sm">
-                                <p class="text-emerald-700 font-semibold">${item.paid} lunas</p>
-                                <p class="text-amber-600 font-semibold">${item.pending} pending</p>
-                                <p class="text-red-600 font-semibold">${item.overdue} tunggak</p>
+                                <p class="text-emerald-700 font-semibold">${rp(item.lunas)} lunas</p>
+                                <p class="text-amber-600 font-semibold">${rp(item.pending)} pending</p>
+                                <p class="text-red-600 font-semibold">${rp(item.belumBayar)} tunggak</p>
                             </div>
                         </div>
-                        <div class="h-3 rounded-full bg-emerald-100 overflow-hidden">
-                            <div class="h-full rounded-full bg-gradient-to-r from-emerald-700 via-emerald-500 to-amber-400" style="width:${width}%"></div>
+                        <div class="h-3 rounded-full bg-gray-100 overflow-hidden flex">
+                            <div class="h-full bg-emerald-500" style="width:${item.total > 0 ? Math.round((item.lunas / item.total) * 100) : 0}%"></div>
+                            <div class="h-full bg-amber-400" style="width:${item.total > 0 ? Math.round((item.pending / item.total) * 100) : 0}%"></div>
                         </div>
                     </button>
                 `;
             }).join('');
         }
 
-        function focusYear(year) {
-            const match = pbbData.find(item => item.yearly && item.yearly[year]);
-            if (!match) return;
+        function renderSummaryCards(overview) {
+            const c = document.getElementById('summary-cards');
+            if (!c) return;
+            const total = overview.totalBelumBayar + overview.totalPending + overview.totalLunas;
+            const lunasPct = total > 0 ? Math.round((overview.totalLunas / total) * 100) : 0;
+            const pendingPct = total > 0 ? Math.round((overview.totalPending / total) * 100) : 0;
+            const tunggakPct = total > 0 ? Math.round((overview.totalBelumBayar / total) * 100) : 0;
 
+            c.innerHTML = `
+                <div class="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium text-emerald-800">✅ Lunas / Terverifikasi</p>
+                            <p class="text-lg font-bold text-emerald-950">${rp(overview.totalLunas)}</p>
+                        </div>
+                        <span class="text-sm font-semibold text-emerald-700">${lunasPct}%</span>
+                    </div>
+                    <div class="mt-2 h-2 rounded-full bg-emerald-200"><div class="h-full rounded-full bg-emerald-600" style="width:${lunasPct}%"></div></div>
+                </div>
+                <div class="rounded-2xl bg-amber-50 p-4 border border-amber-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium text-amber-800">🟡 Pending (Menunggu Verifikasi)</p>
+                            <p class="text-lg font-bold text-amber-950">${rp(overview.totalPending)}</p>
+                        </div>
+                        <span class="text-sm font-semibold text-amber-700">${pendingPct}%</span>
+                    </div>
+                    <div class="mt-2 h-2 rounded-full bg-amber-200"><div class="h-full rounded-full bg-amber-500" style="width:${pendingPct}%"></div></div>
+                </div>
+                <div class="rounded-2xl bg-red-50 p-4 border border-red-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-sm font-medium text-red-800">🔴 Belum Bayar / Tunggakan</p>
+                            <p class="text-lg font-bold text-red-950">${rp(overview.totalBelumBayar)}</p>
+                        </div>
+                        <span class="text-sm font-semibold text-red-700">${tunggakPct}%</span>
+                    </div>
+                    <div class="mt-2 h-2 rounded-full bg-red-200"><div class="h-full rounded-full bg-red-500" style="width:${tunggakPct}%"></div></div>
+                </div>
+            `;
+        }
+
+        async function renderWilayahTree(data) {
+            const container = document.getElementById('wilayah-tree');
+            if (!container) return;
+
+            // Build tree from perDusun data + fetch RW per dusun
+            let html = '';
+            for (const d of data.perDusun) {
+                if (d.dusun === 'luardesa') continue;
+                try {
+                    const rwRes = await API.get('/pbb/stats/by-dusun/' + d.dusun);
+                    const rwData = rwRes.data || [];
+                    let rwHtml = '';
+                    for (const r of rwData) {
+                        try {
+                            const rtRes = await API.get('/pbb/stats/by-dusun/' + d.dusun + '/rw/' + r.rw);
+                            const rtData = rtRes.data || [];
+                            const rtHtml = rtData.map(rt => `
+                                <button class="rt-chip" onclick="setRtFilter('${d.dusun}','${r.rw}','${rt.rt}')">${rt.rtNama}</button>
+                            `).join('');
+                            rwHtml += `
+                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
+                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('rw-${d.dusun}-${r.rw}'); setRtFilter('${d.dusun}','${r.rw}','all')">
+                                        ${r.rwNama} — ${rp(r.totalPajak)}
+                                    </button>
+                                    <div id="rw-${d.dusun}-${r.rw}" class="mt-3 hidden grid grid-cols-2 gap-2">
+                                        ${rtHtml}
+                                    </div>
+                                </div>
+                            `;
+                        } catch(e) {}
+                    }
+                    html += `
+                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
+                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('dusun-${d.dusun}'); setLocationFilter('${d.dusun}')">
+                                <div>
+                                    <p class="font-semibold text-emerald-950">${d.dusunNama}</p>
+                                    <p class="text-sm text-gray-600">${d.count} WP — ${rp(d.totalPajak)}</p>
+                                </div>
+                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
+                            </button>
+                            <div id="dusun-${d.dusun}" class="mt-4 grid sm:grid-cols-2 gap-3">${rwHtml}</div>
+                        </div>
+                    `;
+                } catch(e) {}
+            }
+            container.innerHTML = html;
+            if (typeof lucide !== 'undefined') setTimeout(() => lucide.createIcons(), 100);
+        }
+
+        function focusYear(year) {
+            const p = overviewData.perYear.find(y => y.year === year);
+            if (!p) return;
             const resultEl = document.getElementById('pbb-result');
             const errorEl = document.getElementById('pbb-error');
             errorEl.classList.add('hidden');
             document.getElementById('result-content').innerHTML = `
                 <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Tahun fokus</span>
-                    <p class="mt-1 font-semibold text-emerald-950">${year}</p>
+                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Tahun ${p.year}</span>
+                    <p class="mt-1 font-semibold text-emerald-950 text-lg">${rp(p.total)} total pajak</p>
                 </div>
-                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Ringkasan</span>
-                    <p class="mt-1 font-semibold text-emerald-950">${yearSeries.find(item => item.year === year)?.paid || 0} lunas, ${yearSeries.find(item => item.year === year)?.pending || 0} pending, ${yearSeries.find(item => item.year === year)?.overdue || 0} tunggakan</p>
-                </div>
-                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Contoh NOP</span>
-                    <p class="mt-1 font-semibold text-emerald-950">${match.nop}</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="rounded-2xl bg-white px-3 py-3 border border-emerald-100 text-center">
+                        <span class="text-xs text-gray-500">Lunas</span>
+                        <p class="mt-1 font-bold text-emerald-700">${rp(p.lunas)}</p>
+                        <p class="text-xs text-gray-500">${p.countLunas} WP</p>
+                    </div>
+                    <div class="rounded-2xl bg-white px-3 py-3 border border-amber-100 text-center">
+                        <span class="text-xs text-gray-500">Pending</span>
+                        <p class="mt-1 font-bold text-amber-700">${rp(p.pending)}</p>
+                        <p class="text-xs text-gray-500">${p.countPending} WP</p>
+                    </div>
+                    <div class="rounded-2xl bg-white px-3 py-3 border border-red-100 text-center">
+                        <span class="text-xs text-gray-500">Tunggak</span>
+                        <p class="mt-1 font-bold text-red-700">${rp(p.belumBayar)}</p>
+                        <p class="text-xs text-gray-500">${p.countBelumBayar} WP</p>
+                    </div>
                 </div>
             `;
             resultEl.classList.remove('hidden');
+        }
+
+        // ==============================
+        // FILTERING
+        // ==============================
+        function toggleFilterGroup(id) {
+            const section = document.getElementById(id);
+            if (section) section.classList.toggle('hidden');
         }
 
         function setLocationFilter(value) {
@@ -448,115 +453,145 @@
             renderPbbData();
         }
 
-        function getFilteredData() {
-            return pbbData.filter(item => {
-                const locationMatch = activeLocation === 'all' || item.dusun === activeLocation;
-                const rwMatch = activeRw === 'all' || item.rw === activeRw;
-                const rtMatch = activeRt === 'all' || item.rt === activeRt;
-                return locationMatch && rwMatch && rtMatch;
-            });
+        async function renderPbbData() {
+            if (!overviewData) return;
+
+            // Find current location stats
+            let totalPajak = overviewData.overview.totalPajak;
+            let count = overviewData.overview.totalWp;
+            let totalLunas = overviewData.overview.totalLunas;
+            let totalBelum = overviewData.overview.totalBelumBayar + overviewData.overview.totalPending;
+
+            if (activeLocation !== 'all') {
+                try {
+                    let url = '/pbb/stats/by-dusun/' + activeLocation;
+                    if (activeRw !== 'all') {
+                        url += '/rw/' + activeRw;
+                        if (activeRt !== 'all') {
+                            // For RT level, we sum up from RW data
+                            // We'll just show the RW aggregate for now
+                        }
+                    }
+                    const res = await API.get(url);
+                    const data = res.data || [];
+                    if (activeRw !== 'all' && activeRt !== 'all') {
+                        const rtData = data.find(d => d.rt === activeRt);
+                        if (rtData) {
+                            totalPajak = rtData.totalPajak;
+                            count = rtData.count;
+                            totalLunas = rtData.totalLunas;
+                            totalBelum = rtData.totalBelumBayar + rtData.totalPending;
+                        }
+                    } else if (activeRw !== 'all') {
+                        const rwData = data.find(d => d.rw === activeRw);
+                        if (rwData) {
+                            totalPajak = rwData.totalPajak;
+                            count = rwData.count;
+                            totalLunas = rwData.totalLunas;
+                            totalBelum = rwData.totalBelumBayar + rwData.totalPending;
+                        }
+                    } else {
+                        totalPajak = data.reduce((s, d) => s + d.totalPajak, 0);
+                        count = data.reduce((s, d) => s + d.count, 0);
+                        totalLunas = data.reduce((s, d) => s + d.totalLunas, 0);
+                        totalBelum = data.reduce((s, d) => s + d.totalBelumBayar + d.totalPending, 0);
+                    }
+                } catch(e) {}
+            }
+
+            setText('header-wp', count + ' WP');
+            setText('header-lunas', rp(totalLunas));
+            setText('header-tunggakan', rp(totalBelum));
+
+            const fi = document.getElementById('filter-info');
+            if (fi) fi.textContent = activeLocation === 'all' ? 'Semua wilayah' : activeLocation;
         }
 
-        function updateSummaryCounts(filtered) {
-            const lunas = filtered.filter(item => item.status === 'Lunas').length;
-            const pending = filtered.filter(item => item.status === 'Pending').length;
-            const tunggakan = filtered.filter(item => item.status === 'Menunggak').length;
-            const totalPajak = filtered.reduce((sum, item) => sum + Number(String(item.pajak).replace(/[^0-9]/g, '')), 0);
-
-            const headerWp = document.getElementById('header-wp');
-            const headerTotal = document.getElementById('header-total');
-            const headerFiltered = document.getElementById('header-filtered');
-            if (headerWp) headerWp.textContent = `${filtered.length} WP`;
-            if (headerTotal) headerTotal.textContent = formatCurrency(totalPajak);
-            if (headerFiltered) headerFiltered.textContent = `${filtered.length} WP`;
-
-            const allCount = document.getElementById('card-all-count');
-            const allTotal = document.getElementById('card-all-total');
-            const dusun1Count = document.getElementById('card-dusun1-count');
-            const dusun1Total = document.getElementById('card-dusun1-total');
-            const dusun2Count = document.getElementById('card-dusun2-count');
-            const dusun2Total = document.getElementById('card-dusun2-total');
-            const dusun3Count = document.getElementById('card-dusun3-count');
-            const dusun3Total = document.getElementById('card-dusun3-total');
-            const luarCount = document.getElementById('card-luardesa-count');
-            const luarTotal = document.getElementById('card-luardesa-total');
-
-            if (allCount) allCount.textContent = `${filtered.length} WP`;
-            if (allTotal) allTotal.textContent = formatCurrency(totalPajak);
-            if (dusun1Count) dusun1Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun1').length} WP`;
-            if (dusun1Total) dusun1Total.textContent = 'RW 01 - RW 02';
-            if (dusun2Count) dusun2Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun2').length} WP`;
-            if (dusun2Total) dusun2Total.textContent = 'RW 03 - RW 06';
-            if (dusun3Count) dusun3Count.textContent = `${pbbData.filter(item => item.dusun === 'dusun3').length} WP`;
-            if (dusun3Total) dusun3Total.textContent = 'RW 04 - RW 05 - RW 07';
-            if (luarCount) luarCount.textContent = `${pbbData.filter(item => item.dusun === 'luardesa').length} WP`;
-            if (luarTotal) luarTotal.textContent = 'Alamat tidak terdata';
-
-            const summaryLunas = document.getElementById('summary-lunas');
-            const summaryTunggakan = document.getElementById('summary-tunggakan');
-            const summaryPending = document.getElementById('summary-pending');
-
-            if (summaryLunas) summaryLunas.textContent = `${lunas} WP`;
-            if (summaryTunggakan) summaryTunggakan.textContent = `${tunggakan} WP`;
-            if (summaryPending) summaryPending.textContent = `${pending} WP`;
-        }
-
-        function renderPbbData() {
-            const filtered = getFilteredData();
-            updateSummaryCounts(filtered);
-        }
-
-        // Form submission
-        document.getElementById('pbb-check-form').addEventListener('submit', (e) => {
+        // ==============================
+        // NOP CHECK
+        // ==============================
+        document.getElementById('pbb-check-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nop = document.getElementById('nop').value;
+            const nop = document.getElementById('nop').value.trim();
+            if (!nop) return;
 
             PageLoader.show('Memeriksa data PBB...');
-
-            setTimeout(() => {
-                const data = pbbData.find(item => item.nop === nop.trim());
+            try {
+                const result = await API.post('/pbb/check-nop', { nop });
+                const data = result.data;
                 const resultEl = document.getElementById('pbb-result');
                 const errorEl = document.getElementById('pbb-error');
-
-                if (!data) {
-                    resultEl.classList.add('hidden');
-                    errorEl.classList.remove('hidden');
-                    errorEl.querySelector('#error-message').textContent = 'Data tidak ditemukan. Periksa NOP lalu coba lagi.';
-                    PageLoader.hide();
-                    return;
-                }
-
                 errorEl.classList.add('hidden');
-                const tahunList = Object.entries(data.yearly || {}).map(([year, status]) => `<span class="rounded-full px-3 py-1 ${getStatusClass(status)}">${year}: ${status}</span>`).join('');
-                const yearsWithIssue = Object.entries(data.yearly || {}).filter(([, status]) => status !== 'Lunas').map(([year, status]) => `${year} (${status})`).join(', ') || 'Semua tahun lunas';
-                document.getElementById('result-content').innerHTML = `
+
+                const yearsUnpaid = data.perYear.filter(p => p.status !== 'Lunas');
+                const totalUnpaid = data.totalBelumBayar;
+
+                let rowsHtml = `
                     <div class="grid sm:grid-cols-2 gap-3">
                         <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
                             <span class="text-xs uppercase tracking-[0.18em] text-gray-500">NOP</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.nop}</p>
+                            <p class="mt-1 font-semibold text-emerald-950 font-mono">${data.nop}</p>
                         </div>
                         <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Total Tagihan</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${formatCurrency(data.pajak)}</p>
+                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Nama Wajib Pajak</span>
+                            <p class="mt-1 font-semibold text-emerald-950">${data.nama}</p>
                         </div>
                     </div>
-                    <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Status Tahun yang Bermasalah</span>
-                        <p class="mt-1 font-medium text-emerald-950">${yearsWithIssue}</p>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
+                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Alamat</span>
+                            <p class="mt-1 font-semibold text-emerald-950">${data.alamat}</p>
+                        </div>
+                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
+                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Wilayah</span>
+                            <p class="mt-1 font-semibold text-emerald-950">${data.dusun} / ${data.rw} / ${data.rt}</p>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap gap-2">${tahunList}</div>
+                    <div class="rounded-2xl bg-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-50 px-4 py-3 border border-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-100">
+                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Total Belum Dibayar</span>
+                        <p class="mt-1 font-bold text-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-700 text-lg">${totalUnpaid > 0 ? rp(totalUnpaid) : '✅ Lunas Semua'}</p>
+                    </div>
+                    <div class="rounded-2xl bg-white px-4 py-3 border border-gray-200">
+                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Status per Tahun</span>
+                        <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            ${data.perYear.map(p => `
+                                <div class="rounded-xl px-3 py-2 text-center ${getStatusClass(p.status)}">
+                                    <span class="text-xs font-bold">${p.year}</span>
+                                    <p class="text-xs mt-1">${getStatusLabel(p.status)}</p>
+                                    <p class="text-xs font-semibold">${rp(p.pajak)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                 `;
+
+                document.getElementById('result-content').innerHTML = rowsHtml;
                 resultEl.classList.remove('hidden');
                 PageLoader.hide();
-            }, 900);
+            } catch (e) {
+                PageLoader.hide();
+                document.getElementById('pbb-result').classList.add('hidden');
+                const errorEl = document.getElementById('pbb-error');
+                errorEl.classList.remove('hidden');
+                document.getElementById('error-message').textContent = 'Data tidak ditemukan. Periksa NOP lalu coba lagi.';
+            }
         });
 
-        // Initialize
+        // ==============================
+        // UTILS
+        // ==============================
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        // ==============================
+        // INIT
+        // ==============================
         window.addEventListener('DOMContentLoaded', () => {
             initScrollAnimations();
             initNavigationLoader();
-            renderYearChart();
-            renderPbbData();
+            loadPbbData();
             PageLoader.hide();
             lucide.createIcons();
         });
