@@ -204,13 +204,15 @@ function createSeedDatabase() {
   ];
 
   const pengaduan = [
-    { id: 1, name: 'Warga 1', contact: '081234567890', type: 'Infrastruktur', message: 'Jalan di Kp. Cikadu rusak parah, mohon perbaikan segera.', submittedAt: '2026-01-05T09:30:00Z', status: 'Selesai' },
-    { id: 2, name: 'Warga 2', contact: '081298765432', type: 'Lingkungan', message: 'Drainase tersumbat di depan SDN Kasomalang.', submittedAt: '2026-01-12T14:20:00Z', status: 'Diproses' },
-  ];
+      { id: 1, name: 'Warga 1', contact: '081234567890', type: 'Infrastruktur', message: 'Jalan di Kp. Cikadu rusak parah, mohon perbaikan segera.', submittedAt: '2026-01-05T09:30:00Z', status: 'Selesai' },
+      { id: 2, name: 'Warga 2', contact: '081298765432', type: 'Lingkungan', message: 'Drainase tersumbat di depan SDN Kasomalang.', submittedAt: '2026-01-12T14:20:00Z', status: 'Diproses' },
+    ];
 
-  const approvals = [];
+    const approvals = [];
 
-  return { users, penduduk: pendudukFinal, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, warga, wilayah };
+    const surat = [];
+
+    return { users, penduduk: pendudukFinal, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, warga, wilayah, surat };
 }
 
 function getConnectionString() {
@@ -238,6 +240,7 @@ async function ensureSchema(pool) {
     CREATE TABLE IF NOT EXISTS pengaduan (id INTEGER PRIMARY KEY, name TEXT NOT NULL, contact TEXT, type TEXT, message TEXT, submittedAt TEXT NOT NULL, status TEXT DEFAULT 'Diterima');
     CREATE TABLE IF NOT EXISTS approvals (id INTEGER PRIMARY KEY, pbbId INTEGER NOT NULL, nop TEXT NOT NULL, nama TEXT NOT NULL, approvedBy TEXT NOT NULL, approveStatus TEXT NOT NULL, note TEXT, approvedAt TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS activity_logs (id SERIAL PRIMARY KEY, action TEXT NOT NULL, userId INTEGER, userName TEXT, details TEXT, createdAt TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS surat (id INTEGER PRIMARY KEY, jenis TEXT NOT NULL, nama TEXT NOT NULL, nik TEXT NOT NULL, alamat TEXT, keperluan TEXT, status TEXT DEFAULT 'Diajukan', nomorSurat TEXT, ditandatanganiOleh TEXT, catatan TEXT, diajukanPada TEXT NOT NULL, diprosesPada TEXT);
   `);
 }
 
@@ -253,17 +256,18 @@ async function loadCollection(pool, tableName, orderBy = 'id') {
 }
 
 async function loadDatabase(pool) {
-  const [users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals] = await Promise.all([
-    loadCollection(pool, 'users'),
-    loadCollection(pool, 'penduduk'),
-    loadCollection(pool, 'berita'),
-    loadCollection(pool, 'pbb'),
-    loadCollection(pool, 'bansos'),
-    loadCollection(pool, 'bansos_programs'),
-    loadCollection(pool, 'pengaduan'),
-    loadCollection(pool, 'approvals'),
-  ]);
-  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals };
+  const [users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat] = await Promise.all([
+      loadCollection(pool, 'users'),
+      loadCollection(pool, 'penduduk'),
+      loadCollection(pool, 'berita'),
+      loadCollection(pool, 'pbb'),
+      loadCollection(pool, 'bansos'),
+      loadCollection(pool, 'bansos_programs'),
+      loadCollection(pool, 'pengaduan'),
+      loadCollection(pool, 'approvals'),
+      loadCollection(pool, 'surat'),
+    ]);
+    return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat };
 }
 
 async function syncTable(pool, tableName, rows, columns) {
@@ -295,6 +299,7 @@ async function syncDatabase(pool, database) {
   await syncTable(pool, 'bansos_programs', database.bansosPrograms, ['id', 'nama', 'sumber', 'periode', 'kuota', 'deskripsi']);
   await syncTable(pool, 'pengaduan', database.pengaduan, ['id', 'name', 'contact', 'type', 'message', 'submittedAt', 'status']);
   await syncTable(pool, 'approvals', database.approvals, ['id', 'pbbId', 'nop', 'nama', 'approvedBy', 'approveStatus', 'note', 'approvedAt']);
+  await syncTable(pool, 'surat', database.surat, ['id', 'jenis', 'nama', 'nik', 'alamat', 'keperluan', 'status', 'nomorSurat', 'ditandatanganiOleh', 'catatan', 'diajukanPada', 'diprosesPada']);
 }
 
 module.exports = {

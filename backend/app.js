@@ -396,11 +396,65 @@ app.put('/api/pengaduan/:id', async (req, res) => {
   const idx = (database.pengaduan || []).findIndex(p => p.id == req.params.id);
   if (idx !== -1) { database.pengaduan[idx] = { ...database.pengaduan[idx], status, balasan }; await persistDatabase(); res.json({ success: true, data: database.pengaduan[idx] }); }
   else res.status(404).json({ success: false, message: 'Pengaduan tidak ditemukan' });
-});
+  });
 
-// ==============================
-// ====== USER MANAGEMENT =======
-// ==============================
+  // ==============================
+  // ====== SURAT ONLINE ==========
+  // ==============================
+
+  app.get('/api/surat', (req, res) => {
+    res.json({ success: true, data: database.surat || [] });
+  });
+
+  app.post('/api/surat', async (req, res) => {
+    const { jenis, nama, nik, alamat, keperluan } = req.body;
+    if (!jenis || !nama || !nik) return res.status(400).json({ success: false, message: 'Jenis, nama, dan NIK wajib diisi' });
+    const id = (database.surat || []).length + 1;
+    const surat = {
+      id,
+      jenis,
+      nama,
+      nik,
+      alamat: alamat || '',
+      keperluan: keperluan || '',
+      status: 'Diajukan',
+      nomorSurat: null,
+      ditandatanganiOleh: null,
+      catatan: '',
+      diajukanPada: new Date().toISOString(),
+      diprosesPada: null,
+    };
+    if (!database.surat) database.surat = [];
+    database.surat.push(surat);
+    await persistDatabase();
+    res.status(201).json({ success: true, data: surat });
+  });
+
+  app.put('/api/surat/:id', async (req, res) => {
+    const { status, catatan, nomorSurat, ditandatanganiOleh } = req.body;
+    const idx = (database.surat || []).findIndex(s => s.id == req.params.id);
+    if (idx === -1) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
+    if (status) database.surat[idx].status = status;
+    if (catatan !== undefined) database.surat[idx].catatan = catatan;
+    if (nomorSurat) database.surat[idx].nomorSurat = nomorSurat;
+    if (ditandatanganiOleh) database.surat[idx].ditandatanganiOleh = ditandatanganiOleh;
+    if (status === 'Diproses' && !database.surat[idx].diprosesPada) database.surat[idx].diprosesPada = new Date().toISOString();
+    if (status === 'Selesai' && !database.surat[idx].nomorSurat) database.surat[idx].nomorSurat = 'SURAT-' + String(database.surat[idx].id).padStart(4, '0') + '/' + new Date().getFullYear();
+    await persistDatabase();
+    res.json({ success: true, data: database.surat[idx] });
+  });
+
+  app.delete('/api/surat/:id', async (req, res) => {
+    const idx = (database.surat || []).findIndex(s => s.id == req.params.id);
+    if (idx === -1) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
+    database.surat.splice(idx, 1);
+    await persistDatabase();
+    res.json({ success: true, message: 'Surat dihapus' });
+  });
+
+  // ==============================
+  // ====== USER MANAGEMENT =======
+  // ==============================
 
 app.get('/api/users', (req, res) => {
   res.json({ success: true, data: getUsers().map(u => ({ id: u.id, name: u.name, email: u.email, role: u.role, rt: u.rt, rw: u.rw })) });

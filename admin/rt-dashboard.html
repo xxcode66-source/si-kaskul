@@ -438,6 +438,10 @@
                 window.location.href = '../pages/login.html';
                 return;
             }
+            if (user.role !== 'rt') {
+                window.location.href = '../pages/login.html';
+                return;
+            }
             // Set user info
             const displayName = user.name || user.email || 'RT';
             const rtLabel = user.rt ? 'RT ' + user.rt : '-';

@@ -68,9 +68,14 @@
                 Kelola Bansos
             </a>
             <a href="#pengaduan" id="nav-pengaduan" onclick="switchPage('pengaduan', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
-                <i data-lucide="message-square" style="width:20px;height:20px"></i>
-                Pengaduan
-            </a>
+                            <i data-lucide="message-square" style="width:20px;height:20px"></i>
+                            Pengaduan
+                        </a>
+                        <a href="#surat" id="nav-surat" onclick="switchPage('surat', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                            <i data-lucide="file-text" style="width:20px;height:20px"></i>
+                            Surat Online
+                            <span id="surat-badge" class="ml-auto bg-yellow-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
+                        </a>
             <a href="#pengguna" id="nav-pengguna" onclick="switchPage('pengguna', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="users" style="width:20px;height:20px"></i>
                 Kelola Pengguna
@@ -338,8 +343,34 @@
                 </div>
             </div>
 
-            <!-- ==================== PENGGUNA PAGE ==================== -->
-            <div id="pengguna-page" class="page-content hidden">
+                        <!-- ==================== SURAT PAGE ==================== -->
+                        <div id="surat-page" class="page-content hidden">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">Surat Online</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Kelola permohonan surat dari warga.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                                <table class="w-full min-w-[900px]">
+                                    <thead>
+                                        <tr class="bg-emerald-700 text-white">
+                                            <th class="px-6 py-4 text-left font-semibold text-sm">ID</th>
+                                            <th class="px-6 py-4 text-left font-semibold text-sm">Jenis Surat</th>
+                                            <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
+                                            <th class="px-6 py-4 text-left font-semibold text-sm">NIK</th>
+                                            <th class="px-6 py-4 text-center font-semibold text-sm">Status</th>
+                                            <th class="px-6 py-4 text-left font-semibold text-sm">Tanggal</th>
+                                            <th class="px-6 py-4 text-center font-semibold text-sm">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="surat-table" class="divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ==================== PENGGUNA PAGE ==================== -->
+                        <div id="pengguna-page" class="page-content hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <h3 class="text-xl font-bold text-gray-800">Kelola Pengguna</h3>
                     <button onclick="openUserModal()" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
@@ -447,6 +478,58 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL SURAT ==================== -->
+    <div id="surat-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 id="surat-modal-title" class="text-lg font-bold text-gray-800">Proses Surat</h4>
+                <button onclick="closeModal('surat-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <form id="surat-form" class="space-y-4">
+                <input type="hidden" id="surat-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Surat</label>
+                    <p id="surat-detail-jenis" class="text-gray-800 font-medium"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                        <p id="surat-detail-nama" class="text-gray-800 font-medium"></p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+                        <p id="surat-detail-nik" class="text-gray-800 font-medium font-mono"></p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="surat-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                        <option value="Diajukan">Diajukan</option>
+                        <option value="Diproses">Diproses</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Ditolak">Ditolak</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Surat <span class="text-xs text-gray-400">(akan digenerate otomatis jika status Selesai)</span></label>
+                    <input id="surat-nomor" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: SURAT-0001/2026">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ditandatangani Oleh</label>
+                    <input id="surat-ttd" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama pejabat desa">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                    <textarea id="surat-catatan" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="3" placeholder="Catatan internal (opsional)"></textarea>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <button type="button" onclick="closeModal('surat-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ==================== MODAL USER ==================== -->
     <div id="user-modal" class="modal-overlay">
         <div class="modal-content">
@@ -541,30 +624,34 @@
         }
 
         function checkAuth() {
-            const user = getAdminUser();
-            const token = getAdminToken();
-            if (!user || !token) {
-                window.location.href = '../pages/login.html';
-                return;
-            }
-            // Set user info
-            const displayName = user.name || user.email || 'Admin';
-            const displayRole = user.role === 'admin' ? 'Administrator' : user.role === 'kolektor' ? 'Kolektor' : user.role === 'rt' ? 'Ketua RT' : user.role === 'rw' ? 'Ketua RW' : user.role || '-';
-            for (const id of ['user-name', 'topbar-name']) document.getElementById(id).textContent = displayName;
-            for (const id of ['user-role', 'topbar-role']) document.getElementById(id).textContent = displayRole;
-        }
+                    const user = getAdminUser();
+                    const token = getAdminToken();
+                    if (!user || !token) {
+                        window.location.href = '../pages/login.html';
+                        return;
+                    }
+                    if (user.role !== 'admin') {
+                        window.location.href = '../pages/login.html';
+                        return;
+                    }
+                    // Set user info
+                    const displayName = user.name || user.email || 'Admin';
+                    const displayRole = 'Administrator';
+                    for (const id of ['user-name', 'topbar-name']) document.getElementById(id).textContent = displayName;
+                    for (const id of ['user-role', 'topbar-role']) document.getElementById(id).textContent = displayRole;
+                }
 
-        // =============================
-        // API HELPERS
-        // =============================
-        function apiHeaders() {
-            const token = getAdminToken();
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = 'Bearer ' + token;
-            return headers;
-        }
+                // =============================
+                                // API HELPERS
+                                // =============================
+                                function apiHeaders() {
+                                    const token = getAdminToken();
+                                    const headers = { 'Content-Type': 'application/json' };
+                                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                                    return headers;
+                                }
 
-        async function apiGet(url) {
+                        async function apiGet(url) {
             return fetchWithLoader(url, { headers: apiHeaders() });
         }
 
@@ -616,14 +703,15 @@
             if (pageContent) pageContent.classList.remove('hidden');
             
             const titles = {
-                'dashboard': 'Dashboard',
-                'berita': 'Kelola Berita',
-                'pbb': 'Kelola PBB',
-                'bansos': 'Kelola Bansos',
-                'pengaduan': 'Pengaduan Masyarakat',
-                'pengguna': 'Kelola Pengguna',
-                'approvals': 'Persetujuan PBB'
-            };
+                            'dashboard': 'Dashboard',
+                            'berita': 'Kelola Berita',
+                            'pbb': 'Kelola PBB',
+                            'bansos': 'Kelola Bansos',
+                            'pengaduan': 'Pengaduan Masyarakat',
+                            'surat': 'Surat Online',
+                            'pengguna': 'Kelola Pengguna',
+                            'approvals': 'Persetujuan PBB'
+                        };
             document.getElementById('page-title').textContent = titles[page] || page;
             
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -641,7 +729,8 @@
             else if (page === 'pbb') loadPbbData();
             else if (page === 'bansos') { loadBansosPrograms(); loadBansos(); }
             else if (page === 'pengaduan') loadPengaduan();
-            else if (page === 'pengguna') loadUsers();
+                        else if (page === 'surat') loadSurat();
+                        else if (page === 'pengguna') loadUsers();
             else if (page === 'approvals') loadPendingApprovals();
 
             // Close mobile sidebar
@@ -1295,11 +1384,130 @@
                         showToast('Gagal memperbarui pengaduan', 'error');
                     }
                 });
-            }
-        });
+                            }
+                        });
 
-        // =============================
-        // LOGOUT
+                        // =============================
+                        // SURAT ONLINE
+                        // =============================
+                        async function loadSurat() {
+                            const tbody = document.getElementById('surat-table');
+                            if (!tbody) return;
+                            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+                            try {
+                                const res = await apiGet(API_BASE_URL + '/surat');
+                                const data = res.success ? (res.data || []) : [];
+                                tbody.innerHTML = '';
+                                if (data.length === 0) {
+                                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada permohonan surat.</td></tr>';
+                                    return;
+                                }
+                                // Update badge
+                                const pendingCount = data.filter(s => s.status === 'Diajukan' || s.status === 'Diproses').length;
+                                const badge = document.getElementById('surat-badge');
+                                if (badge) {
+                                    if (pendingCount > 0) { badge.textContent = pendingCount; badge.classList.remove('hidden'); }
+                                    else { badge.classList.add('hidden'); }
+                                }
+                                data.forEach(item => {
+                                    const row = document.createElement('tr');
+                                    row.className = 'hover:bg-gray-50 transition';
+                                    const dateStr = item.diajukanPada ? new Date(item.diajukanPada).toLocaleDateString('id-ID') : '-';
+                                    let statusClass = 'bg-yellow-100 text-yellow-700';
+                                    if (item.status === 'Diproses') statusClass = 'bg-blue-100 text-blue-700';
+                                    else if (item.status === 'Selesai') statusClass = 'bg-green-100 text-green-700';
+                                    else if (item.status === 'Ditolak') statusClass = 'bg-red-100 text-red-700';
+                                    row.innerHTML = `
+                                        <td class="px-6 py-4 text-sm text-gray-600 font-mono">#${item.id}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-800">${escapeHtml(item.jenis || '-')}</td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                                        <td class="px-6 py-4 text-sm font-mono text-gray-600">${escapeHtml(item.nik || '-')}</td>
+                                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                                        <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
+                                        <td class="px-6 py-4 text-center">
+                                            <button onclick="openSuratModal(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Proses</button>
+                                            <button onclick="deleteSurat(${item.id})" class="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                                        </td>
+                                    `;
+                                    tbody.appendChild(row);
+                                });
+                                lucide.createIcons();
+                            } catch (err) {
+                                console.error('Load surat error:', err);
+                                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+                            }
+                        }
+
+                        function openSuratModal(id) {
+                            apiGet(API_BASE_URL + '/surat')
+                                .then(res => {
+                                    const data = res.data || [];
+                                    const item = data.find(s => s.id === id);
+                                    if (!item) {
+                                        showToast('Surat tidak ditemukan', 'error');
+                                        return;
+                                    }
+                                    document.getElementById('surat-id').value = item.id;
+                                    document.getElementById('surat-detail-jenis').textContent = item.jenis || '-';
+                                    document.getElementById('surat-detail-nama').textContent = item.nama || '-';
+                                    document.getElementById('surat-detail-nik').textContent = item.nik || '-';
+                                    document.getElementById('surat-status').value = item.status || 'Diajukan';
+                                    document.getElementById('surat-nomor').value = item.nomorSurat || '';
+                                    document.getElementById('surat-ttd').value = item.ditandatanganiOleh || '';
+                                    document.getElementById('surat-catatan').value = item.catatan || '';
+                                    openModal('surat-modal');
+                                })
+                                .catch(() => showToast('Gagal memuat data surat', 'error'));
+                        }
+
+                        async function deleteSurat(id) {
+                            if (!confirm('Yakin ingin menghapus permohonan surat ini?')) return;
+                            try {
+                                const res = await apiDelete(API_BASE_URL + '/surat/' + id);
+                                if (res.success) {
+                                    showToast('Surat berhasil dihapus');
+                                    loadSurat();
+                                } else {
+                                    showToast(res.message || 'Gagal menghapus surat', 'error');
+                                }
+                            } catch (err) {
+                                showToast('Gagal menghapus surat', 'error');
+                            }
+                        }
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const suratForm = document.getElementById('surat-form');
+                            if (suratForm) {
+                                suratForm.addEventListener('submit', async function(e) {
+                                    e.preventDefault();
+                                    const id = document.getElementById('surat-id').value;
+                                    const status = document.getElementById('surat-status').value;
+                                    const nomorSurat = document.getElementById('surat-nomor').value.trim();
+                                    const ditandatanganiOleh = document.getElementById('surat-ttd').value.trim();
+                                    const catatan = document.getElementById('surat-catatan').value.trim();
+                                    const body = { status };
+                                    if (nomorSurat) body.nomorSurat = nomorSurat;
+                                    if (ditandatanganiOleh) body.ditandatanganiOleh = ditandatanganiOleh;
+                                    if (catatan) body.catatan = catatan;
+
+                                    try {
+                                        const res = await apiPut(API_BASE_URL + '/surat/' + id, body);
+                                        if (res.success) {
+                                            showToast('Surat berhasil diperbarui');
+                                            closeModal('surat-modal');
+                                            loadSurat();
+                                        } else {
+                                            showToast(res.message || 'Gagal memperbarui surat', 'error');
+                                        }
+                                    } catch (err) {
+                                        showToast('Gagal memperbarui surat', 'error');
+                                    }
+                                });
+                            }
+                        });
+
+                        // =============================
+                        // LOGOUT
         // =============================
         function logout() {
             if (!confirm('Yakin ingin logout?')) return;

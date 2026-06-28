@@ -115,7 +115,7 @@
     </div>
 
     <script src="../assets/nav-config.js"></script>
-    <script>renderNavbar('login', true);</script>
+    <script>renderNavbar('login');</script>
     <script src="../assets/script.js"></script>
     <script>
         let currentTab = 'petugas';
@@ -186,7 +186,9 @@
                     } else if (role === 'kolektor') {
                         redirectUrl = '../admin/kolektor-dashboard.html';
                     } else {
-                        redirectUrl = '../admin/dashboard.html';
+                        showMessage('Role tidak dikenal. Hubungi administrator.', 'error');
+                        PageLoader.hide();
+                        return;
                     }
 
                     setTimeout(() => {

@@ -1,67 +1,67 @@
 // ==============================
 // NAVBAR CONFIG — mega-menu
-// Edit di sini aja, semua page otomatis.
+// SEMUA PATH ROOT-RELATIVE (/pages/...)
+// Biar gak ada double-pages bug!
 // ==============================
 
 const NAV_CONFIG = {
   items: [
-    { href: '../index.html', label: 'Beranda', key: 'beranda' },
+    { href: '/index.html', label: 'Beranda', key: 'beranda' },
     {
       label: 'Profil Desa', key: 'profil',
       children: [
-        { href: '../pages/profil/sejarah.html', label: 'Sejarah & Visi Misi', key: 'sejarah' },
-        { href: '../pages/profil/struktur.html', label: 'Struktur Organisasi', key: 'struktur' },
-        { href: '../pages/profil/perangkat.html', label: 'Perangkat Desa', key: 'perangkat' },
-        { href: '../pages/profil/wilayah.html', label: 'Wilayah Administratif', key: 'wilayah' },
-        { href: '../index.html#profil', label: 'Peta Desa', key: 'peta' },
+        { href: '/pages/profil/sejarah.html', label: 'Sejarah & Visi Misi', key: 'sejarah' },
+        { href: '/pages/profil/struktur.html', label: 'Struktur Organisasi', key: 'struktur' },
+        { href: '/pages/profil/perangkat.html', label: 'Perangkat Desa', key: 'perangkat' },
+        { href: '/pages/profil/wilayah.html', label: 'Wilayah Administratif', key: 'wilayah' },
+        { href: '/index.html#profil', label: 'Peta Desa', key: 'peta' },
       ]
     },
     {
       label: 'Data & Statistik', key: 'data',
       children: [
-        { href: '../pages/data/penduduk.html', label: 'Jumlah Penduduk', key: 'penduduk' },
-        { href: '../pages/data/penduduk.html#usia', label: 'Berdasarkan Usia', key: 'usia' },
-        { href: '../pages/data/penduduk.html#pendidikan', label: 'Berdasarkan Pendidikan', key: 'pendidikan' },
-        { href: '../pages/data/penduduk.html#pekerjaan', label: 'Berdasarkan Pekerjaan', key: 'pekerjaan' },
+        { href: '/pages/data/penduduk.html', label: 'Jumlah Penduduk', key: 'penduduk' },
+        { href: '/pages/data/penduduk.html#usia', label: 'Berdasarkan Usia', key: 'usia' },
+        { href: '/pages/data/penduduk.html#pendidikan', label: 'Berdasarkan Pendidikan', key: 'pendidikan' },
+        { href: '/pages/data/penduduk.html#pekerjaan', label: 'Berdasarkan Pekerjaan', key: 'pekerjaan' },
       ]
     },
-    { href: '../pages/pbb.html', label: 'PBB', key: 'pbb' },
+    { href: '/pages/pbb.html', label: 'PBB', key: 'pbb' },
     {
       label: 'Bansos', key: 'bansos',
       children: [
-        { href: '../pages/bansos.html', label: 'Program Aktif', key: 'program' },
-        { href: '../pages/bansos.html#cek-status', label: 'Cek Status Penerima', key: 'cek-bansos' },
-        { href: '../pages/bansos.html#statistik', label: 'Statistik', key: 'stat-bansos' },
+        { href: '/pages/bansos.html', label: 'Program Aktif', key: 'program' },
+        { href: '/pages/bansos.html#cek-status', label: 'Cek Status Penerima', key: 'cek-bansos' },
+        { href: '/pages/bansos.html#statistik', label: 'Statistik', key: 'stat-bansos' },
       ]
     },
     {
       label: 'Layanan', key: 'layanan',
       children: [
-        { href: '../pages/pengaduan.html', label: 'Pengaduan Masyarakat', key: 'pengaduan' },
-        { href: '../pages/layanan/surat-online.html', label: 'Permohonan Surat Online', key: 'surat' },
-        { href: '../pages/layanan/formulir.html', label: 'Unduh Formulir', key: 'formulir' },
+        { href: '/pages/pengaduan.html', label: 'Pengaduan Masyarakat', key: 'pengaduan' },
+        { href: '/pages/layanan/surat-online.html', label: 'Permohonan Surat Online', key: 'surat' },
+        { href: '/pages/layanan/formulir.html', label: 'Unduh Formulir', key: 'formulir' },
       ]
     },
-    { href: '../pages/berita.html', label: 'Berita', key: 'berita' },
-    { href: '../pages/galeri.html', label: 'Galeri', key: 'galeri' },
+    { href: '/pages/berita.html', label: 'Berita', key: 'berita' },
+    { href: '/pages/galeri.html', label: 'Galeri', key: 'galeri' },
     {
       label: 'Login', key: 'login', isButton: true,
       children: [
-        { href: '../pages/login.html?role=admin', label: 'Admin Desa', key: 'login-admin' },
-        { href: '../pages/login.html?role=rt', label: 'RT', key: 'login-rt' },
-        { href: '../pages/login.html?role=kolektor', label: 'Kolektor', key: 'login-kolektor' },
+        { href: '/pages/login.html', label: 'Admin Desa', key: 'login-admin' },
+        { href: '/pages/login.html', label: 'RT', key: 'login-rt' },
+        { href: '/pages/login.html', label: 'Kolektor', key: 'login-kolektor' },
         { href: '#', label: 'Masyarakat (Segera Hadir)', key: 'login-warga', disabled: true },
       ]
     },
   ]
 };
 
-function renderNavbar(activeKey, isInner = true) {
-  const p = isInner ? '../' : '';
+function renderNavbar(activeKey) {
   const navHtml = `
-    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm" x-data="{ openMenu: null }">
+    <nav class="nav-blur fixed top-0 left-0 right-0 z-50 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="${p}index.html" class="font-display text-emerald-800 text-xl font-bold shrink-0">Desa Kasomalang</a>
+        <a href="/index.html" class="font-display text-emerald-800 text-xl font-bold shrink-0">Desa Kasomalang</a>
         <button id="mobile-toggle" class="md:hidden text-emerald-800" onclick="toggleMobileMenu()" aria-label="Menu">
           <i data-lucide="menu" style="width:28px;height:28px"></i>
         </button>
@@ -70,7 +70,6 @@ function renderNavbar(activeKey, isInner = true) {
             if (item.children) {
               const isActive = item.children.some(c => c.key === activeKey) || item.key === activeKey;
               if (item.isButton) {
-                // Login button with dropdown
                 return `
                   <li class="relative group">
                     <a href="#" class="px-3 py-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center gap-1.5 font-semibold ${isActive ? 'ring-2 ring-emerald-300' : ''}" onclick="event.preventDefault(); toggleDropdown('dd-${item.key}')">
@@ -88,7 +87,6 @@ function renderNavbar(activeKey, isInner = true) {
                   </li>
                 `;
               }
-              // Regular mega-menu dropdown
               return `
                 <li class="relative group">
                   <a href="#" class="px-2.5 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition flex items-center gap-1 ${isActive ? 'text-emerald-600 font-semibold' : ''}" onclick="event.preventDefault(); toggleDropdown('dd-${item.key}')">
@@ -103,9 +101,9 @@ function renderNavbar(activeKey, isInner = true) {
                 </li>
               `;
             }
-            // Simple link
+            // Simple link — root-relative, no ../ manipulation
             return `
-              <li><a href="${p}${item.href.replace('../', '')}" class="px-2.5 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition ${item.key === activeKey ? 'text-emerald-600 font-semibold' : ''}">${item.label}</a></li>
+              <li><a href="${item.href}" class="px-2.5 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition ${item.key === activeKey ? 'text-emerald-600 font-semibold' : ''}">${item.label}</a></li>
             `;
           }).join('')}
         </ul>
@@ -128,7 +126,7 @@ function renderNavbar(activeKey, isInner = true) {
               </div>
             `;
           }
-          return `<a href="${p}${item.href.replace('../', '')}" class="block py-2.5 ${item.key === activeKey ? 'text-emerald-600 font-semibold' : 'hover:text-emerald-600'}">${item.label}</a>`;
+          return `<a href="${item.href}" class="block py-2.5 ${item.key === activeKey ? 'text-emerald-600 font-semibold' : 'hover:text-emerald-600'}">${item.label}</a>`;
         }).join('')}
       </div>
     </nav>
@@ -168,7 +166,6 @@ function toggleMobileDropdown(id) {
   }
 }
 
-// Close dropdowns on click outside
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.group') && !e.target.closest('[id^="dd-"]')) closeAllDropdowns();
 });
