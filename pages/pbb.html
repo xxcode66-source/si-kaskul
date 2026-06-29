@@ -6,595 +6,370 @@
     <title>PBB - Desa Kasomalang Kulon</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/style.css">
+    <style>
+        :root { --em: #059669; --em-dark: #065f46; --gold: #d97706; --red: #dc2626; }
+        body { font-family: 'DM Sans', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+
+        /* Hero metrics */
+        .hero { background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #059669 100%); padding: 7rem 1rem 2rem; }
+        .hero-inner { max-width: 1200px; margin: 0 auto; }
+        .hero-eyebrow { display: inline-block; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; padding: .45rem 1.1rem; font-size: .8rem; color: #d1fae5; margin-bottom: 1rem; }
+        .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,4vw,3rem); color: #fff; line-height: 1.15; margin-bottom: 1.5rem; }
+        .hero-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; }
+        .hm-card { background: rgba(255,255,255,.1); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.15); border-radius: 1.25rem; padding: 1.25rem 1.5rem; }
+        .hm-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .18em; color: #a7f3d0; margin-bottom: .35rem; }
+        .hm-val { font-size: 1.75rem; font-weight: 800; color: #fff; }
+        .hm-val.gold { color: #fcd34d; }
+        .hm-sub { font-size: .75rem; color: #d1fae5; margin-top: .2rem; }
+
+        /* Dusun strip */
+        .dusun-strip { padding: 1.5rem 1rem; overflow-x: auto; }
+        .dusun-inner { display: flex; gap: .75rem; max-width: 1200px; margin: 0 auto; min-width: min-content; }
+        .dcard { flex: 1; min-width: 180px; background: #fff; border: 2px solid #e5e7eb; border-radius: 1.15rem; padding: 1rem 1.25rem; cursor: pointer; transition: all .25s ease; }
+        .dcard:hover { border-color: #a7f3d0; box-shadow: 0 4px 20px rgba(5,150,105,.1); }
+        .dcard.on { border-color: var(--em); background: #ecfdf5; box-shadow: 0 4px 20px rgba(5,150,105,.15); }
+        .dcard-name { font-weight: 700; font-size: .9rem; color: #065f46; margin-bottom: .15rem; }
+        .dcard-rw { font-size: .7rem; color: #6b7280; margin-bottom: .5rem; }
+        .dcard-n { font-size: 1.15rem; font-weight: 800; color: #065f46; }
+        .dcard-rp { font-size: .75rem; color: var(--gold); font-weight: 600; margin-top: .1rem; }
+
+        /* Analytics */
+        .analytics { max-width: 1200px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+        .analytics-title { font-weight: 700; font-size: 1.15rem; color: #065f46; margin-bottom: 1rem; padding-left: .5rem; }
+        .rw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 1rem; }
+        .rw-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 1.15rem; padding: 1.25rem; cursor: pointer; transition: all .25s ease; }
+        .rw-card:hover { border-color: #a7f3d0; box-shadow: 0 4px 20px rgba(5,150,105,.1); }
+        .rw-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: .35rem; }
+        .rw-card-label { font-weight: 700; font-size: 1rem; color: #065f46; }
+        .rw-card-wp { font-size: .75rem; color: #6b7280; background: #f3f4f6; padding: .2rem .6rem; border-radius: 999px; }
+        .rw-card-rp { font-size: .85rem; color: var(--gold); font-weight: 700; margin-bottom: .5rem; }
+        .rw-card-bar-bg { height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+        .rw-card-bar { height: 100%; background: linear-gradient(90deg, #059669, #34d399); border-radius: 999px; transition: width .5s ease; }
+
+        /* RT accordion */
+        .rt-accordion { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+        .rt-accordion.open { max-height: 600px; }
+        .rt-row { display: flex; align-items: center; gap: .5rem; padding: .45rem 0; border-top: 1px solid #f3f4f6; }
+        .rt-label { font-size: .75rem; font-weight: 600; color: #374151; min-width: 36px; }
+        .rt-bar-wrap { flex: 1; height: 5px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+        .rt-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 999px; transition: width .5s ease; }
+        .rt-rp { font-size: .7rem; color: var(--gold); font-weight: 600; min-width: 80px; text-align: right; }
+        .rt-wp { font-size: .65rem; color: #9ca3af; min-width: 40px; text-align: right; }
+
+        /* Search */
+        .search-bar { max-width: 1200px; margin: 0 auto; padding: 0 1rem 1rem; }
+        .search-input { width: 100%; padding: .75rem 1rem; border: 2px solid #e5e7eb; border-radius: 1rem; font-size: .9rem; outline: none; transition: border-color .2s; }
+        .search-input:focus { border-color: var(--em); }
+
+        @media (max-width: 768px) {
+            .hero-metrics { grid-template-columns: 1fr; }
+            .rw-grid { grid-template-columns: 1fr; }
+            .dcard { min-width: 150px; }
+        }
+    </style>
 </head>
-<body class="w-full min-h-screen bg-[#f3f6f1]">
+<body class="w-full min-h-screen bg-gray-50">
     <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
-            <p class="loader-text">Memuat dashboard PBB...</p>
+            <p class="loader-text">Memuat data PBB...</p>
         </div>
     </div>
 
-    <!-- Navbar -->
+    <!-- Navigation -->
     <div id="navbar-container"></div>
 
-    <!-- Header -->
-    <header class="pt-28 pb-8 px-4 hero-grid-bg text-white overflow-hidden relative">
-        <div class="absolute inset-0 bg-black/10"></div>
-        <div class="relative max-w-7xl mx-auto space-y-8">
-            <div class="max-w-4xl">
-                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
-                    <i data-lucide="file-text" style="width:18px;height:18px"></i>
-                    <span>Dashboard tunggakan, lunas, dan cek NOP</span>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-eyebrow">📋 Data Tunggakan PBB-P2</div>
+            <div class="hero-title">Wajib Pajak Belum Lunas<br>Desa Kasomalang Kulon</div>
+            <div class="hero-metrics">
+                <div class="hm-card">
+                    <div class="hm-label">Wajib Pajak</div>
+                    <div class="hm-val" id="h-wp">—</div>
+                    <div class="hm-sub" id="h-wp-sub">Belum melunasi PBB</div>
                 </div>
-                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight mt-5 animate-slideUp">Wajib Pajak PBB<br>Desa Kasomalang Kulon</h1>
-                <p class="text-emerald-50/90 text-lg md:text-xl max-w-3xl mt-5 leading-relaxed animate-slideUp" style="animation-delay:0.12s">Klik dusun, lalu turun ke RW dan RT, untuk melihat ringkasan angka yang berubah dinamis. Cek NOP di bawah untuk status lunas, pending, atau tunggakan per tahun.</p>
-            </div>
-
-            <div class="grid gap-5 lg:grid-cols-3 animate-slideUp" style="animation-delay:0.18s">
-                <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
-                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Wajib Pajak</p>
-                    <p id="header-wp" class="text-5xl font-bold mt-3">--</p>
-                    <p class="text-sm text-emerald-100 mt-2">Total terdaftar</p>
+                <div class="hm-card">
+                    <div class="hm-label">Total Tunggakan</div>
+                    <div class="hm-val gold" id="h-rp">—</div>
+                    <div class="hm-sub" id="h-rp-sub">Seluruh data desa</div>
                 </div>
-                <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl lg:col-span-1">
-                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Pembayaran</p>
-                    <p id="header-lunas" class="text-4xl md:text-5xl font-bold text-emerald-300 mt-3">--</p>
-                    <p class="text-sm text-emerald-100 mt-2">Sudah dibayar 2020-2026</p>
-                </div>
-                <div class="rounded-[2rem] bg-white/10 backdrop-blur border border-white/10 p-6 shadow-2xl">
-                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-100">Total Tunggakan</p>
-                    <p id="header-tunggakan" class="text-4xl md:text-5xl font-bold text-amber-300 mt-3">--</p>
-                    <p class="text-sm text-emerald-100 mt-2">Belum dibayar + pending</p>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Content -->
-    <section class="px-4 pb-20 -mt-6">
-        <div class="max-w-7xl mx-auto space-y-8">
-            <!-- Dusun Cards -->
-            <div class="bg-white/95 backdrop-blur rounded-[2rem] shadow-2xl border border-white/60 overflow-hidden fade-in">
-                <div class="grid md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-emerald-100">
-                    <button class="p-6 text-left bg-emerald-50 border-b md:border-b-0 border-emerald-100" onclick="setLocationFilter('all')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Semua Dusun</p>
-                        <p id="card-all-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
-                        <p id="card-all-total" class="text-sm text-gray-500">Rp --</p>
-                    </button>
-                    <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun1')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 01</p>
-                        <p id="card-dusun1-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
-                        <p id="card-dusun1-total" class="text-sm text-gray-500">Rp --</p>
-                    </button>
-                    <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun2')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 02</p>
-                        <p id="card-dusun2-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
-                        <p id="card-dusun2-total" class="text-sm text-gray-500">Rp --</p>
-                    </button>
-                    <button class="p-6 text-left hover:bg-emerald-50 transition" onclick="setLocationFilter('dusun3')">
-                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500">Dusun 03</p>
-                        <p id="card-dusun3-count" class="text-2xl font-bold text-emerald-950 mt-2">-- WP</p>
-                        <p id="card-dusun3-total" class="text-sm text-gray-500">Rp --</p>
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-8 items-start">
-                <div class="space-y-8">
-                    <!-- Filter Wilayah -->
-                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-                            <div>
-                                <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">Filter Wilayah</p>
-                                <h2 class="font-display text-3xl font-bold text-emerald-950 mt-2">Dusun > RW > RT</h2>
-                            </div>
-                            <div id="filter-info" class="text-sm text-gray-500">Klik untuk mempersempit</div>
-                        </div>
-                        <div id="wilayah-tree" class="space-y-4">
-                            <!-- Populated by JS -->
-                            <div class="text-center text-gray-400 py-8">Memuat data wilayah...</div>
-                        </div>
-                    </div>
-
-                    <!-- NOP Check -->
-                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <div class="flex items-start justify-between gap-4 mb-6">
-                            <div>
-                                <p class="text-xs uppercase tracking-[0.22em] text-emerald-700">🔍 Cari & Filter</p>
-                                <h2 class="font-display text-3xl font-bold text-emerald-950 mt-2">Cek status PBB lewat NOP</h2>
-                                <p class="text-gray-600 mt-2">Masukkan NOP. Sistem akan menampilkan status per tahun 2020-2026.</p>
-                            </div>
-                            <span class="inline-flex items-center rounded-full bg-amber-50 px-4 py-2 text-xs font-semibold text-amber-700">Pencarian NOP</span>
-                        </div>
-
-                        <form id="pbb-check-form" class="space-y-5">
-                            <div>
-                                <label for="nop" class="block text-sm font-medium text-gray-700 mb-2">Nomor Objek Pajak (NOP)</label>
-                                <input id="nop" type="text" placeholder="Contoh: 32.08.120.0000000001" class="w-full px-4 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
-                            </div>
-                            <button type="submit" class="w-full py-4 rounded-2xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
-                                <i data-lucide="search" style="width:20px;height:20px"></i>
-                                Cek Data PBB
-                            </button>
-                        </form>
-
-                        <div id="pbb-result" class="mt-8 hidden p-6 rounded-[1.5rem] border border-emerald-200 bg-emerald-50">
-                            <div class="flex items-start gap-3 mb-4">
-                                <i data-lucide="check-circle" style="width:24px;height:24px;color:#059669" class="flex-shrink-0"></i>
-                                <div>
-                                    <h3 class="font-semibold text-emerald-950 text-lg">Hasil Pencarian</h3>
-                                    <p class="text-sm text-gray-600">Status pembayaran dan riwayat ditampilkan di bawah.</p>
-                                </div>
-                            </div>
-                            <div id="result-content" class="space-y-3 text-sm text-emerald-950"></div>
-                        </div>
-
-                        <div id="pbb-error" class="mt-8 hidden p-4 bg-red-50 border border-red-300 rounded-2xl text-red-800 text-sm flex items-center gap-3">
-                            <i data-lucide="alert-circle" style="width:20px;height:20px"></i>
-                            <span id="error-message">Data tidak ditemukan. Periksa NOP lalu coba lagi.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-8">
-                    <!-- Year Chart -->
-                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-2">Grafik 2020-2026</h3>
-                        <p class="text-sm text-gray-500 mb-5">Klik tahun untuk lihat ringkasan</p>
-                        <div class="space-y-4" id="year-chart">
-                            <div class="text-center text-gray-400 py-8">Memuat data...</div>
-                        </div>
-                    </div>
-
-                    <!-- Summary Cards -->
-                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Ringkasan Status</h3>
-                        <div class="space-y-4" id="summary-cards"></div>
-                        <p class="text-xs text-gray-500 mt-4">Data di atas adalah ringkasan agregat — tidak menampilkan data individu warga.</p>
-                    </div>
-
-                    <!-- Panduan -->
-                    <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
-                        <h3 class="font-display text-2xl font-bold text-emerald-950 mb-5">Panduan Singkat</h3>
-                        <ul class="space-y-3 text-sm text-gray-600">
-                            <li>Masukkan NOP saja untuk melihat status lunas, pending, atau tunggakan otomatis.</li>
-                            <li>Pilih dusun, RW, lalu RT untuk mempersempit ringkasan angka.</li>
-                            <li>Gunakan grafik tahunan 2020-2026 untuk membaca tren pembayaran desa.</li>
-                        </ul>
-                    </div>
+                <div class="hm-card">
+                    <div class="hm-label">Data Tersaring</div>
+                    <div class="hm-val" id="h-fil">—</div>
+                    <div class="hm-sub" id="h-fil-sub">Hasil filter</div>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Dusun Strip -->
+    <div class="dusun-strip">
+        <div class="dusun-inner" id="dusun-strip">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+        <input type="text" class="search-input" id="search-input" placeholder="🔍 Cari nama wajib pajak atau NOP...">
+    </div>
+
+    <!-- Analytics -->
+    <div class="analytics" id="analytics-section">
+        <div class="analytics-title">📊 Analitik Tunggakan per RW & RT</div>
+        <div class="rw-grid" id="rw-grid">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
     <!-- Footer -->
-    <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
+    <footer class="py-10 px-4 text-center bg-emerald-900 text-white">
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
     </footer>
 
     <script src="../assets/nav-config.js"></script>
+    <script>renderNavbar('pbb');</script>
     <script src="../assets/script.js"></script>
     <script>
-        // ==============================
-        // NAVBAR
-        // ==============================
-        renderNavbar('pbb');
-
-        // ==============================
-        // API BASE
-        // ==============================
         const API = (() => {
-            const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const base = isLocal ? 'http://localhost:3000/api' : window.location.origin + '/api';
+            const base = API_BASE_URL; // from script.js, already includes /api
             return {
-                get: async (path) => {
-                    const r = await fetch(base + path);
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.json();
-                },
-                post: async (path, body) => {
-                    const r = await fetch(base + path, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                    });
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.json();
-                }
+                get: async (path) => { const r = await fetch(base + path); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
+                post: async (path, body) => { const r = await fetch(base + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
             };
         })();
 
-        // ==============================
-        // STATE
-        // ==============================
         let overviewData = null;
-        let activeLocation = 'all';
-        let activeRw = 'all';
-        let activeRt = 'all';
+        let allDusunData = [];
+        let currentDusun = null; // null = semua
+        let rwData = [];
+        let maxBelumBayar = 0;
 
-        // ==============================
-        // FORMAT HELPERS
-        // ==============================
-        function rp(v) {
-            return 'Rp ' + Number(v || 0).toLocaleString('id-ID');
+        function formatRp(n) {
+            if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + ' M';
+            if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(0) + '.' + String(Math.round((n % 1e6) / 1e3)).padStart(3, '0').substring(0, 3) + '.000';
+            return 'Rp ' + Number(n).toLocaleString('id-ID');
         }
 
-        function getStatusClass(status) {
-            if (status === 'Lunas') return 'bg-emerald-100 text-emerald-700';
-            if (status === 'Pending') return 'bg-amber-100 text-amber-700';
-            return 'bg-red-100 text-red-700';
+        function formatRpShort(n) {
+            if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + ' M';
+            if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + ' Jt';
+            return 'Rp ' + Number(n).toLocaleString('id-ID');
         }
 
-        function getStatusLabel(status) {
-            if (status === 'Lunas') return '✅ Lunas';
-            if (status === 'Pending') return '🟡 Pending';
-            return '🔴 Belum Bayar';
-        }
-
-        // ==============================
-        // LOAD DATA
-        // ==============================
-        async function loadPbbData() {
+        // Load overview
+        async function loadOverview() {
             try {
-                PageLoader.show('Memuat data PBB...');
-                const result = await API.get('/pbb/stats/overview');
-                overviewData = result.data;
-
-                renderHeaderStats(overviewData.overview);
-                renderDusunCards(overviewData.perDusun);
-                renderYearChart(overviewData.perYear);
-                renderSummaryCards(overviewData.overview);
-                renderWilayahTree(overviewData);
-                renderPbbData();
-                PageLoader.hide();
+                const res = await API.get('/pbb/stats/overview');
+                overviewData = res.data;
+                const ov = res.data.overview;
+                document.getElementById('h-wp').textContent = ov.totalWp;
+                document.getElementById('h-rp').textContent = formatRpShort(ov.totalBelumBayar);
+                document.getElementById('h-rp-sub').textContent = 'Dari total ' + formatRpShort(ov.totalPajak);
+                document.getElementById('h-fil').textContent = ov.totalWp;
+                document.getElementById('h-fil-sub').textContent = 'Total ' + ov.totalWp + ' WP terdaftar';
             } catch (e) {
-                console.error('Gagal muat data PBB:', e);
-                document.querySelector('#wilayah-tree').innerHTML = '<div class="text-center text-red-500 py-8">Gagal memuat data. Pastikan backend berjalan.</div>';
-                PageLoader.hide();
+                console.error('Failed to load overview:', e);
             }
         }
 
-        // ==============================
-        // RENDER FUNCTIONS
-        // ==============================
-        function renderHeaderStats(overview) {
-            setText('header-wp', overview.totalWp + ' WP');
-            setText('header-lunas', rp(overview.totalLunas));
-            setText('header-tunggakan', rp(overview.totalBelumBayar + overview.totalPending));
-        }
+        // Load dusun cards
+        async function loadDusunCards() {
+            try {
+                const res = await API.get('/pbb/stats/overview');
+                allDusunData = res.data.perDusun || [];
 
-        function renderDusunCards(perDusun) {
-            setText('card-all-count', overviewData.overview.totalWp + ' WP');
-            setText('card-all-total', rp(overviewData.overview.totalPajak));
+                // Compute totals for "Semua Dusun"
+                const totalWP = allDusunData.reduce((s, d) => s + d.count, 0);
+                const totalTunggakan = allDusunData.reduce((s, d) => s + d.totalBelumBayar, 0);
 
-            for (const d of perDusun) {
-                const countEl = document.getElementById('card-' + d.dusun + '-count');
-                const totalEl = document.getElementById('card-' + d.dusun + '-total');
-                if (countEl) countEl.textContent = d.count + ' WP';
-                if (totalEl) totalEl.textContent = rp(d.totalPajak);
-            }
-        }
+                const strip = document.getElementById('dusun-strip');
+                strip.innerHTML = '';
 
-        function renderYearChart(perYear) {
-            const container = document.getElementById('year-chart');
-            if (!container) return;
-            const maxTotal = Math.max(...perYear.map(item => item.total));
-
-            container.innerHTML = perYear.map(item => {
-                const pct = Math.max(20, Math.round((item.total / maxTotal) * 100));
-                return `
-                    <button class="w-full text-left rounded-[1.5rem] border border-emerald-100 bg-gradient-to-r from-emerald-50 to-white px-4 py-4 transition hover:shadow-lg hover:border-emerald-300" onclick="focusYear(${item.year})">
-                        <div class="flex items-center justify-between gap-4 mb-3">
-                            <div>
-                                <p class="text-xs uppercase tracking-[0.2em] text-gray-500">Tahun ${item.year}</p>
-                                <p class="font-bold text-emerald-950 mt-1">${rp(item.total)}</p>
-                            </div>
-                            <div class="text-right text-sm">
-                                <p class="text-emerald-700 font-semibold">${rp(item.lunas)} lunas</p>
-                                <p class="text-amber-600 font-semibold">${rp(item.pending)} pending</p>
-                                <p class="text-red-600 font-semibold">${rp(item.belumBayar)} tunggak</p>
-                            </div>
-                        </div>
-                        <div class="h-3 rounded-full bg-gray-100 overflow-hidden flex">
-                            <div class="h-full bg-emerald-500" style="width:${item.total > 0 ? Math.round((item.lunas / item.total) * 100) : 0}%"></div>
-                            <div class="h-full bg-amber-400" style="width:${item.total > 0 ? Math.round((item.pending / item.total) * 100) : 0}%"></div>
-                        </div>
-                    </button>
+                // "Semua Dusun" card
+                const allCard = document.createElement('div');
+                allCard.className = 'dcard on';
+                allCard.id = 'dc-all';
+                allCard.onclick = () => setDusun(null);
+                allCard.innerHTML = `
+                    <div class="dcard-name">🏘️ Semua Dusun</div>
+                    <div class="dcard-rw">Semua RW</div>
+                    <div class="dcard-n">${totalWP} WP</div>
+                    <div class="dcard-rp">${formatRpShort(totalTunggakan)}</div>
                 `;
-            }).join('');
-        }
+                strip.appendChild(allCard);
 
-        function renderSummaryCards(overview) {
-            const c = document.getElementById('summary-cards');
-            if (!c) return;
-            const total = overview.totalBelumBayar + overview.totalPending + overview.totalLunas;
-            const lunasPct = total > 0 ? Math.round((overview.totalLunas / total) * 100) : 0;
-            const pendingPct = total > 0 ? Math.round((overview.totalPending / total) * 100) : 0;
-            const tunggakPct = total > 0 ? Math.round((overview.totalBelumBayar / total) * 100) : 0;
+                // Individual dusun cards
+                const icons = { dusun1: '🌿 Dusun I', dusun2: '🌿 Dusun II', dusun3: '🌿 Dusun III', luardesa: '🔹 Luar Desa' };
+                const rwLabels = { dusun1: 'RW 01 · RW 02', dusun2: 'RW 03 · RW 04', dusun3: 'RW 05 · RW 06 · RW 07', luardesa: 'Alamat tidak terdata' };
 
-            c.innerHTML = `
-                <div class="rounded-2xl bg-emerald-50 p-4 border border-emerald-100">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm font-medium text-emerald-800">✅ Lunas / Terverifikasi</p>
-                            <p class="text-lg font-bold text-emerald-950">${rp(overview.totalLunas)}</p>
-                        </div>
-                        <span class="text-sm font-semibold text-emerald-700">${lunasPct}%</span>
-                    </div>
-                    <div class="mt-2 h-2 rounded-full bg-emerald-200"><div class="h-full rounded-full bg-emerald-600" style="width:${lunasPct}%"></div></div>
-                </div>
-                <div class="rounded-2xl bg-amber-50 p-4 border border-amber-100">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm font-medium text-amber-800">🟡 Pending (Menunggu Verifikasi)</p>
-                            <p class="text-lg font-bold text-amber-950">${rp(overview.totalPending)}</p>
-                        </div>
-                        <span class="text-sm font-semibold text-amber-700">${pendingPct}%</span>
-                    </div>
-                    <div class="mt-2 h-2 rounded-full bg-amber-200"><div class="h-full rounded-full bg-amber-500" style="width:${pendingPct}%"></div></div>
-                </div>
-                <div class="rounded-2xl bg-red-50 p-4 border border-red-100">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="text-sm font-medium text-red-800">🔴 Belum Bayar / Tunggakan</p>
-                            <p class="text-lg font-bold text-red-950">${rp(overview.totalBelumBayar)}</p>
-                        </div>
-                        <span class="text-sm font-semibold text-red-700">${tunggakPct}%</span>
-                    </div>
-                    <div class="mt-2 h-2 rounded-full bg-red-200"><div class="h-full rounded-full bg-red-500" style="width:${tunggakPct}%"></div></div>
-                </div>
-            `;
-        }
-
-        async function renderWilayahTree(data) {
-            const container = document.getElementById('wilayah-tree');
-            if (!container) return;
-
-            // Build tree from perDusun data + fetch RW per dusun
-            let html = '';
-            for (const d of data.perDusun) {
-                if (d.dusun === 'luardesa') continue;
-                try {
-                    const rwRes = await API.get('/pbb/stats/by-dusun/' + d.dusun);
-                    const rwData = rwRes.data || [];
-                    let rwHtml = '';
-                    for (const r of rwData) {
-                        try {
-                            const rtRes = await API.get('/pbb/stats/by-dusun/' + d.dusun + '/rw/' + r.rw);
-                            const rtData = rtRes.data || [];
-                            const rtHtml = rtData.map(rt => `
-                                <button class="rt-chip" onclick="setRtFilter('${d.dusun}','${r.rw}','${rt.rt}')">${rt.rtNama}</button>
-                            `).join('');
-                            rwHtml += `
-                                <div class="rounded-2xl bg-white border border-gray-200 p-4">
-                                    <button class="w-full text-left font-semibold text-emerald-950" onclick="toggleFilterGroup('rw-${d.dusun}-${r.rw}'); setRtFilter('${d.dusun}','${r.rw}','all')">
-                                        ${r.rwNama} — ${rp(r.totalPajak)}
-                                    </button>
-                                    <div id="rw-${d.dusun}-${r.rw}" class="mt-3 hidden grid grid-cols-2 gap-2">
-                                        ${rtHtml}
-                                    </div>
-                                </div>
-                            `;
-                        } catch(e) {}
-                    }
-                    html += `
-                        <div class="rounded-[1.5rem] border border-emerald-100 bg-emerald-50 p-5">
-                            <button class="w-full flex items-center justify-between text-left" onclick="toggleFilterGroup('dusun-${d.dusun}'); setLocationFilter('${d.dusun}')">
-                                <div>
-                                    <p class="font-semibold text-emerald-950">${d.dusunNama}</p>
-                                    <p class="text-sm text-gray-600">${d.count} WP — ${rp(d.totalPajak)}</p>
-                                </div>
-                                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
-                            </button>
-                            <div id="dusun-${d.dusun}" class="mt-4 grid sm:grid-cols-2 gap-3">${rwHtml}</div>
-                        </div>
+                for (const d of allDusunData) {
+                    const card = document.createElement('div');
+                    card.className = 'dcard';
+                    card.id = 'dc-' + d.dusun;
+                    card.onclick = () => setDusun(d.dusun);
+                    card.innerHTML = `
+                        <div class="dcard-name">${icons[d.dusun] || d.dusunNama}</div>
+                        <div class="dcard-rw">${rwLabels[d.dusun] || d.dusunNama}</div>
+                        <div class="dcard-n">${d.count} WP</div>
+                        <div class="dcard-rp">${formatRpShort(d.totalBelumBayar)}</div>
                     `;
-                } catch(e) {}
+                    strip.appendChild(card);
+                }
+            } catch (e) {
+                console.error('Failed to load dusun cards:', e);
             }
-            container.innerHTML = html;
-            if (typeof lucide !== 'undefined') setTimeout(() => lucide.createIcons(), 100);
         }
 
-        function focusYear(year) {
-            const p = overviewData.perYear.find(y => y.year === year);
-            if (!p) return;
-            const resultEl = document.getElementById('pbb-result');
-            const errorEl = document.getElementById('pbb-error');
-            errorEl.classList.add('hidden');
-            document.getElementById('result-content').innerHTML = `
-                <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                    <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Tahun ${p.year}</span>
-                    <p class="mt-1 font-semibold text-emerald-950 text-lg">${rp(p.total)} total pajak</p>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div class="rounded-2xl bg-white px-3 py-3 border border-emerald-100 text-center">
-                        <span class="text-xs text-gray-500">Lunas</span>
-                        <p class="mt-1 font-bold text-emerald-700">${rp(p.lunas)}</p>
-                        <p class="text-xs text-gray-500">${p.countLunas} WP</p>
-                    </div>
-                    <div class="rounded-2xl bg-white px-3 py-3 border border-amber-100 text-center">
-                        <span class="text-xs text-gray-500">Pending</span>
-                        <p class="mt-1 font-bold text-amber-700">${rp(p.pending)}</p>
-                        <p class="text-xs text-gray-500">${p.countPending} WP</p>
-                    </div>
-                    <div class="rounded-2xl bg-white px-3 py-3 border border-red-100 text-center">
-                        <span class="text-xs text-gray-500">Tunggak</span>
-                        <p class="mt-1 font-bold text-red-700">${rp(p.belumBayar)}</p>
-                        <p class="text-xs text-gray-500">${p.countBelumBayar} WP</p>
-                    </div>
-                </div>
-            `;
-            resultEl.classList.remove('hidden');
-        }
+        function setDusun(dusunId) {
+            currentDusun = dusunId;
 
-        // ==============================
-        // FILTERING
-        // ==============================
-        function toggleFilterGroup(id) {
-            const section = document.getElementById(id);
-            if (section) section.classList.toggle('hidden');
-        }
-
-        function setLocationFilter(value) {
-            activeLocation = value;
-            activeRw = 'all';
-            activeRt = 'all';
-            renderPbbData();
-        }
-
-        function setRtFilter(location, rw, rt) {
-            activeLocation = location;
-            activeRw = rw;
-            activeRt = rt;
-            renderPbbData();
-        }
-
-        async function renderPbbData() {
-            if (!overviewData) return;
-
-            // Find current location stats
-            let totalPajak = overviewData.overview.totalPajak;
-            let count = overviewData.overview.totalWp;
-            let totalLunas = overviewData.overview.totalLunas;
-            let totalBelum = overviewData.overview.totalBelumBayar + overviewData.overview.totalPending;
-
-            if (activeLocation !== 'all') {
-                try {
-                    let url = '/pbb/stats/by-dusun/' + activeLocation;
-                    if (activeRw !== 'all') {
-                        url += '/rw/' + activeRw;
-                        if (activeRt !== 'all') {
-                            // For RT level, we sum up from RW data
-                            // We'll just show the RW aggregate for now
-                        }
-                    }
-                    const res = await API.get(url);
-                    const data = res.data || [];
-                    if (activeRw !== 'all' && activeRt !== 'all') {
-                        const rtData = data.find(d => d.rt === activeRt);
-                        if (rtData) {
-                            totalPajak = rtData.totalPajak;
-                            count = rtData.count;
-                            totalLunas = rtData.totalLunas;
-                            totalBelum = rtData.totalBelumBayar + rtData.totalPending;
-                        }
-                    } else if (activeRw !== 'all') {
-                        const rwData = data.find(d => d.rw === activeRw);
-                        if (rwData) {
-                            totalPajak = rwData.totalPajak;
-                            count = rwData.count;
-                            totalLunas = rwData.totalLunas;
-                            totalBelum = rwData.totalBelumBayar + rwData.totalPending;
-                        }
-                    } else {
-                        totalPajak = data.reduce((s, d) => s + d.totalPajak, 0);
-                        count = data.reduce((s, d) => s + d.count, 0);
-                        totalLunas = data.reduce((s, d) => s + d.totalLunas, 0);
-                        totalBelum = data.reduce((s, d) => s + d.totalBelumBayar + d.totalPending, 0);
-                    }
-                } catch(e) {}
+            // Update card styles
+            document.querySelectorAll('.dcard').forEach(c => c.classList.remove('on'));
+            if (dusunId === null) {
+                document.getElementById('dc-all')?.classList.add('on');
+            } else {
+                document.getElementById('dc-' + dusunId)?.classList.add('on');
             }
 
-            setText('header-wp', count + ' WP');
-            setText('header-lunas', rp(totalLunas));
-            setText('header-tunggakan', rp(totalBelum));
-
-            const fi = document.getElementById('filter-info');
-            if (fi) fi.textContent = activeLocation === 'all' ? 'Semua wilayah' : activeLocation;
+            loadRWData();
         }
 
-        // ==============================
-        // NOP CHECK
-        // ==============================
-        document.getElementById('pbb-check-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nop = document.getElementById('nop').value.trim();
-            if (!nop) return;
+        async function loadRWData() {
+            const grid = document.getElementById('rw-grid');
+            grid.innerHTML = '<div class="text-center text-gray-400 py-8 col-span-full">Memuat data...</div>';
 
-            PageLoader.show('Memeriksa data PBB...');
             try {
-                const result = await API.post('/pbb/check-nop', { nop });
-                const data = result.data;
-                const resultEl = document.getElementById('pbb-result');
-                const errorEl = document.getElementById('pbb-error');
-                errorEl.classList.add('hidden');
+                if (currentDusun === null) {
+                    // Load all RW data across all dusun
+                    let allRW = [];
+                    for (const d of allDusunData) {
+                        const res = await API.get('/pbb/stats/by-dusun/' + d.dusun);
+                        const rwList = (res.data || []).map(rw => ({ ...rw, dusunId: d.dusun, dusunNama: d.dusunNama }));
+                        allRW = allRW.concat(rwList);
+                    }
+                    rwData = allRW;
+                } else {
+                    const res = await API.get('/pbb/stats/by-dusun/' + currentDusun);
+                    rwData = (res.data || []).map(rw => ({ ...rw, dusunId: currentDusun }));
+                }
 
-                const yearsUnpaid = data.perYear.filter(p => p.status !== 'Lunas');
-                const totalUnpaid = data.totalBelumBayar;
+                maxBelumBayar = Math.max(...rwData.map(r => r.totalBelumBayar), 1);
+                renderRWGrid();
+            } catch (e) {
+                console.error('Failed to load RW data:', e);
+                grid.innerHTML = '<div class="text-center text-red-400 py-8 col-span-full">Gagal memuat data.</div>';
+            }
+        }
 
-                let rowsHtml = `
-                    <div class="grid sm:grid-cols-2 gap-3">
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">NOP</span>
-                            <p class="mt-1 font-semibold text-emerald-950 font-mono">${data.nop}</p>
-                        </div>
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Nama Wajib Pajak</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.nama}</p>
-                        </div>
+        function renderRWGrid() {
+            const grid = document.getElementById('rw-grid');
+            grid.innerHTML = '';
+
+            // Update filtered count
+            const totalFilteredWP = rwData.reduce((s, r) => s + r.count, 0);
+            const totalFilteredTunggakan = rwData.reduce((s, r) => s + r.totalBelumBayar, 0);
+            document.getElementById('h-fil').textContent = totalFilteredWP;
+            document.getElementById('h-fil-sub').textContent = rwData.length + ' RW ditampilkan';
+
+            if (rwData.length === 0) {
+                grid.innerHTML = '<div class="text-center text-gray-400 py-8 col-span-full">Tidak ada data untuk filter ini.</div>';
+                return;
+            }
+
+            rwData.forEach((rw, idx) => {
+                const pct = Math.round((rw.totalBelumBayar / maxBelumBayar) * 100);
+                const card = document.createElement('div');
+                card.className = 'rw-card';
+                card.id = 'rwc-' + idx;
+                const rwLabel = rw.rwNama || rw.rw;
+                card.innerHTML = `
+                    <div class="rw-card-head">
+                        <span class="rw-card-label">${rwLabel}</span>
+                        <span class="rw-card-wp">${rw.count} WP</span>
                     </div>
-                    <div class="grid sm:grid-cols-2 gap-3">
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Alamat</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.alamat}</p>
-                        </div>
-                        <div class="rounded-2xl bg-white px-4 py-3 border border-emerald-100">
-                            <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Wilayah</span>
-                            <p class="mt-1 font-semibold text-emerald-950">${data.dusun} / ${data.rw} / ${data.rt}</p>
-                        </div>
-                    </div>
-                    <div class="rounded-2xl bg-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-50 px-4 py-3 border border-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-100">
-                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Total Belum Dibayar</span>
-                        <p class="mt-1 font-bold text-${yearsUnpaid.length > 0 ? 'red' : 'emerald'}-700 text-lg">${totalUnpaid > 0 ? rp(totalUnpaid) : '✅ Lunas Semua'}</p>
-                    </div>
-                    <div class="rounded-2xl bg-white px-4 py-3 border border-gray-200">
-                        <span class="text-xs uppercase tracking-[0.18em] text-gray-500">Status per Tahun</span>
-                        <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            ${data.perYear.map(p => `
-                                <div class="rounded-xl px-3 py-2 text-center ${getStatusClass(p.status)}">
-                                    <span class="text-xs font-bold">${p.year}</span>
-                                    <p class="text-xs mt-1">${getStatusLabel(p.status)}</p>
-                                    <p class="text-xs font-semibold">${rp(p.pajak)}</p>
-                                </div>
-                            `).join('')}
-                        </div>
+                    <div class="rw-card-rp">${formatRpShort(rw.totalBelumBayar)}</div>
+                    <div class="rw-card-bar-bg"><div class="rw-card-bar" style="width:${pct}%"></div></div>
+                    <div class="rt-accordion" id="rta-${idx}">
+                        <div class="text-xs text-gray-400 py-2">Memuat data RT...</div>
                     </div>
                 `;
+                card.onclick = () => toggleRWCard(idx, rw);
+                grid.appendChild(card);
+            });
+        }
 
-                document.getElementById('result-content').innerHTML = rowsHtml;
-                resultEl.classList.remove('hidden');
-                PageLoader.hide();
-            } catch (e) {
-                PageLoader.hide();
-                document.getElementById('pbb-result').classList.add('hidden');
-                const errorEl = document.getElementById('pbb-error');
-                errorEl.classList.remove('hidden');
-                document.getElementById('error-message').textContent = 'Data tidak ditemukan. Periksa NOP lalu coba lagi.';
+        async function toggleRWCard(idx, rw) {
+            const acc = document.getElementById('rta-' + idx);
+            if (acc.classList.contains('open')) {
+                acc.classList.remove('open');
+                return;
             }
+
+            // Close others
+            document.querySelectorAll('.rt-accordion.open').forEach(el => el.classList.remove('open'));
+            acc.classList.add('open');
+
+            // Load RT data if not loaded
+            if (acc.querySelector('.text-gray-400')) {
+                try {
+                    const res = await API.get(`/pbb/stats/by-dusun/${rw.dusunId}/rw/${rw.rw}`);
+                    const rtData = res.data || [];
+                    const maxRt = Math.max(...rtData.map(r => r.totalBelumBayar), 1);
+
+                    acc.innerHTML = '';
+                    rtData.forEach(rt => {
+                        const rtPct = Math.round((rt.totalBelumBayar / maxRt) * 100);
+                        const row = document.createElement('div');
+                        row.className = 'rt-row';
+                        row.innerHTML = `
+                            <span class="rt-label">${rt.rtNama || rt.rt}</span>
+                            <div class="rt-bar-wrap"><div class="rt-bar" style="width:${rtPct}%"></div></div>
+                            <span class="rt-rp">${formatRpShort(rt.totalBelumBayar)}</span>
+                            <span class="rt-wp">${rt.count} WP</span>
+                        `;
+                        acc.appendChild(row);
+                    });
+
+                    if (rtData.length === 0) {
+                        acc.innerHTML = '<div class="text-xs text-gray-400 py-2">Tidak ada data RT.</div>';
+                    }
+                } catch (e) {
+                    acc.innerHTML = '<div class="text-xs text-red-400 py-2">Gagal memuat data RT.</div>';
+                }
+            }
+        }
+
+        // Search
+        document.getElementById('search-input').addEventListener('input', async (e) => {
+            const q = e.target.value.trim();
+            if (q.length < 2) {
+                loadRWData();
+                return;
+            }
+            try {
+                const res = await API.post('/pbb/warga-list', {});
+                // Filter locally if API doesn't support search
+                // For now, just filter the RW data display
+            } catch (e) { /* ignore */ }
         });
 
-        // ==============================
-        // UTILS
-        // ==============================
-        function setText(id, val) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = val;
-        }
-
-        // ==============================
-        // INIT
-        // ==============================
-        window.addEventListener('DOMContentLoaded', () => {
-            initScrollAnimations();
-            initNavigationLoader();
-            loadPbbData();
+        // Init
+        async function init() {
+            await loadOverview();
+            await loadDusunCards();
+            await loadRWData();
             PageLoader.hide();
             lucide.createIcons();
-        });
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

@@ -76,11 +76,23 @@
     </footer>
 
     <!-- Lightbox -->
-    <div id="lightbox" class="lightbox" onclick="this.classList.remove('active')">
-        <span class="lightbox-close" onclick="event.stopPropagation(); document.getElementById('lightbox').classList.remove('active')">
-            <i data-lucide="x" style="width:24px;height:24px"></i>
-        </span>
-        <img id="lightbox-img" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg">
+    <div id="lightbox" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
+            <i data-lucide="x" style="width:20px;height:20px"></i>
+        </button>
+        <button onclick="event.stopPropagation(); lightboxNav(-1)" class="absolute left-4 z-10 w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
+            <i data-lucide="chevron-left" style="width:20px;height:20px"></i>
+        </button>
+        <button onclick="event.stopPropagation(); lightboxNav(1)" class="absolute right-4 z-10 w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition">
+            <i data-lucide="chevron-right" style="width:20px;height:20px"></i>
+        </button>
+        <div class="flex flex-col items-center gap-4 max-w-[90vw]" onclick="event.stopPropagation()">
+            <img id="lightbox-img" class="max-w-[90vw] max-h-[75vh] object-contain rounded-lg shadow-2xl">
+            <div class="text-center text-white">
+                <p id="lightbox-caption" class="font-semibold text-lg"></p>
+                <p id="lightbox-category" class="text-emerald-300 text-sm mt-1 uppercase tracking-wider"></p>
+            </div>
+        </div>
     </div>
 
     <script src="../assets/nav-config.js"></script>
@@ -104,6 +116,8 @@
         ];
 
         let currentFilter = 'semua';
+        let currentLightboxIndex = 0;
+        let currentFilteredItems = [];
 
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
@@ -112,13 +126,16 @@
             const filtered = currentFilter === 'semua' 
                 ? galleryData 
                 : galleryData.filter(item => item.category === currentFilter);
+            currentFilteredItems = filtered;
 
             filtered.forEach((item, index) => {
                 const div = document.createElement('div');
-                div.className = 'gallery-item group rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item relative bg-gray-900';
-                div.style.animationDelay = (index * 0.1) + 's';
+                // Make some items taller for masonry effect
+                const isTall = index % 5 === 0;
+                div.className = `gallery-item group rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item relative bg-gray-900 ${isTall ? 'row-span-2' : ''}`;
+                div.style.animationDelay = (index * 0.08) + 's';
                 div.innerHTML = `
-                    <img src="${item.image}" alt="${item.title}" class="w-full h-48 md:h-60 object-cover transition-transform duration-500 group-hover:scale-110 group-hover:rotate-1">
+                    <img src="${item.image}" alt="${item.title}" class="w-full ${isTall ? 'h-full min-h-[320px]' : 'h-48 md:h-60'} object-cover transition-transform duration-500 group-hover:scale-110">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
                     <div class="absolute inset-x-0 bottom-0 p-4 text-white">
                         <div class="flex items-center justify-between gap-3">
@@ -131,13 +148,35 @@
                     </div>
                 `;
                 
-                div.addEventListener('click', () => {
-                    document.getElementById('lightbox-img').src = item.image;
-                    document.getElementById('lightbox').classList.add('active');
-                });
-
+                div.addEventListener('click', () => openLightbox(index));
                 grid.appendChild(div);
             });
+        }
+
+        function openLightbox(index) {
+            currentLightboxIndex = index;
+            const item = currentFilteredItems[index];
+            if (!item) return;
+            document.getElementById('lightbox-img').src = item.image;
+            document.getElementById('lightbox-caption').textContent = item.title;
+            document.getElementById('lightbox-category').textContent = item.category;
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            lb.style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('hidden');
+            lb.style.display = 'none';
+        }
+
+        function lightboxNav(dir) {
+            currentLightboxIndex += dir;
+            if (currentLightboxIndex < 0) currentLightboxIndex = currentFilteredItems.length - 1;
+            if (currentLightboxIndex >= currentFilteredItems.length) currentLightboxIndex = 0;
+            openLightbox(currentLightboxIndex);
         }
 
         function filterGallery(category, button) {

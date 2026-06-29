@@ -22,10 +22,29 @@
         <div id="navbar-container"></div>
 
     <!-- Header -->
-    <div class="pt-32 pb-12 px-4 bg-gradient-to-b from-emerald-800 to-emerald-600">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="font-display text-white text-5xl md:text-5xl mb-4">Program Bantuan Sosial</h1>
-            <p class="text-emerald-100 text-lg">Data penerima bantuan sosial di Desa Kasomalang Kulon</p>
+    <div class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-end">
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                    <i data-lucide="heart-handshake" style="width:18px;height:18px"></i>
+                    <span>Transparansi bantuan sosial untuk warga</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Bantuan Sosial</h1>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Data penerima bantuan sosial di Desa Kasomalang Kulon — terbuka dan dapat diperiksa oleh seluruh warga.</p>
+            </div>
+
+            <div class="hero-card rounded-[2rem] p-6 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
+                <p class="text-xs uppercase tracking-[0.22em] text-emerald-700 mb-3">Cek Penerima Bansos</p>
+                <p class="text-sm text-gray-600 mb-4">Masukkan NIK Anda untuk memeriksa status kepesertaan bansos.</p>
+                <div class="flex gap-2">
+                    <input id="bansos-nik-input" type="text" maxlength="16" placeholder="Masukkan 16 digit NIK" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <button onclick="checkBansos()" class="px-5 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition text-sm flex items-center gap-2">
+                        <i data-lucide="search" style="width:16px;height:16px"></i>Cek
+                    </button>
+                </div>
+                <div id="bansos-check-result" class="mt-4 hidden"></div>
+            </div>
         </div>
     </div>
 
@@ -34,33 +53,37 @@
         <div class="max-w-7xl mx-auto">
             <!-- Stats -->
             <div class="grid md:grid-cols-4 gap-6 mb-12 fade-in">
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-600 text-sm font-medium">Total Penerima</span>
-                        <i data-lucide="users" style="width:24px;height:24px;color:#10b981"></i>
+                <div class="bg-white p-6 rounded-[1.75rem] shadow-lg border border-gray-100 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-gray-500 text-sm font-medium">Total Penerima</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center"><i data-lucide="users" style="width:20px;height:20px;color:#059669"></i></div>
                     </div>
                     <p class="text-3xl font-bold text-emerald-600">156</p>
+                    <p class="text-xs text-gray-400 mt-1">Warga terdaftar</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-600 text-sm font-medium">Program PKH</span>
-                        <i data-lucide="heart" style="width:24px;height:24px;color:#f59e0b"></i>
+                <div class="bg-white p-6 rounded-[1.75rem] shadow-lg border border-gray-100 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-gray-500 text-sm font-medium">Program PKH</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center"><i data-lucide="heart" style="width:20px;height:20px;color:#d97706"></i></div>
                     </div>
                     <p class="text-3xl font-bold text-amber-600">89</p>
+                    <p class="text-xs text-gray-400 mt-1">Keluarga penerima</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-600 text-sm font-medium">Program BPNT</span>
-                        <i data-lucide="package" style="width:24px;height:24px;color:#ef4444"></i>
+                <div class="bg-white p-6 rounded-[1.75rem] shadow-lg border border-gray-100 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-gray-500 text-sm font-medium">Program BPNT</span>
+                        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center"><i data-lucide="package" style="width:20px;height:20px;color:#dc2626"></i></div>
                     </div>
                     <p class="text-3xl font-bold text-red-600">78</p>
+                    <p class="text-xs text-gray-400 mt-1">Kartu penerima</p>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-600 text-sm font-medium">Bansos Lainnya</span>
-                        <i data-lucide="gift" style="width:24px;height:24px;color:#8b5cf6"></i>
+                <div class="bg-white p-6 rounded-[1.75rem] shadow-lg border border-gray-100 hover:shadow-xl transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-gray-500 text-sm font-medium">Bansos Lainnya</span>
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><i data-lucide="gift" style="width:20px;height:20px;color:#7c3aed"></i></div>
                     </div>
                     <p class="text-3xl font-bold text-purple-600">45</p>
+                    <p class="text-xs text-gray-400 mt-1">Program tambahan</p>
                 </div>
             </div>
 
@@ -123,18 +146,18 @@
     <script>
         // Bansos data
         const bansosData = [
-            { no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', rt_code: 'rt1', program: 'PKH + BPNT', status: 'Aktif' },
-            { no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', rt_code: 'rt1', program: 'BPNT', status: 'Aktif' },
-            { no: 3, nama: 'Rina Handoko', alamat: 'Jl. Raya No. 18', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif' },
-            { no: 4, nama: 'Budi Santoso', alamat: 'Jl. Tengah No. 5', rt: '02/01', rt_code: 'rt2', program: 'PKH + BPNT', status: 'Aktif' },
-            { no: 5, nama: 'Dewi Lestari', alamat: 'Jl. Tengah No. 8', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif' },
-            { no: 6, nama: 'Hendra Wijaya', alamat: 'Jl. Utama No. 22', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif' },
-            { no: 7, nama: 'Lisa Amelia', alamat: 'Jl. Utama No. 25', rt: '03/01', rt_code: 'rt3', program: 'PKH', status: 'Aktif' },
-            { no: 8, nama: 'Roni Pratama', alamat: 'Jl. Maju No. 7', rt: '04/01', rt_code: 'rt4', program: 'BPNT', status: 'Aktif' },
-            { no: 9, nama: 'Susi Hermawan', alamat: 'Jl. Maju No. 10', rt: '04/01', rt_code: 'rt4', program: 'PKH + BPNT', status: 'Aktif' },
-            { no: 10, nama: 'Yolanda Putri', alamat: 'Jl. Raya No. 20', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif' },
-            { no: 11, nama: 'Bambang Irawan', alamat: 'Jl. Tengah No. 3', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif' },
-            { no: 12, nama: 'Nur Fitriani', alamat: 'Jl. Utama No. 30', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif' }
+            { no: 1, nama: 'Siti Nurhaliza', alamat: 'Jl. Raya No. 12', rt: '01/01', rt_code: 'rt1', program: 'PKH + BPNT', status: 'Aktif', nik: '3201012345000001' },
+            { no: 2, nama: 'Ahmad Sutisna', alamat: 'Jl. Raya No. 15', rt: '01/01', rt_code: 'rt1', program: 'BPNT', status: 'Aktif', nik: '3201012345000002' },
+            { no: 3, nama: 'Rina Handoko', alamat: 'Jl. Raya No. 18', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif', nik: '3201012345000003' },
+            { no: 4, nama: 'Budi Santoso', alamat: 'Jl. Tengah No. 5', rt: '02/01', rt_code: 'rt2', program: 'PKH + BPNT', status: 'Aktif', nik: '3201012345000004' },
+            { no: 5, nama: 'Dewi Lestari', alamat: 'Jl. Tengah No. 8', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif', nik: '3201012345000005' },
+            { no: 6, nama: 'Hendra Wijaya', alamat: 'Jl. Utama No. 22', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif', nik: '3201012345000006' },
+            { no: 7, nama: 'Lisa Amelia', alamat: 'Jl. Utama No. 25', rt: '03/01', rt_code: 'rt3', program: 'PKH', status: 'Aktif', nik: '3201012345000007' },
+            { no: 8, nama: 'Roni Pratama', alamat: 'Jl. Maju No. 7', rt: '04/01', rt_code: 'rt4', program: 'BPNT', status: 'Aktif', nik: '3201012345000008' },
+            { no: 9, nama: 'Susi Hermawan', alamat: 'Jl. Maju No. 10', rt: '04/01', rt_code: 'rt4', program: 'PKH + BPNT', status: 'Aktif', nik: '3201012345000009' },
+            { no: 10, nama: 'Yolanda Putri', alamat: 'Jl. Raya No. 20', rt: '01/01', rt_code: 'rt1', program: 'PKH', status: 'Aktif', nik: '3201012345000010' },
+            { no: 11, nama: 'Bambang Irawan', alamat: 'Jl. Tengah No. 3', rt: '02/01', rt_code: 'rt2', program: 'BPNT', status: 'Aktif', nik: '3201012345000011' },
+            { no: 12, nama: 'Nur Fitriani', alamat: 'Jl. Utama No. 30', rt: '03/01', rt_code: 'rt3', program: 'PKH + BPNT', status: 'Aktif', nik: '3201012345000012' }
         ];
 
         let currentFilter = 'semua';
@@ -193,6 +216,24 @@
             }
 
             renderBansos();
+        }
+
+        function checkBansos() {
+            const nik = document.getElementById('bansos-nik-input').value.trim();
+            const resultEl = document.getElementById('bansos-check-result');
+            if (!nik || nik.length !== 16) {
+                resultEl.innerHTML = '<div class="p-3 rounded-xl bg-amber-50 text-amber-700 text-sm font-medium">Masukkan 16 digit NIK yang valid.</div>';
+                resultEl.classList.remove('hidden');
+                return;
+            }
+            // Check against sample data (in real app, this would call API)
+            const found = bansosData.find(item => item.nik === nik);
+            if (found) {
+                resultEl.innerHTML = `<div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-sm"><p class="font-bold text-emerald-800 mb-1">Ditemukan!</p><p class="text-emerald-700">Nama: <strong>${found.nama}</strong></p><p class="text-emerald-700">Program: <strong>${found.program}</strong></p><p class="text-emerald-700">Status: <strong>${found.status}</strong></p></div>`;
+            } else {
+                resultEl.innerHTML = '<div class="p-3 rounded-xl bg-gray-50 text-gray-600 text-sm font-medium">NIK tidak ditemukan dalam data bansos saat ini. Hubungi kantor desa untuk informasi lebih lanjut.</div>';
+            }
+            resultEl.classList.remove('hidden');
         }
 
         // Initialize

@@ -7,15 +7,22 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "keywords": ["desa", "api", "backend"],
+  "keywords": [
+    "desa",
+    "api",
+    "backend"
+  ],
   "author": "xxcode66-source",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
     "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "docx": "^9.7.1",
     "dotenv": "^16.3.1",
-    "pg": "^8.12.0"
+    "express": "^4.18.2",
+    "mysql2": "^3.22.5",
+    "pg": "^8.12.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

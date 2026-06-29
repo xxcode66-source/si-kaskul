@@ -3,331 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permohonan Surat Online - Desa Kasomalang Kulon</title>
+    <title>Pelayanan Surat Online - Desa Kasomalang Kulon</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/style.css">
     <style>
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Playfair Display', serif; }
-        .hero-grid-bg {
-            background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-grid-bg::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-        .page-loader {
-            position: fixed; inset: 0; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-            background: #f9fafb; transition: opacity 0.5s ease;
-        }
-        .page-loader.hidden { opacity: 0; pointer-events: none; }
-        .loader-spinner {
-            width: 48px; height: 48px;
-            border: 4px solid #e5e7eb; border-top-color: #059669;
-            border-radius: 50%; animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { margin-top: 12px; font-size: 14px; color: #6b7280; }
-        .success-card {
-            display: none;
-            animation: fadeInUp 0.5s ease forwards;
-        }
-        .success-card.show { display: block; }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .type-card { transition: all .25s ease; cursor: pointer; }
+        .type-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(5,150,105,.12); border-color: #34d399; }
+        .type-card.selected { border-color: #059669; background: #ecfdf5; box-shadow: 0 8px 25px rgba(5,150,105,.15); }
+        .step-indicator .step { transition: all .3s ease; }
+        .step-indicator .step.active { background: #059669; color: #fff; }
+        .step-indicator .step.done { background: #34d399; color: #fff; }
+        .fade-enter { animation: fadeSlideIn .4s ease forwards; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-
-    <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
-        <div class="text-center">
-            <div class="loader-spinner"></div>
-            <p class="loader-text">Memuat...</p>
-        </div>
+        <div class="loader-content"><div class="loader-spinner"></div><p class="loader-text">Memuat...</p></div>
     </div>
 
-    <!-- Navbar -->
     <div id="navbar-container"></div>
 
-    <!-- Hero Section -->
-    <div class="pt-28 pb-16 px-4 hero-grid-bg text-white">
+    <!-- Hero -->
+    <div class="pt-28 pb-14 px-4 hero-grid-bg text-white">
         <div class="max-w-4xl mx-auto text-center relative z-10">
-            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium mb-4">
-                <i data-lucide="file-text" style="width:16px;height:16px"></i>
-                Layanan Desa
+            <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm font-medium mb-4 border border-white/10">
+                <i data-lucide="file-text" style="width:16px;height:16px"></i> Layanan Desa
             </div>
-            <h1 class="font-display text-4xl md:text-5xl font-bold mb-4">Permohonan Surat Online</h1>
-            <p class="text-emerald-100 text-lg max-w-2xl mx-auto">
-                Ajukan permohonan surat keterangan secara online tanpa harus datang ke kantor desa
-            </p>
+            <h1 class="font-display text-4xl md:text-5xl font-bold mb-3">Pelayanan Surat Online</h1>
+            <p class="text-emerald-100 text-lg max-w-2xl mx-auto">Ajukan permohonan surat keterangan secara online — pilih jenis surat, isi form, dan pantau statusnya.</p>
         </div>
     </div>
 
-    <!-- Form Section -->
-    <section class="py-16 px-4">
-        <div class="max-w-3xl mx-auto">
-            <!-- Loading -->
-            <div id="form-loading" class="text-center py-12">
-                <div class="loader-spinner mx-auto"></div>
-                <p class="text-gray-500 mt-4">Memuat form...</p>
-            </div>
+    <!-- Steps -->
+    <div class="max-w-4xl mx-auto px-4 -mt-6 relative z-20 mb-8">
+        <div class="bg-white rounded-2xl shadow-lg p-4 flex items-center justify-center gap-2 step-indicator">
+            <div class="step active w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" id="step-1">1</div>
+            <div class="w-12 h-0.5 bg-gray-200 rounded" id="line-1-2"></div>
+            <div class="step w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-gray-200 text-gray-500" id="step-2">2</div>
+            <div class="w-12 h-0.5 bg-gray-200 rounded" id="line-2-3"></div>
+            <div class="step w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-gray-200 text-gray-500" id="step-3">3</div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-400 mt-1 px-2">
+            <span>Pilih Surat</span><span>Isi Data</span><span>Selesai</span>
+        </div>
+    </div>
 
-            <!-- Form Card -->
-            <div id="form-card" class="bg-white rounded-[2rem] p-8 md:p-10 shadow-xl hidden">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                        <i data-lucide="edit-3" style="width:24px;height:24px;color:#059669"></i>
-                    </div>
+    <!-- Content Area -->
+    <section class="max-w-4xl mx-auto px-4 pb-16">
+
+        <!-- STEP 1: Letter Type Selection -->
+        <div id="view-type-select" class="fade-enter">
+            <h2 class="text-xl font-bold text-gray-800 mb-1">Pilih Jenis Surat</h2>
+            <p class="text-gray-500 text-sm mb-6">Klik jenis surat yang ingin Anda ajukan.</p>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4" id="type-grid"></div>
+        </div>
+
+        <!-- STEP 2: Dynamic Form -->
+        <div id="view-form" class="hidden fade-enter">
+            <div class="bg-white rounded-[1.75rem] p-6 md:p-8 shadow-xl border border-gray-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="goToStep(1)" class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition">
+                        <i data-lucide="arrow-left" style="width:18px;height:18px"></i>
+                    </button>
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Form Permohonan Surat</h2>
+                        <h2 id="form-title" class="text-xl font-bold text-gray-800">Form Permohonan</h2>
                         <p class="text-gray-500 text-sm">Isi data dengan lengkap dan benar</p>
                     </div>
                 </div>
 
-                <form id="surat-form" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Jenis Surat <span class="text-red-500">*</span>
-                        </label>
-                        <select id="field-jenis" required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white text-gray-800 transition">
-                            <option value="">Pilih jenis surat...</option>
-                            <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
-                            <option value="Surat Keterangan Tidak Mampu (SKTM)">Surat Keterangan Tidak Mampu (SKTM)</option>
-                            <option value="Surat Pengantar KTP">Surat Pengantar KTP</option>
-                            <option value="Surat Pengantar KK">Surat Pengantar KK</option>
-                            <option value="Surat Keterangan Usaha">Surat Keterangan Usaha</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
+                <form id="surat-form" class="space-y-5">
+                    <input type="hidden" id="field-jenis">
 
-                    <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Common fields -->
+                    <div class="grid md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                                Nama Lengkap <span class="text-red-500">*</span>
-                            </label>
-                            <input id="field-nama" type="text" required placeholder="Masukkan nama lengkap"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">NIK <span class="text-red-500">*</span></label>
+                            <input id="field-nik" type="text" required maxlength="16" placeholder="16 digit NIK" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm" oninput="this.value=this.value.replace(/\D/g,'')">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                                NIK <span class="text-red-500">*</span>
-                            </label>
-                            <input id="field-nik" type="text" required placeholder="Nomor Induk Kependudukan" maxlength="16"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
-                                oninput="this.value=this.value.replace(/\D/g,'')">
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <input id="field-nama" type="text" required placeholder="Nama sesuai KTP" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tempat Lahir</label>
+                            <input id="field-tempatLahir" type="text" placeholder="Contoh: Subang" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Lahir</label>
+                            <input id="field-tanggalLahir" type="date" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Alamat <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="field-alamat" rows="3" required placeholder="Masukkan alamat lengkap"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition resize-none"></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Alamat <span class="text-red-500">*</span></label>
+                        <textarea id="field-alamat" rows="2" required placeholder="Alamat lengkap" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm resize-none"></textarea>
                     </div>
+
+                    <div class="grid md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">RT</label>
+                            <input id="field-rt" type="text" placeholder="Contoh: 01" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">RW</label>
+                            <input id="field-rw" type="text" placeholder="Contoh: 01" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pekerjaan</label>
+                            <input id="field-pekerjaan" type="text" placeholder="Contoh: Wiraswasta" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic fields container -->
+                    <div id="dynamic-fields" class="space-y-5"></div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Keperluan <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="field-keperluan" rows="3" required placeholder="Jelaskan keperluan pengajuan surat ini"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition resize-none"></textarea>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Keperluan / Tujuan <span class="text-red-500">*</span></label>
+                        <textarea id="field-keperluan" rows="2" required placeholder="Jelaskan keperluan pengajuan surat ini" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm resize-none"></textarea>
                     </div>
 
-                    <div id="form-error" class="hidden p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+                    <!-- File Upload Section -->
+                    <div class="border-t border-gray-200 pt-5">
+                        <p class="text-sm font-semibold text-gray-700 mb-3">Upload Dokumen <span class="text-red-500">*</span></p>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Foto KTP <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <input type="file" id="field-ktp" accept="image/*,.pdf" required class="hidden">
+                                    <label for="field-ktp" class="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition text-sm">
+                                        <i data-lucide="upload" style="width:16px;height:16px" class="text-gray-400"></i>
+                                        <span id="ktp-filename" class="text-gray-500 truncate">Pilih file KTP</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Foto KK <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <input type="file" id="field-kk" accept="image/*,.pdf" required class="hidden">
+                                    <label for="field-kk" class="flex items-center gap-2 px-4 py-3 border border-gray-200 rounded-xl cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition text-sm">
+                                        <i data-lucide="upload" style="width:16px;height:16px" class="text-gray-400"></i>
+                                        <span id="kk-filename" class="text-gray-500 truncate">Pilih file KK</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Format: JPG, PNG, atau PDF (maks. 5MB)</p>
+                    </div>
 
-                    <button type="submit" id="btn-submit"
-                        class="btn-hover-glow w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <i data-lucide="send" style="width:20px;height:20px"></i>
+                    <div id="form-error" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"></div>
+
+                    <button type="submit" id="btn-submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 text-sm disabled:opacity-50">
+                        <i data-lucide="send" style="width:18px;height:18px"></i>
                         <span id="btn-text">Ajukan Permohonan</span>
-                        <div id="btn-spinner" class="hidden">
-                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                            </svg>
-                        </div>
+                        <div id="btn-spinner" class="hidden"><svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
                     </button>
                 </form>
             </div>
+        </div>
 
-            <!-- Success Card -->
-            <div id="success-card" class="success-card bg-white rounded-[2rem] p-8 md:p-10 shadow-xl text-center">
-                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <!-- STEP 3: Success -->
+        <div id="view-success" class="hidden fade-enter">
+            <div class="bg-white rounded-[1.75rem] p-8 shadow-xl border border-gray-100 text-center">
+                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <i data-lucide="check-circle" style="width:48px;height:48px;color:#059669"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Permohonan Berhasil Diajukan!</h2>
-                <p class="text-gray-500 mb-6">Permohonan surat Anda telah diterima dan akan diproses oleh petugas desa.</p>
-                <div class="bg-emerald-50 rounded-2xl p-6 mb-6 inline-block">
-                    <p class="text-sm text-emerald-700 font-medium mb-1">Nomor Antrian / ID Permohonan</p>
-                    <p id="success-id" class="text-3xl font-bold text-emerald-600 font-mono">-</p>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Permohonan Berhasil!</h2>
+                <p class="text-gray-500 mb-5">Permohonan surat Anda telah diterima dan akan diproses oleh petugas desa.</p>
+                <div class="bg-emerald-50 rounded-xl p-5 mb-5 inline-block">
+                    <p class="text-xs text-emerald-600 font-medium mb-1">ID Permohonan</p>
+                    <p id="success-id" class="text-3xl font-bold text-emerald-700 font-mono">—</p>
                 </div>
-                <div class="text-left bg-gray-50 rounded-2xl p-6 mb-6 space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Jenis Surat</span>
-                        <span id="success-jenis" class="text-gray-800 font-medium text-sm"></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Nama</span>
-                        <span id="success-nama" class="text-gray-800 font-medium text-sm"></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500 text-sm">Status</span>
-                        <span id="success-status" class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium">Diproses</span>
-                    </div>
+                <div class="text-left bg-gray-50 rounded-xl p-5 mb-5 space-y-2.5 max-w-sm mx-auto">
+                    <div class="flex justify-between"><span class="text-gray-400 text-sm">Jenis Surat</span><span id="success-jenis" class="text-gray-800 font-medium text-sm"></span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 text-sm">Nama</span><span id="success-nama" class="text-gray-800 font-medium text-sm"></span></div>
+                    <div class="flex justify-between"><span class="text-gray-400 text-sm">Status</span><span class="bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-semibold">Pending</span></div>
                 </div>
-                <div class="inline-flex flex-col sm:flex-row gap-3 justify-center">
-                    <button onclick="resetForm()"
-                        class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-2xl transition btn-hover-glow">
-                        Ajukan Lagi
-                    </button>
-                    <a href="../../index.html"
-                        class="px-8 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-2xl transition">
-                        Kembali ke Beranda
-                    </a>
+                <p class="text-xs text-gray-400 mb-5">Simpan ID permohonan untuk memantau status. Admin akan memproses dan Anda bisa mengunduh surat dalam format Word.</p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="goToStep(1); resetAll();" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition text-sm">Ajukan Surat Lagi</button>
+                    <a href="../../index.html" class="px-8 py-3 border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium rounded-xl transition text-sm text-center">Kembali ke Beranda</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="py-10 px-4 text-center bg-emerald-900 text-white">
-        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon</p>
+        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
     </footer>
 
     <script src="../../assets/nav-config.js"></script>
+    <script>renderNavbar('layanan');</script>
     <script src="../../assets/script.js"></script>
     <script>
-        // API base URL — auto-detects environment
-        var API_BASE_URL = window.__API_BASE_URL__ || (
-            window.location.protocol === 'file:' ||
-            window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1'
-                ? 'http://localhost:3000/api'
-                : window.location.origin + '/api'
-        );
+        // Check authentication - redirect to login if not logged in
+        function getLoggedUser() {
+            try {
+                let user = JSON.parse(localStorage.getItem('wargaUser') || 'null');
+                if (!user) user = JSON.parse(localStorage.getItem('loggedUser') || 'null');
+                return user;
+            } catch { return null; }
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            renderNavbar('layanan');
-            if (typeof initScrollAnimations === 'function') initScrollAnimations();
+        const loggedUser = getLoggedUser();
+        if (!loggedUser || (loggedUser.role && loggedUser.role !== 'penduduk' && loggedUser.role !== 'warga')) {
+            window.location.href = '/pages/login.html';
+        }
 
-            var formLoading = document.getElementById('form-loading');
-            var formCard = document.getElementById('form-card');
+        // Letter type definitions
+        const LETTER_TYPES = [
+            { id: 'Surat Keterangan Usaha', icon: 'briefcase', color: 'emerald', desc: 'Untuk keperluan usaha / bisnis', extra: [{ name: 'jenisUsaha', label: 'Jenis Usaha', type: 'text', placeholder: 'Contoh: Warung sembako, Online shop', required: true }] },
+            { id: 'Surat Keterangan Domisili', icon: 'home', color: 'blue', desc: 'Surat keterangan tempat tinggal', extra: [] },
+            { id: 'Surat Keterangan Tidak Mampu (SKTM)', icon: 'heart-handshake', color: 'rose', desc: 'Untuk bantuan sosial, beasiswa, dll', extra: [{ name: 'keterangan', label: 'Keterangan Tambahan', type: 'text', placeholder: 'Contoh: Untuk pendaftaran beasiswa', required: false }] },
+            { id: 'Surat Pengantar KTP', icon: 'credit-card', color: 'violet', desc: 'Pengantar pembuatan KTP baru/perubahan', extra: [] },
+            { id: 'Surat Pengantar KK', icon: 'users', color: 'amber', desc: 'Pengantar pembuatan Kartu Keluarga', extra: [{ name: 'keterangan', label: 'Jumlah Anggota Keluarga', type: 'text', placeholder: 'Contoh: 4 orang', required: false }] },
+            { id: 'Surat Keterangan Kematian', icon: 'cross', color: 'gray', desc: 'Surat keterangan kematian warga', extra: [{ name: 'keterangan', label: 'Keterangan Tambahan', type: 'text', placeholder: 'Nama almarhum/almarhumah, hubungan, tanggal meninggal', required: false }] },
+            { id: 'Surat Keterangan Kelahiran', icon: 'baby', color: 'cyan', desc: 'Surat keterangan kelahiran', extra: [{ name: 'keterangan', label: 'Keterangan Bayi', type: 'text', placeholder: 'Nama bayi, nama ayah & ibu', required: false }] },
+        ];
 
-            // Brief loading before showing form
-            setTimeout(function() {
-                formLoading.classList.add('hidden');
-                formCard.classList.remove('hidden');
-                PageLoader.hide();
-                lucide.createIcons();
-            }, 400);
+        const colorMap = { emerald: ['bg-emerald-50','text-emerald-600','border-emerald-200'], blue: ['bg-blue-50','text-blue-600','border-blue-200'], rose: ['bg-rose-50','text-rose-600','border-rose-200'], violet: ['bg-violet-50','text-violet-600','border-violet-200'], amber: ['bg-amber-50','text-amber-600','border-amber-200'], gray: ['bg-gray-100','text-gray-600','border-gray-200'], cyan: ['bg-cyan-50','text-cyan-600','border-cyan-200'] };
+
+        function renderTypeGrid() {
+            const grid = document.getElementById('type-grid');
+            grid.innerHTML = '';
+            LETTER_TYPES.forEach(lt => {
+                const [bg, txt, brd] = colorMap[lt.color] || colorMap.emerald;
+                const card = document.createElement('div');
+                card.className = `type-card bg-white rounded-xl p-5 border border-gray-200`;
+                card.onclick = () => selectType(lt.id);
+                card.innerHTML = `
+                    <div class="w-11 h-11 ${bg} rounded-xl flex items-center justify-center mb-3">
+                        <i data-lucide="${lt.icon}" style="width:22px;height:22px" class="${txt}"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-sm mb-1">${lt.id}</h3>
+                    <p class="text-xs text-gray-500">${lt.desc}</p>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function selectType(typeId) {
+            document.getElementById('field-jenis').value = typeId;
+            const lt = LETTER_TYPES.find(l => l.id === typeId);
+            if (!lt) return;
+
+            document.getElementById('form-title').textContent = lt.id;
+
+            // Render dynamic fields
+            const dyn = document.getElementById('dynamic-fields');
+            dyn.innerHTML = '';
+            (lt.extra || []).forEach(f => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">${f.label}${f.required ? ' <span class="text-red-500">*</span>' : ''}</label>
+                    <input id="field-${f.name}" type="${f.type}" ${f.required ? 'required' : ''} placeholder="${f.placeholder || ''}" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                `;
+                dyn.appendChild(div);
+            });
+
+            goToStep(2);
+        }
+
+        function goToStep(step) {
+            const views = ['view-type-select', 'view-form', 'view-success'];
+            views.forEach((v, i) => {
+                const el = document.getElementById(v);
+                if (i + 1 === step) { el.classList.remove('hidden'); el.classList.add('fade-enter'); }
+                else { el.classList.add('hidden'); el.classList.remove('fade-enter'); }
+            });
+
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const s = document.getElementById('step-' + i);
+                s.className = 'step w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold';
+                if (i < step) s.classList.add('done');
+                else if (i === step) s.classList.add('active');
+                else { s.classList.add('bg-gray-200', 'text-gray-500'); }
+            }
+            // Lines
+            document.getElementById('line-1-2').style.background = step > 1 ? '#34d399' : '#e5e7eb';
+            document.getElementById('line-2-3').style.background = step > 2 ? '#34d399' : '#e5e7eb';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            lucide.createIcons();
+        }
+
+        function resetAll() {
+            document.getElementById('surat-form').reset();
+            document.getElementById('dynamic-fields').innerHTML = '';
+            document.getElementById('form-error').classList.add('hidden');
+            document.getElementById('ktp-filename').textContent = 'Pilih file KTP';
+            document.getElementById('kk-filename').textContent = 'Pilih file KK';
+        }
+
+        // File input display handlers
+        document.getElementById('field-ktp').addEventListener('change', function() {
+            const file = this.files[0];
+            document.getElementById('ktp-filename').textContent = file ? file.name : 'Pilih file KTP';
+        });
+        document.getElementById('field-kk').addEventListener('change', function() {
+            const file = this.files[0];
+            document.getElementById('kk-filename').textContent = file ? file.name : 'Pilih file KK';
         });
 
-        // Form submission
-        document.getElementById('surat-form').addEventListener('submit', async function(e) {
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Form submit
+        document.getElementById('surat-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const errorEl = document.getElementById('form-error');
+            const btnSubmit = document.getElementById('btn-submit');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
 
-            var jenis = document.getElementById('field-jenis').value;
-            var nama = document.getElementById('field-nama').value.trim();
-            var nik = document.getElementById('field-nik').value.trim();
-            var alamat = document.getElementById('field-alamat').value.trim();
-            var keperluan = document.getElementById('field-keperluan').value.trim();
-            var errorEl = document.getElementById('form-error');
-            var btnSubmit = document.getElementById('btn-submit');
-            var btnText = document.getElementById('btn-text');
-            var btnSpinner = document.getElementById('btn-spinner');
-
-            // Reset error
-            errorEl.classList.add('hidden');
-            errorEl.textContent = '';
-
-            // Validate NIK length
-            if (nik.length !== 16) {
-                showFormError('NIK harus 16 digit angka');
+            // Check file uploads
+            const ktpFile = document.getElementById('field-ktp').files[0];
+            const kkFile = document.getElementById('field-kk').files[0];
+            if (!ktpFile || !kkFile) {
+                errorEl.textContent = 'Upload KTP dan KK wajib dilengkapi.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (ktpFile.size > 5 * 1024 * 1024 || kkFile.size > 5 * 1024 * 1024) {
+                errorEl.textContent = 'Ukuran file maksimal 5MB.';
+                errorEl.classList.remove('hidden');
                 return;
             }
 
-            // Show loading state
+            const body = {
+                jenis: document.getElementById('field-jenis').value,
+                nik: document.getElementById('field-nik').value.trim(),
+                nama: document.getElementById('field-nama').value.trim(),
+                tempatLahir: document.getElementById('field-tempatLahir').value.trim(),
+                tanggalLahir: document.getElementById('field-tanggalLahir').value,
+                alamat: document.getElementById('field-alamat').value.trim(),
+                rt: document.getElementById('field-rt').value.trim(),
+                rw: document.getElementById('field-rw').value.trim(),
+                pekerjaan: document.getElementById('field-pekerjaan').value.trim(),
+                keperluan: document.getElementById('field-keperluan').value.trim(),
+            };
+
+            // Collect dynamic fields
+            const lt = LETTER_TYPES.find(l => l.id === body.jenis);
+            if (lt) {
+                (lt.extra || []).forEach(f => {
+                    const el = document.getElementById('field-' + f.name);
+                    if (el) body[f.name] = el.value.trim();
+                });
+            }
+
+            if (!body.jenis || !body.nama || !body.nik) {
+                errorEl.textContent = 'Jenis surat, nama, dan NIK wajib diisi.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (body.nik.length !== 16) {
+                errorEl.textContent = 'NIK harus 16 digit angka.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            errorEl.classList.add('hidden');
             btnSubmit.disabled = true;
             btnText.textContent = 'Mengirim...';
             btnSpinner.classList.remove('hidden');
 
             try {
-                var res = await fetch(API_BASE_URL + '/surat', {
+                // Convert files to base64
+                const ktpBase64 = await fileToBase64(ktpFile);
+                const kkBase64 = await fileToBase64(kkFile);
+                body.fileKtp = ktpBase64;
+                body.fileKk = kkBase64;
+                body.fileKtpName = ktpFile.name;
+                body.fileKkName = kkFile.name;
+
+                const res = await fetch(API_BASE_URL + '/surat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jenis: jenis,
-                        nama: nama,
-                        nik: nik,
-                        alamat: alamat,
-                        keperluan: keperluan
-                    })
+                    body: JSON.stringify(body)
                 });
-
-                var json = await res.json();
+                const json = await res.json();
 
                 if (!json.success) {
-                    showFormError(json.message || 'Gagal mengajukan permohonan');
+                    errorEl.textContent = json.message || 'Gagal mengajukan permohonan';
+                    errorEl.classList.remove('hidden');
                     btnSubmit.disabled = false;
                     btnText.textContent = 'Ajukan Permohonan';
                     btnSpinner.classList.add('hidden');
                     return;
                 }
 
-                // On success — show success card with nomor antrian (ID from API)
-                var data = json.data;
-                document.getElementById('success-id').textContent = '#' + data.id;
-                document.getElementById('success-jenis').textContent = data.jenis || jenis;
-                document.getElementById('success-nama').textContent = data.nama || nama;
-                if (data.status) {
-                    document.getElementById('success-status').textContent = data.status;
-                }
-                document.getElementById('form-card').classList.add('hidden');
-                document.getElementById('success-card').classList.add('show');
-                lucide.createIcons();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Success
+                document.getElementById('success-id').textContent = '#SK-' + String(json.data.id).padStart(4, '0');
+                document.getElementById('success-jenis').textContent = json.data.jenis;
+                document.getElementById('success-nama').textContent = json.data.nama;
+                goToStep(3);
 
             } catch (err) {
-                showFormError('Gagal terhubung ke server. Pastikan server sedang berjalan.');
+                errorEl.textContent = 'Gagal terhubung ke server. Pastikan server sedang berjalan.';
+                errorEl.classList.remove('hidden');
                 btnSubmit.disabled = false;
                 btnText.textContent = 'Ajukan Permohonan';
                 btnSpinner.classList.add('hidden');
-                console.error('Submit surat error:', err);
             }
         });
 
-        function showFormError(msg) {
-            var el = document.getElementById('form-error');
-            el.textContent = msg;
-            el.classList.remove('hidden');
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTypeGrid();
+            PageLoader.hide();
+            lucide.createIcons();
 
-        function resetForm() {
-            document.getElementById('surat-form').reset();
-            document.getElementById('success-card').classList.remove('show');
-            document.getElementById('form-card').classList.remove('hidden');
-            document.getElementById('form-error').classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Fallback: hide page loader after timeout
-        window.addEventListener('load', function() { PageLoader.hide(); });
-        setTimeout(function() { PageLoader.hide(); }, 5000);
+            // Auto-fill NIK and name from logged-in user
+            if (loggedUser) {
+                if (loggedUser.nik) document.getElementById('field-nik').value = loggedUser.nik;
+                if (loggedUser.name) document.getElementById('field-nama').value = loggedUser.name;
+            }
+        });
     </script>
 </body>
 </html>

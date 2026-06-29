@@ -6,8 +6,24 @@
     <title>Lapak Desa - Desa Kasomalang Kulon</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/style.css">
+    <style>
+        .product-card { transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .product-card .product-img { transition: transform 0.5s ease; }
+        .product-card:hover .product-img { transform: scale(1.08); }
+        .category-tab { transition: all 0.2s ease; }
+        .category-tab.active { background: linear-gradient(135deg, #059669, #0ea5e9); color: white; border-color: transparent; }
+        .wa-float { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 rgba(37,211,102,0.4)} 50%{box-shadow:0 0 0 12px rgba(37,211,102,0)} }
+        .modal-overlay { opacity:0; pointer-events:none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity:1; pointer-events:auto; }
+        .modal-content { transform: scale(0.9) translateY(20px); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .gallery-img { transition: opacity 0.3s ease; }
+        .seller-badge { background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
+    </style>
 </head>
 <body class="w-full min-h-screen bg-gray-50">
     <!-- Page Loader -->
@@ -19,160 +35,120 @@
     </div>
 
     <!-- Navigation -->
-        <div id="navbar-container"></div>
+    <div id="navbar-container"></div>
 
-    <header class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+    <!-- Header -->
+    <header class="pt-28 pb-12 px-4 hero-grid-bg text-white overflow-hidden relative">
         <div class="absolute inset-0 bg-black/10"></div>
-        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1.08fr_.92fr] gap-10 items-center">
-            <div class="space-y-5">
-                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
-                    <i data-lucide="shopping-bag" style="width:18px;height:18px"></i>
-                    <span>Lapak produk lokal, jasa warga, dan pemesanan cepat</span>
-                </div>
-                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Lapak Desa</h1>
-                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Wadah promosi produk warga dengan tampilan marketplace yang lebih rapi, kartu produk yang jelas, dan jalur pesan langsung ke WhatsApp.</p>
-                <div class="flex flex-wrap gap-3 animate-slideUp" style="animation-delay:0.18s">
-                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Olahan Desa</span>
-                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Kerajinan</span>
-                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Hasil Tani</span>
-                    <span class="rounded-full bg-white/10 px-4 py-2 text-sm border border-white/15">Layanan Antar</span>
-                </div>
-            </div>
-
-            <div class="hero-card rounded-[2rem] p-5 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
-                <div class="grid gap-4">
-                    <div class="rounded-[1.6rem] overflow-hidden shadow-lg">
-                        <img src="https://images.unsplash.com/photo-1500595046891-e9eda8b2fa4d?w=1000&h=700&fit=crop" alt="Lapak desa" class="w-full h-56 object-cover">
+        <div class="relative max-w-7xl mx-auto">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div class="space-y-4 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                        <i data-lucide="shopping-bag" style="width:18px;height:18px"></i>
+                        <span>Marketplace Warga Desa</span>
                     </div>
-                    <div class="grid sm:grid-cols-3 gap-3 text-sm">
-                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
-                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Produk</p>
-                            <p class="font-semibold text-emerald-950 mt-1">4 kategori</p>
-                        </div>
-                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
-                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Pesan</p>
-                            <p class="font-semibold text-emerald-950 mt-1">Via WA</p>
-                        </div>
-                        <div class="rounded-2xl bg-emerald-50 p-3 border border-emerald-100">
-                            <p class="text-xs uppercase tracking-[0.18em] text-emerald-700">Lokasi</p>
-                            <p class="font-semibold text-emerald-950 mt-1">Subang</p>
-                        </div>
+                    <h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold animate-slideUp" style="animation-delay:0.1s">Lapak Desa</h1>
+                    <p class="text-emerald-50/80 text-lg max-w-xl animate-slideUp" style="animation-delay:0.15s">Belanja langsung dari warga desa. Klik gambar untuk lihat detail, hubungi penjual via WhatsApp.</p>
+                </div>
+                <!-- Search Bar -->
+                <div class="w-full lg:w-96 animate-slideUp" style="animation-delay:0.2s">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2" style="width:20px;height:20px;color:#9ca3af"></i>
+                        <input id="search-input" type="text" placeholder="Cari produk atau penjual..." class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-sm text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 outline-none transition text-sm" oninput="filterProducts()">
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <section class="py-20 px-4">
-        <div class="max-w-7xl mx-auto grid lg:grid-cols-[1.15fr_.85fr] gap-8 items-start">
-            <div class="space-y-8">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                        <div class="relative">
-                            <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=500&fit=crop" alt="Produk Makanan" class="w-full h-56 object-cover">
-                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Olahan Desa</div>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-start justify-between gap-4 mb-3">
-                                <div>
-                                    <h2 class="font-semibold text-2xl text-gray-900">Olahan Khas Desa</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Rp 15.000 - 35.000</p>
-                                </div>
-                                <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Stok tersedia</span>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Emping, keripik, sambal, dan cemilan rumahan yang dikemas rapi oleh pelaku usaha lokal.</p>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20memesan%20produk%20olahan%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
-                            </div>
-                        </div>
-                    </article>
-                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                        <div class="relative">
-                            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=500&fit=crop" alt="Kerajinan Lokal" class="w-full h-56 object-cover">
-                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Kerajinan</div>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-start justify-between gap-4 mb-3">
-                                <div>
-                                    <h2 class="font-semibold text-2xl text-gray-900">Kerajinan Tangan</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Produk pesanan & suvenir</p>
-                                </div>
-                                <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">Pre-order</span>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Anyaman bambu, tas eceng gondok, dan suvenir desa yang cocok untuk hadiah maupun acara.</p>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20membeli%20kerajinan%20lokal" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
+    <!-- Category Tabs -->
+    <div class="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2 overflow-x-auto" id="category-tabs">
+            <button class="category-tab active whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border border-gray-200 bg-white" onclick="filterCategory('all')" data-cat="all">Semua</button>
+            <button class="category-tab whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" onclick="filterCategory('olahan')" data-cat="olahan">Olahan Desa</button>
+            <button class="category-tab whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" onclick="filterCategory('kerajinan')" data-cat="kerajinan">Kerajinan</button>
+            <button class="category-tab whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" onclick="filterCategory('tani')" data-cat="tani">Hasil Tani</button>
+            <button class="category-tab whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50" onclick="filterCategory('layanan')" data-cat="layanan">Layanan</button>
+        </div>
+    </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                        <div class="relative">
-                            <img src="https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=500&fit=crop" alt="Pertanian Lokal" class="w-full h-56 object-cover">
-                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Hasil Tani</div>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-start justify-between gap-4 mb-3">
-                                <div>
-                                    <h2 class="font-semibold text-2xl text-gray-900">Produk Pertanian</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Panen segar dari warga</p>
-                                </div>
-                                <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">Fresh</span>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Sayur segar, beras organik, dan hasil bumi lokal untuk kebutuhan rumah tangga dan usaha kuliner.</p>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20mengetahui%20produk%20pertanian" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
-                            </div>
-                        </div>
-                    </article>
-                    <article class="market-card bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100">
-                        <div class="relative">
-                            <img src="https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800&h=500&fit=crop" alt="Jasa Lokal" class="w-full h-56 object-cover">
-                            <div class="absolute left-4 top-4 market-badge rounded-full px-3 py-1 text-xs font-semibold text-emerald-700 shadow-lg">Layanan</div>
-                        </div>
-                        <div class="p-6">
-                            <div class="flex items-start justify-between gap-4 mb-3">
-                                <div>
-                                    <h2 class="font-semibold text-2xl text-gray-900">Layanan Desa</h2>
-                                    <p class="text-sm text-gray-500 mt-1">Antar, titip, dan bantuan harian</p>
-                                </div>
-                                <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700">Cepat</span>
-                            </div>
-                            <p class="text-gray-600 text-sm mb-5 leading-relaxed">Jasa antar, tour desa, dan pengiriman produk langsung ke rumah warga dengan koordinasi yang praktis.</p>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <a href="https://wa.me/6281234567890?text=Halo%20Desa%20Kasomalang%2C%20saya%20ingin%20menggunakan%20layanan%20desa" target="_blank" class="px-4 py-2 rounded-full bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">Pesan via WA</a>
-                                <a href="https://maps.google.com/?q=Desa+Kasomalang+Kulon" target="_blank" class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition">Lihat Lokasi</a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
+    <!-- Products Grid -->
+    <section class="py-8 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+                <p class="text-sm text-gray-500"><span id="product-count">0</span> produk ditemukan</p>
+                <select id="sort-select" onchange="filterProducts()" class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white outline-none focus:border-emerald-300">
+                    <option value="default">Urutkan</option>
+                    <option value="cheapest">Termurah</option>
+                    <option value="expensive">Termahal</option>
+                    <option value="name">Nama A-Z</option>
+                </select>
             </div>
-
-            <aside class="space-y-6">
-                <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
-                    <h3 class="font-semibold text-xl text-emerald-950 mb-4">Cara Pesan</h3>
-                    <ol class="space-y-4 text-sm text-gray-600">
-                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">1</span><span>Pilih produk atau layanan yang sesuai kebutuhan Anda.</span></li>
-                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">2</span><span>Klik tombol WhatsApp untuk mengirim pesan cepat.</span></li>
-                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">3</span><span>Konfirmasi alamat, jumlah, dan waktu pengantaran.</span></li>
-                        <li class="flex gap-3"><span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-semibold flex-shrink-0">4</span><span>Lapak desa akan membantu proses pesanan sampai selesai.</span></li>
-                    </ol>
-                </div>
-                <div class="bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-[2rem] p-8 shadow-xl border border-emerald-100">
-                    <h3 class="font-semibold text-xl text-emerald-950 mb-4">Lokasi & Jam Buka</h3>
-                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">Desa Kasomalang Kulon, Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat. Lapak online aktif setiap saat, pemrosesan pesanan mengikuti jam layanan warga.</p>
-                    <div class="rounded-[1.5rem] overflow-hidden border border-emerald-100 shadow-lg">
-                        <iframe class="w-full h-72" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=Desa+Kasomalang+Kulon,Jawa+Barat"></iframe>
-                    </div>
-                </div>
-            </aside>
+            <div id="products-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+            <div id="no-products" class="hidden text-center py-20">
+                <i data-lucide="search-x" class="mx-auto mb-4" style="width:48px;height:48px;color:#d1d5db"></i>
+                <p class="text-gray-400 text-lg">Produk tidak ditemukan</p>
+                <p class="text-gray-300 text-sm mt-1">Coba kata kunci lain atau ubah filter</p>
+            </div>
         </div>
     </section>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="modal-overlay fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+        <div class="modal-content bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="relative">
+                <!-- Gallery -->
+                <div class="relative h-72 sm:h-80 overflow-hidden rounded-t-3xl bg-gray-100">
+                    <div id="modal-gallery" class="w-full h-full bg-cover bg-center gallery-img"></div>
+                    <button onclick="prevGalleryImg()" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/50 transition">
+                        <i data-lucide="chevron-left" style="width:20px;height:20px"></i>
+                    </button>
+                    <button onclick="nextGalleryImg()" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/50 transition">
+                        <i data-lucide="chevron-right" style="width:20px;height:20px"></i>
+                    </button>
+                    <button onclick="closeModal()" class="absolute right-3 top-3 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/50 transition">
+                        <i data-lucide="x" style="width:20px;height:20px"></i>
+                    </button>
+                    <!-- Image counter -->
+                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5" id="gallery-dots"></div>
+                </div>
+                <!-- Product Info -->
+                <div class="p-6 space-y-4">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h2 id="modal-title" class="font-bold text-xl text-gray-900"></h2>
+                            <p id="modal-price" class="text-2xl font-bold text-emerald-600 mt-1"></p>
+                        </div>
+                        <span id="modal-badge" class="whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold"></span>
+                    </div>
+                    <p id="modal-desc" class="text-gray-600 text-sm leading-relaxed"></p>
+                    
+                    <!-- Seller Info -->
+                    <div class="seller-badge rounded-2xl p-4 flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-emerald-200 flex items-center justify-center">
+                            <i data-lucide="user" style="width:24px;height:24px;color:#059669"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p id="modal-seller" class="font-semibold text-gray-900"></p>
+                            <div class="flex items-center gap-1 text-xs text-gray-500">
+                                <i data-lucide="map-pin" style="width:12px;height:12px"></i>
+                                <span id="modal-location"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <a id="modal-wa-link" href="#" target="_blank" class="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-green-500 text-white font-semibold hover:bg-green-600 transition shadow-lg shadow-green-200/50 wa-float">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.414.248-.694.248-1.289.173-1.414-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.387 0-4.594-.838-6.32-2.236l-.456-.37-3.16 1.06 1.06-3.16-.37-.456A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                            <span>Hubungi Penjual</span>
+                        </a>
+                        <button onclick="closeModal()" class="px-6 py-3.5 rounded-2xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="py-10 px-4 text-center bg-emerald-900 text-white">
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
@@ -182,10 +158,141 @@
     <script>renderNavbar('lapak');</script>
     <script src="../assets/script.js"></script>
     <script>
+        // ─── Product Data ──────────────────────────────
+        const products = [
+            { id:1, name:'Emping Melinjo Premium', price:25000, category:'olahan', seller:'Ibu Sumiati', location:'RW 01', badge:'Best Seller', badgeColor:'bg-amber-100 text-amber-700', desc:'Emping melinjo pilihan, diolah secara tradisional. Renyah dan tahan lama. Cocok untuk camilan atau oleh-oleh.', wa:'6281234567890', images:['https://images.unsplash.com/photo-1599490659468-964839f5c5ec?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop'] },
+            { id:2, name:'Sambal Bu Rud', price:18000, category:'olahan', seller:'Ibu Rudiyah', location:'RW 02', badge:'Pedas!', badgeColor:'bg-red-100 text-red-700', desc:'Sambal buatan rumah dengan resep turun temurun. Tersedia level pedas sesuai selera.', wa:'6281234567891', images:['https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1599490659468-964839f5c5ec?w=800&h=600&fit=crop'] },
+            { id:3, name:'Tas Eceng Gondok', price:85000, category:'kerajinan', seller:'Pak Ahmad', location:'RW 03', badge:'Handmade', badgeColor:'bg-purple-100 text-purple-700', desc:'Tas rajut eceng gondok buatan tangan. Unik, ramah lingkungan, dan tahan lama. Bisa pesan custom warna.', wa:'6281234567892', images:['https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&h=600&fit=crop'] },
+            { id:4, name:'Anyaman Bambu Set', price:120000, category:'kerajinan', seller:'Pak Joko', location:'RW 04', badge:'Premium', badgeColor:'bg-indigo-100 text-indigo-700', desc:'Set anyaman bambu untuk dekorasi rumah. Incluye tudung saji, tempat buah, dan nampan.', wa:'6281234567893', images:['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&h=600&fit=crop'] },
+            { id:5, name:'Beras Organik 5kg', price:65000, category:'tani', seller:'Kelompok Tani Makmur', location:'RW 01', badge:'Organik', badgeColor:'bg-green-100 text-green-700', desc:'Beras organik tanpa pestisida, ditanam oleh kelompok tani desa. Pulen dan wangi.', wa:'6281234567894', images:['https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop'] },
+            { id:6, name:'Sayur Segar Campur', price:15000, category:'tani', seller:'Ibu Tuminah', location:'RW 02', badge:'Fresh', badgeColor:'bg-emerald-100 text-emerald-700', desc:'Paket sayur segar harian dari kebun warga. Bayam, kangkung, sawi, dan wortel.', wa:'6281234567895', images:['https://images.unsplash.com/photo-1540479859536-9346a2396000?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=600&fit=crop'] },
+            { id:7, name:'Jasa Tour Desa', price:50000, category:'layanan', seller:'Karang Taruna', location:'RW 03', badge:'Populer', badgeColor:'bg-cyan-100 text-cyan-700', desc:'Paket wisata keliling desa. Lihat sawah, kebun, dan kehidupan pedesaan. Termasuk guide lokal.', wa:'6281234567896', images:['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1500595046891-e9eda8b2fa4d?w=800&h=600&fit=crop'] },
+            { id:8, name:'Keripik Singkong', price:12000, category:'olahan', seller:'Ibu Warsi', location:'RW 04', badge:'Renyah', badgeColor:'bg-orange-100 text-orange-700', desc:'Keripik singkong renyah berbagai rasa: original, balado, keju, dan jagung bakar.', wa:'6281234567897', images:['https://images.unsplash.com/photo-1599490659468-964839f5c5ec?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=600&fit=crop'] },
+            { id:9, name:'Suvenir Wedding', price:8000, category:'kerajinan', seller:'Ibu Sari', location:'RW 01', badge:'Custom', badgeColor:'bg-pink-100 text-pink-700', desc:'Suvenir pernikahan handmade. Minimal order 50 pcs. Bisa custom nama dan tanggal.', wa:'6281234567898', images:['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&h=600&fit=crop'] },
+            { id:10, name:'Jasa Antar Barang', price:5000, category:'layanan', seller:'Pak Ujang', location:'RW 02', badge:'Cepat', badgeColor:'bg-blue-100 text-blue-700', desc:'Jasa antar barang dalam desa. Cepat, aman, dan terpercaya. Hubungi via WA.', wa:'6281234567899', images:['https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop'] },
+            { id:11, name:'Telur Ayam Kampung', price:35000, category:'tani', seller:'Pak Dadang', location:'RW 03', badge:'Fresh', badgeColor:'bg-yellow-100 text-yellow-700', desc:'Telur ayam kampung segar, isi 10 butir. Kuning telur lebih oranye dan bergizi.', wa:'6281234567900', images:['https://images.unsplash.com/photo-1540479859536-9346a2396000?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1503602642458-232111445657?w=800&h=600&fit=crop'] },
+            { id:12, name:'Dodol Tradisional', price:30000, category:'olahan', seller:'Ibu Eneng', location:'RW 04', badge:'Legacy', badgeColor:'bg-amber-100 text-amber-700', desc:'Dodol buatan rumah dengan resep warisan. Lembut, manis, dan legit. Cocok untuk oleh-oleh.', wa:'6281234567901', images:['https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1599490659468-964839f5c5ec?w=800&h=600&fit=crop'] }
+        ];
+
+        let currentCategory = 'all';
+        let currentGalleryIndex = 0;
+        let currentModalImages = [];
+
+        function formatPrice(n) { return 'Rp ' + n.toLocaleString('id-ID'); }
+
+        function renderProducts(list) {
+            const grid = document.getElementById('products-grid');
+            const noProducts = document.getElementById('no-products');
+            document.getElementById('product-count').textContent = list.length;
+
+            if (list.length === 0) {
+                grid.classList.add('hidden');
+                noProducts.classList.remove('hidden');
+                return;
+            }
+            grid.classList.remove('hidden');
+            noProducts.classList.add('hidden');
+
+            grid.innerHTML = list.map(p => `
+                <div class="product-card bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer" onclick="openModal(${p.id})">
+                    <div class="relative overflow-hidden">
+                        <img src="${p.images[0]}" alt="${p.name}" class="product-img w-full h-40 sm:h-48 object-cover">
+                        <div class="absolute left-2 top-2 ${p.badgeColor} rounded-full px-2.5 py-0.5 text-[10px] font-semibold shadow-sm">${p.badge}</div>
+                        <button onclick="event.stopPropagation(); openWA('${p.wa}', '${p.name}')" class="absolute right-2 bottom-2 w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg hover:bg-green-600 transition wa-float">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.414.248-.694.248-1.289.173-1.414-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.387 0-4.594-.838-6.32-2.236l-.456-.37-3.16 1.06 1.06-3.16-.37-.456A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-sm text-gray-900 line-clamp-1">${p.name}</h3>
+                        <p class="text-emerald-600 font-bold text-sm mt-1">${formatPrice(p.price)}</p>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center gap-1 text-[10px] text-gray-400">
+                                <i data-lucide="map-pin" style="width:10px;height:10px"></i>
+                                <span>${p.location}</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400">${p.seller}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-tab').forEach(t => {
+                t.classList.remove('active');
+                if (t.dataset.cat === cat) t.classList.add('active');
+            });
+            filterProducts();
+        }
+
+        function filterProducts() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const sort = document.getElementById('sort-select').value;
+            let filtered = products.filter(p => {
+                const matchCat = currentCategory === 'all' || p.category === currentCategory;
+                const matchSearch = !search || p.name.toLowerCase().includes(search) || p.seller.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+            if (sort === 'cheapest') filtered.sort((a,b) => a.price - b.price);
+            else if (sort === 'expensive') filtered.sort((a,b) => b.price - a.price);
+            else if (sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+            renderProducts(filtered);
+        }
+
+        function openModal(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            currentModalImages = p.images;
+            currentGalleryIndex = 0;
+            document.getElementById('modal-title').textContent = p.name;
+            document.getElementById('modal-price').textContent = formatPrice(p.price);
+            document.getElementById('modal-desc').textContent = p.desc;
+            document.getElementById('modal-seller').textContent = p.seller;
+            document.getElementById('modal-location').textContent = p.location + ', Desa Kasomalang Kulon';
+            const badge = document.getElementById('modal-badge');
+            badge.textContent = p.badge;
+            badge.className = `whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${p.badgeColor}`;
+            document.getElementById('modal-wa-link').href = `https://wa.me/${p.wa}?text=Halo ${encodeURIComponent(p.seller)}, saya tertarik dengan "${encodeURIComponent(p.name)}" di Lapak Desa Kasomalang Kulon`;
+            updateGalleryView();
+            document.getElementById('product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateGalleryView() {
+            document.getElementById('modal-gallery').style.backgroundImage = `url('${currentModalImages[currentGalleryIndex]}')`;
+            const dots = document.getElementById('gallery-dots');
+            dots.innerHTML = currentModalImages.map((_, i) => 
+                `<div class="w-2 h-2 rounded-full ${i === currentGalleryIndex ? 'bg-white' : 'bg-white/40'} transition"></div>`
+            ).join('');
+        }
+
+        function nextGalleryImg() {
+            currentGalleryIndex = (currentGalleryIndex + 1) % currentModalImages.length;
+            updateGalleryView();
+        }
+
+        function prevGalleryImg() {
+            currentGalleryIndex = (currentGalleryIndex - 1 + currentModalImages.length) % currentModalImages.length;
+            updateGalleryView();
+        }
+
+        function openWA(wa, productName) {
+            window.open(`https://wa.me/${wa}?text=Halo, saya tertarik dengan "${productName}" di Lapak Desa Kasomalang Kulon`, '_blank');
+        }
+
+        // ESC to close modal
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        // Init
         window.addEventListener('DOMContentLoaded', () => {
-            initScrollAnimations();
-            initNavigation();
-            initNavigationLoader();
+            renderProducts(products);
             PageLoader.hide();
             lucide.createIcons();
         });

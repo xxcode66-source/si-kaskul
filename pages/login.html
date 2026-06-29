@@ -108,6 +108,8 @@
                 </div>
                 <ul class="ml-7 space-y-1 text-white/80">
                     <li>Admin: <code class="bg-white/10 px-2 py-1 rounded">admin@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">admin123</code></li>
+                    <li>Kolektor: <code class="bg-white/10 px-2 py-1 rounded">kolektor1@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">kolektor123</code></li>
+                    <li>RT: <code class="bg-white/10 px-2 py-1 rounded">rt1@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">rt123</code></li>
                     <li>Penduduk: <code class="bg-white/10 px-2 py-1 rounded">1234567890123456</code> / <code class="bg-white/10 px-2 py-1 rounded">123456</code></li>
                 </ul>
             </div>
@@ -118,6 +120,8 @@
     <script>renderNavbar('login');</script>
     <script src="../assets/script.js"></script>
     <script>
+        // Uses API_BASE_URL from script.js (already includes /api path)
+
         let currentTab = 'petugas';
 
         function switchTab(tab) {
@@ -162,11 +166,11 @@
 
             PageLoader.show('Memverifikasi kredensial...');
             try {
-                const response = await fetchWithLoader(`${API_BASE_URL}/auth/admin-login`, {
+                const response = await fetch(API_BASE_URL + '/auth/admin-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
-                });
+                }).then(r => r.json());
 
                 if (response.success) {
                     // Save auth to localStorage
@@ -207,7 +211,35 @@
         // Penduduk Form Submit
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            showMessage('Fitur Segera Hadir', 'info');
+            const nik = document.getElementById('user-nik').value;
+            const password = document.getElementById('user-password').value;
+
+            PageLoader.show('Memverifikasi kredensial...');
+            try {
+                const response = await fetch(API_BASE_URL + '/auth/user-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nik, password })
+                }).then(r => r.json());
+
+                if (response.success) {
+                    localStorage.setItem('wargaUser', JSON.stringify(response.user));
+                    localStorage.setItem('wargaToken', response.token);
+
+                    showMessage('Login berhasil! Mengalihkan ke portal warga...', 'success');
+                    PageLoader.hide();
+
+                    setTimeout(() => {
+                        window.location.href = '../pages/user-portal.html';
+                    }, 1200);
+                } else {
+                    showMessage(response.message || 'Login gagal', 'error');
+                    PageLoader.hide();
+                }
+            } catch (error) {
+                showMessage('Gagal terhubung ke server login', 'error');
+                PageLoader.hide();
+            }
         });
 
         function showMessage(msg, type) {

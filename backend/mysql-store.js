@@ -106,6 +106,8 @@ function createSeedDatabase() {
     { id: 4, name: 'Ketua RT 1', email: 'rt1@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: 'dusun1/rw1/rt1', rw: '01' },
     { id: 5, name: 'Ketua RT 2', email: 'rt2@kasomalangkulon.id', password: 'rt123', role: 'rt', rt: 'dusun1/rw1/rt2', rw: '01' },
     { id: 6, name: 'Ketua RW 1', email: 'rwk1@kasomalangkulon.id', password: 'rt123', role: 'rw', rt: 'dusun1/rw1', rw: '01' },
+    { id: 7, name: 'Warga Demo 1', nik: '1234567890123456', password: '123456', role: 'warga', email: 'warga1@kasomalangkulon.id' },
+    { id: 8, name: 'Warga Demo 2', nik: '9876543210987654', password: '123456', role: 'warga', email: 'warga2@kasomalangkulon.id' },
   ];
 
   const berita = [

@@ -87,6 +87,16 @@
         </div>
     </section>
 
+    <!-- News Detail Modal -->
+    <div id="news-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(6px)">
+        <div class="bg-white rounded-[2rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button onclick="closeNewsModal()" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/90 shadow flex items-center justify-center hover:bg-white transition">
+                <i data-lucide="x" style="width:20px;height:20px"></i>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
@@ -198,10 +208,10 @@
                 div.className = 'bg-white rounded-[1.75rem] overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition news-card-animated stagger-item';
                 div.style.animationDelay = (index * 0.1) + 's';
                 div.innerHTML = `
-                    <div class="relative">
-                        <img src="${news.image}" alt="${news.title}" class="w-full h-52 object-cover">
+                    <div class="relative overflow-hidden">
+                        <img src="${news.image}" alt="${news.title}" class="w-full h-52 object-cover transition-transform duration-500 hover:scale-110">
                         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-emerald-950/10 to-transparent"></div>
-                        <div class="absolute left-4 top-4 px-3 py-1 rounded-full bg-white/90 text-emerald-700 text-xs font-semibold shadow-lg">${news.category}</div>
+                        <div class="absolute left-4 top-4">${getCategoryBadge(news.category)}</div>
                     </div>
                     <div class="p-6">
                         <div class="flex items-center gap-2 mb-3 text-xs text-gray-500">
@@ -259,11 +269,43 @@
             renderNews();
         }
 
+        function getCategoryBadge(cat) {
+            const colors = {
+                pengumuman: 'bg-blue-500/90 text-white',
+                program: 'bg-emerald-500/90 text-white',
+                acara: 'bg-amber-500/90 text-white',
+                edukasi: 'bg-purple-500/90 text-white'
+            };
+            const labels = { pengumuman: 'Pengumuman', program: 'Program', acara: 'Acara', edukasi: 'Edukasi' };
+            const cls = colors[cat] || 'bg-gray-500/90 text-white';
+            return `<span class="px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${cls}">${labels[cat] || cat}</span>`;
+        }
+
         function showNewsDetail(id) {
             const news = newsData.find(n => n.id === id);
-            if (news) {
-                alert(`${news.title}\n\n${news.content}`);
-            }
+            if (!news) return;
+            const modal = document.getElementById('news-modal');
+            document.getElementById('modal-content').innerHTML = `
+                <img src="${news.image}" alt="${news.title}" class="w-full h-64 object-cover rounded-t-[2rem]">
+                <div class="p-8">
+                    <div class="flex items-center gap-3 mb-4">${getCategoryBadge(news.category)}<span class="text-sm text-gray-500">${formatDate(news.date)}</span></div>
+                    <h2 class="font-display text-3xl font-bold text-gray-900 mb-4 leading-tight">${news.title}</h2>
+                    <p class="text-gray-700 leading-relaxed text-base">${news.content}</p>
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-xs text-gray-400">Desa Kasomalang Kulon</span>
+                        <button onclick="closeNewsModal()" class="px-5 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition text-sm">Tutup</button>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeNewsModal() {
+            const modal = document.getElementById('news-modal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
         }
 
         function renderFeaturedNews() {

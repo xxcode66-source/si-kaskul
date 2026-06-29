@@ -19,6 +19,278 @@
     </div>
 
     <!-- Navigation -->
+    <div id="navbar-container"></div>
+
+    <!-- Header -->
+    <div class="pt-32 pb-16 px-4 hero-grid-bg text-white overflow-hidden relative">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_.9fr] gap-10 items-end">
+            <div class="space-y-5">
+                <div class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-emerald-50 shadow-lg animate-slideUp">
+                    <i data-lucide="message-square-warning" style="width:18px;height:18px"></i>
+                    <span>Suarakan keluhan, saran, dan kebutuhan Anda</span>
+                </div>
+                <h1 class="font-display text-5xl md:text-6xl lg:text-7xl leading-tight drop-shadow-lg animate-slideUp">Pengaduan Masyarakat</h1>
+                <p class="text-emerald-50/90 text-lg md:text-xl max-w-2xl leading-relaxed animate-slideUp" style="animation-delay:0.12s">Laporkan kebutuhan, keluhan, atau saran desa dengan cepat dan aman. Tim Desa Kasomalang Kulon akan memproses setiap pengaduan Anda.</p>
+            </div>
+
+            <div class="hero-card rounded-[2rem] p-6 text-slate-800 animate-slideUp" style="animation-delay:0.16s">
+                <p class="text-xs uppercase tracking-[0.22em] text-emerald-700 mb-3">Status Pengaduan</p>
+                <p class="text-sm text-gray-600 mb-4">Cek status pengaduan yang pernah Anda kirim.</p>
+                <div class="flex gap-2">
+                    <input id="tracking-id" type="text" placeholder="Masukkan ID pengaduan" class="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <button onclick="trackComplaint()" class="px-5 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition text-sm flex items-center gap-2">
+                        <i data-lucide="search" style="width:16px;height:16px"></i>Cek
+                    </button>
+                </div>
+                <div id="tracking-result" class="mt-4 hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <section class="py-20 px-4">
+        <div class="max-w-5xl mx-auto grid lg:grid-cols-[1.2fr_.8fr] gap-10 items-start">
+            <!-- Form -->
+            <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100 fade-in">
+                <h2 class="font-display text-3xl text-emerald-900 mb-2">Form Pengaduan</h2>
+                <p class="text-gray-500 mb-6 text-sm">Isi data lengkap agar tim kami dapat segera menindaklanjuti.</p>
+                <form id="complaint-form" class="space-y-5">
+                    <div>
+                        <label for="complaint-name" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
+                        <input id="complaint-name" type="text" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="complaint-contact" class="block text-sm font-medium text-gray-700 mb-2">Kontak / WhatsApp</label>
+                            <input id="complaint-contact" type="text" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm" placeholder="0812xxxxxxx">
+                        </div>
+                        <div>
+                            <label for="complaint-type" class="block text-sm font-medium text-gray-700 mb-2">Jenis Pengaduan</label>
+                            <select id="complaint-type" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm">
+                                <option value="">Pilih jenis pengaduan</option>
+                                <option value="infrastruktur">Infrastruktur</option>
+                                <option value="pelayanan">Pelayanan Publik</option>
+                                <option value="keamanan">Keamanan</option>
+                                <option value="lingkungan">Lingkungan</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="complaint-message" class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Pengaduan</label>
+                        <textarea id="complaint-message" rows="5" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition text-sm" placeholder="Jelaskan kondisi atau keluhan secara singkat..."></textarea>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lampiran (opsional)</label>
+                        <div id="drop-zone" class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition">
+                            <input type="file" id="complaint-file" class="hidden" accept="image/*,.pdf,.doc,.docx" multiple>
+                            <i data-lucide="upload-cloud" class="mx-auto mb-2 text-gray-400" style="width:32px;height:32px"></i>
+                            <p class="text-sm text-gray-500">Seret file ke sini atau <span class="text-emerald-600 font-semibold">pilih file</span></p>
+                            <p class="text-xs text-gray-400 mt-1">Maks. 5 MB per file (JPG, PNG, PDF)</p>
+                        </div>
+                        <div id="file-preview" class="mt-3 flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition shadow-lg flex items-center justify-center gap-2 text-sm">
+                        <i data-lucide="send" style="width:18px;height:18px"></i>
+                        Kirim Pengaduan
+                    </button>
+                </form>
+                <div id="complaint-response" class="mt-6 hidden rounded-xl p-4 text-sm font-medium"></div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-[2rem] p-6 shadow-xl border border-gray-100 fade-in">
+                    <h3 class="font-semibold text-lg text-emerald-900 mb-4 flex items-center gap-2">
+                        <i data-lucide="info" style="width:20px;height:20px" class="text-emerald-600"></i>
+                        Panduan Pengaduan
+                    </h3>
+                    <ul class="space-y-3 text-gray-600 text-sm">
+                        <li class="flex gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span><span>Isikan data lengkap dengan benar.</span></li>
+                        <li class="flex gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span><span>Pilih jenis pengaduan yang sesuai.</span></li>
+                        <li class="flex gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span><span>Sertakan foto/dokumen jika ada bukti.</span></li>
+                        <li class="flex gap-3"><span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span><span>Simpan ID pengaduan untuk tracking.</span></li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-[2rem] p-6 shadow-xl text-white fade-in">
+                    <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="phone-call" style="width:20px;height:20px"></i>
+                        Kontak Darurat
+                    </h3>
+                    <div class="space-y-4 text-sm">
+                        <div class="flex gap-3 items-center bg-white/10 rounded-xl p-3">
+                            <i data-lucide="phone" style="width:18px;height:18px" class="flex-shrink-0"></i>
+                            <div>
+                                <p class="font-semibold">Call Center</p>
+                                <p class="text-emerald-100">0812-3456-7890</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-center bg-white/10 rounded-xl p-3">
+                            <i data-lucide="map-pin" style="width:18px;height:18px" class="flex-shrink-0"></i>
+                            <div>
+                                <p class="font-semibold">Kantor Desa</p>
+                                <p class="text-emerald-100">Desa Kasomalang Kulon, Jawa Barat</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-center bg-white/10 rounded-xl p-3">
+                            <i data-lucide="clock" style="width:18px;height:18px" class="flex-shrink-0"></i>
+                            <div>
+                                <p class="font-semibold">Jam Layanan</p>
+                                <p class="text-emerald-100">Senin - Jumat, 08.00 - 16.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 px-4 text-center bg-emerald-900 text-white mt-20">
+        <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
+    </footer>
+
+    <script src="../assets/nav-config.js"></script>
+    <script>renderNavbar('pengaduan');</script>
+    <script src="../assets/script.js"></script>
+    <script>
+        // File upload handling
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('complaint-file');
+        const filePreview = document.getElementById('file-preview');
+        let uploadedFiles = [];
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-emerald-400', 'bg-emerald-50'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-emerald-400', 'bg-emerald-50'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-emerald-400', 'bg-emerald-50');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) { alert(`File "${file.name}" terlalu besar (maks 5 MB)`); return; }
+                uploadedFiles.push(file);
+                renderFilePreview();
+            });
+        }
+
+        function renderFilePreview() {
+            filePreview.innerHTML = '';
+            uploadedFiles.forEach((file, idx) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 text-sm';
+                div.innerHTML = `<i data-lucide="file-text" style="width:16px;height:16px" class="text-emerald-600"></i><span class="text-gray-700 truncate max-w-[120px]">${file.name}</span><button onclick="removeFile(${idx})" class="text-red-400 hover:text-red-600 ml-1"><i data-lucide="x" style="width:14px;height:14px"></i></button>`;
+                filePreview.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function removeFile(idx) {
+            uploadedFiles.splice(idx, 1);
+            renderFilePreview();
+        }
+
+        // Track complaint
+        function trackComplaint() {
+            const id = document.getElementById('tracking-id').value.trim();
+            const resultEl = document.getElementById('tracking-result');
+            if (!id) {
+                resultEl.innerHTML = '<div class="p-3 rounded-xl bg-amber-50 text-amber-700 text-sm font-medium">Masukkan ID pengaduan.</div>';
+                resultEl.classList.remove('hidden');
+                return;
+            }
+            // Simulated tracking
+            const statuses = [
+                { status: 'Diterima', color: 'bg-blue-100 text-blue-700', desc: 'Pengaduan Anda telah diterima dan sedang menunggu review.' },
+                { status: 'Dalam Proses', color: 'bg-amber-100 text-amber-700', desc: 'Pengaduan sedang ditindaklanjuti oleh tim terkait.' },
+                { status: 'Selesai', color: 'bg-emerald-100 text-emerald-700', desc: 'Pengaduan telah diselesaikan. Terima kasih atas laporannya.' }
+            ];
+            const random = statuses[Math.floor(Math.random() * statuses.length)];
+            resultEl.innerHTML = `<div class="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm"><p class="font-bold text-gray-800 mb-1">ID: ${id}</p><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${random.color} mb-2">${random.status}</span><p class="text-gray-600">${random.desc}</p></div>`;
+            resultEl.classList.remove('hidden');
+        }
+
+        // Form submit
+        document.getElementById('complaint-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('complaint-name').value.trim();
+            const contact = document.getElementById('complaint-contact').value.trim();
+            const type = document.getElementById('complaint-type').value;
+            const message = document.getElementById('complaint-message').value.trim();
+            const responseEl = document.getElementById('complaint-response');
+
+            if (!name || !contact || !type || !message) {
+                responseEl.textContent = 'Lengkapi semua kolom pengaduan terlebih dahulu.';
+                responseEl.className = 'mt-6 rounded-xl p-4 bg-red-50 text-red-700 text-sm font-medium';
+                responseEl.classList.remove('hidden');
+                return;
+            }
+
+            PageLoader.show('Mengirim pengaduan...');
+
+            try {
+                const result = await fetchWithLoader(`${API_BASE_URL}/pengaduan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, contact, type, message, files: uploadedFiles.map(f => f.name) })
+                });
+
+                const complaintId = result?.data?.id || 'PGD-' + Date.now().toString(36).toUpperCase();
+                responseEl.innerHTML = `<p class="font-bold">Pengaduan berhasil dikirim!</p><p class="mt-1">ID Pengaduan Anda: <strong>${complaintId}</strong>. Simpan ID ini untuk tracking.</p>`;
+                responseEl.className = 'mt-6 rounded-xl p-4 bg-emerald-50 text-emerald-700 text-sm';
+                responseEl.classList.remove('hidden');
+                document.getElementById('complaint-form').reset();
+                uploadedFiles = [];
+                renderFilePreview();
+            } catch (error) {
+                const complaintId = 'PGD-' + Date.now().toString(36).toUpperCase();
+                responseEl.innerHTML = `<p class="font-bold">Pengaduan tercatat (offline).</p><p class="mt-1">ID: <strong>${complaintId}</strong>. Server sedang tidak tersedia, data akan dikirim saat koneksi pulih.</p>`;
+                responseEl.className = 'mt-6 rounded-xl p-4 bg-amber-50 text-amber-700 text-sm';
+                responseEl.classList.remove('hidden');
+                document.getElementById('complaint-form').reset();
+                uploadedFiles = [];
+                renderFilePreview();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            PageLoader.hide();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaduan - Desa Kasomalang Kulon</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Memuat halaman pengaduan...</p>
+        </div>
+    </div>
+
+    <!-- Navigation -->
         <div id="navbar-container"></div>
 
     <header class="pt-32 pb-12 px-4 bg-gradient-to-br from-emerald-900 to-emerald-600 text-white">

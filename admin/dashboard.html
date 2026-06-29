@@ -30,8 +30,10 @@
     <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p id="loader-text" class="loader-text">Memuat dashboard...</p>
+            <div class="ls-emblem">🏛️</div>
+            <div class="ls-title">SI<b>KASKUL</b></div>
+            <div class="ls-sub">Admin Panel · Desa Kasomalang Kulon</div>
+            <div class="ls-track"><div class="ls-fill"></div></div>
         </div>
     </div>
 
@@ -57,11 +59,7 @@
             <a href="#pbb" id="nav-pbb" onclick="switchPage('pbb', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="building2" style="width:20px;height:20px"></i>
                 Kelola PBB
-            </a>
-            <a href="#approvals" id="nav-approvals" onclick="switchPage('approvals', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
-                <i data-lucide="check-circle" style="width:20px;height:20px"></i>
-                Persetujuan PBB
-                <span id="pending-badge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
+                <span id="pbb-badge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
             </a>
             <a href="#bansos" id="nav-bansos" onclick="switchPage('bansos', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
@@ -210,9 +208,9 @@
                                 <i data-lucide="newspaper" style="width:24px;height:24px;color:#059669" class="mb-2"></i>
                                 <p class="font-semibold text-sm text-gray-800">Kelola Berita</p>
                             </button>
-                            <button onclick="switchPage('approvals', document.getElementById('nav-approvals'))" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition">
-                                <i data-lucide="check-circle" style="width:24px;height:24px;color:#2563eb" class="mb-2"></i>
-                                <p class="font-semibold text-sm text-gray-800">Persetujuan PBB</p>
+                            <button onclick="switchPage('pbb', document.getElementById('nav-pbb'))" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition">
+                                <i data-lucide="building2" style="width:24px;height:24px;color:#2563eb" class="mb-2"></i>
+                                <p class="font-semibold text-sm text-gray-800">Kelola PBB</p>
                             </button>
                             <button onclick="switchPage('bansos', document.getElementById('nav-bansos'))" class="p-4 bg-pink-50 hover:bg-pink-100 rounded-xl text-left transition">
                                 <i data-lucide="heart-handshake" style="width:24px;height:24px;color:#db2777" class="mb-2"></i>
@@ -255,41 +253,167 @@
 
             <!-- ==================== PBB PAGE ==================== -->
             <div id="pbb-page" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <h3 class="text-xl font-bold text-gray-800">Kelola PBB</h3>
-                    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <input id="pbb-search" type="text" placeholder="Cari NOP atau Nama..." oninput="loadPbbData()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm w-full sm:w-64">
-                    </div>
+                <!-- Sub-nav tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button onclick="switchPbbTab('data-wp', this)" class="pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white transition">Data Wajib Pajak</button>
+                    <button onclick="switchPbbTab('approval', this)" class="pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Approval Pembayaran</button>
+                    <button onclick="switchPbbTab('riwayat', this)" class="pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Riwayat Pembayaran</button>
+                    <button onclick="switchPbbTab('tunggakan', this)" class="pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition">Rekap Tunggakan</button>
                 </div>
-                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
-                    <table class="w-full min-w-[800px]">
-                        <thead>
-                            <tr class="bg-emerald-700 text-white">
-                                <th class="px-6 py-4 text-left font-semibold text-sm">NOP</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Nama</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Alamat</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Dusun</th>
-                                <th class="px-6 py-4 text-center font-semibold text-sm">RW/RT</th>
-                                <th class="px-6 py-4 text-left font-semibold text-sm">Status</th>
-                                <th class="px-6 py-4 text-right font-semibold text-sm">Total Pajak</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pbb-table" class="divide-y divide-gray-200"></tbody>
-                    </table>
-                </div>
-            </div>
 
-            <!-- ==================== APPROVALS PAGE ==================== -->
-            <div id="approvals-page" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-800">Persetujuan PBB</h3>
-                        <p class="text-sm text-gray-600 mt-1">Setujui atau tolak pembayaran PBB yang menunggu.</p>
+                <!-- TAB: Data Wajib Pajak -->
+                <div id="pbb-tab-data-wp" class="pbb-tab-content">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Data Wajib Pajak</h3>
+                            <p class="text-sm text-gray-500 mt-1">Kelola data dan riwayat pembayaran per NOP</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <div class="relative w-full sm:w-72">
+                                <i data-lucide="search" style="width:18px;height:18px" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input id="pbb-search" type="text" placeholder="Cari nama / NOP / RT / RW..." oninput="loadPbbData()" class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-sm bg-gray-50">
+                            </div>
+                            <select id="pbb-filter-dusun" onchange="loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <option value="">Semua Dusun</option>
+                            </select>
+                            <select id="pbb-filter-status" onchange="loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <option value="">Semua Status</option>
+                                <option value="Lunas">Lunas</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Belum Bayar">Belum Bayar</option>
+                                <option value="Menunggak">Menunggak</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                        <table class="w-full min-w-[900px]">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">NOP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Nama WP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Dusun</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">RW</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">RT</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Status 2026</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Tunggakan</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pbb-table" class="divide-y divide-gray-100"></tbody>
+                        </table>
                     </div>
                 </div>
-                <div id="approvals-loading" class="text-center py-8 text-gray-500">Memuat data persetujuan...</div>
-                <div id="approvals-empty" class="hidden text-center py-8 text-gray-500">Tidak ada data PBB menunggu persetujuan.</div>
-                <div id="approvals-list" class="space-y-4"></div>
+
+                <!-- TAB: Approval Pembayaran -->
+                <div id="pbb-tab-approval" class="pbb-tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Approval Pembayaran</h3>
+                        <p class="text-sm text-gray-500 mt-1">Verifikasi bukti pembayaran yang diupload petugas</p>
+                    </div>
+                    <div id="approvals-loading" class="text-center py-8 text-gray-500">Memuat data...</div>
+                    <div id="approvals-empty" class="hidden text-center py-8 text-gray-500">Tidak ada data menunggu persetujuan.</div>
+                    <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                        <table class="w-full min-w-[900px]">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">NOP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Nama WP</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Tahun</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Petugas</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Bukti</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approvals-table" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: Riwayat Pembayaran -->
+                <div id="pbb-tab-riwayat" class="pbb-tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Riwayat Pembayaran</h3>
+                        <p class="text-sm text-gray-500 mt-1">Semua transaksi yang telah diverifikasi dengan filter tanggal</p>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <div class="flex flex-wrap gap-4 items-end">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
+                                <input id="riwayat-from" type="date" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
+                                <input id="riwayat-to" type="date" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-1">Filter Petugas</label>
+                                <select id="riwayat-petugas" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                                    <option value="">Semua Petugas</option>
+                                </select>
+                            </div>
+                            <button onclick="exportRiwayatExcel()" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition text-sm font-medium flex items-center gap-2">
+                                <i data-lucide="download" style="width:18px;height:18px"></i> Export Excel
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                        <table class="w-full min-w-[800px]">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Tgl Lunas</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">NOP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Nama WP</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Tahun</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Petugas</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Diapprove Oleh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riwayat-table" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: Rekap Tunggakan -->
+                <div id="pbb-tab-tunggakan" class="pbb-tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800">Rekap Tunggakan</h3>
+                        <p class="text-sm text-gray-500 mt-1">Wajib pajak yang masih memiliki tunggakan 2020–2026</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-5 border-t-4 border-red-500">
+                            <div class="text-2xl mb-2">📊</div>
+                            <p id="tung-total" class="text-3xl font-bold text-red-600">-</p>
+                            <p class="text-sm text-gray-500 mt-1">Total Tunggakan</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-lg p-5 border-t-4 border-amber-500">
+                            <div class="text-2xl mb-2">🗓️</div>
+                            <p id="tung-1thn" class="text-3xl font-bold text-amber-600">-</p>
+                            <p class="text-sm text-gray-500 mt-1">Tunggak 1 Tahun</p>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-lg p-5 border-t-4 border-red-600">
+                            <div class="text-2xl mb-2">🗓️</div>
+                            <p id="tung-more" class="text-3xl font-bold text-red-600">-</p>
+                            <p class="text-sm text-gray-500 mt-1">Tunggak &gt;1 Tahun</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                        <table class="w-full min-w-[800px]">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">NOP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Nama WP</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Dusun / RW / RT</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider">Tahun Tunggak</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Jumlah</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tunggakan-table" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- ==================== BANSOS PAGE ==================== -->
@@ -399,6 +523,46 @@
         </div>
     </main>
 
+    <!-- ==================== MODAL WP DETAIL ==================== -->
+    <div id="wp-detail-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width:650px">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="text-lg font-bold text-gray-800">Detail Wajib Pajak</h4>
+                <button onclick="closeModal('wp-detail-modal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500">NOP</span>
+                    <span id="wp-detail-nop" class="font-mono font-semibold text-gray-800 text-sm"></span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500">Nama WP</span>
+                    <span id="wp-detail-nama" class="font-semibold text-gray-800 text-sm"></span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500">Dusun</span>
+                    <span id="wp-detail-dusun" class="font-semibold text-gray-800 text-sm"></span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm text-gray-500">RW / RT</span>
+                    <span id="wp-detail-rwrt" class="font-semibold text-gray-800 text-sm"></span>
+                </div>
+            </div>
+            <h5 class="font-bold text-gray-800 mb-3">Riwayat Pembayaran</h5>
+            <div class="bg-gray-50 rounded-xl overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tahun</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wp-detail-payments" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== MODAL BERITA ==================== -->
     <div id="berita-modal" class="modal-overlay">
         <div class="modal-content">
@@ -480,51 +644,70 @@
 
     <!-- ==================== MODAL SURAT ==================== -->
     <div id="surat-modal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width:700px">
             <div class="flex justify-between items-center mb-4">
                 <h4 id="surat-modal-title" class="text-lg font-bold text-gray-800">Proses Surat</h4>
-                <button onclick="closeModal('surat-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+                <button onclick="closeModal('surat-modal')" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div id="surat-detail-info" class="bg-gray-50 rounded-xl p-4 mb-4 space-y-2 text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><span class="text-gray-400">Jenis Surat</span><p id="surat-detail-jenis" class="font-medium text-gray-800"></p></div>
+                    <div><span class="text-gray-400">ID Permohonan</span><p id="surat-detail-id" class="font-mono font-medium text-gray-800"></p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><span class="text-gray-400">Nama</span><p id="surat-detail-nama" class="font-medium text-gray-800"></p></div>
+                    <div><span class="text-gray-400">NIK</span><p id="surat-detail-nik" class="font-mono font-medium text-gray-800"></p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><span class="text-gray-400">TTL</span><p id="surat-detail-ttl" class="font-medium text-gray-800">-</p></div>
+                    <div><span class="text-gray-400">Pekerjaan</span><p id="surat-detail-pekerjaan" class="font-medium text-gray-800">-</p></div>
+                </div>
+                <div><span class="text-gray-400">Alamat</span><p id="surat-detail-alamat" class="font-medium text-gray-800">-</p></div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div><span class="text-gray-400">RT/RW</span><p id="surat-detail-rtrw" class="font-medium text-gray-800">-</p></div>
+                    <div><span class="text-gray-400">Keperluan</span><p id="surat-detail-keperluan" class="font-medium text-gray-800">-</p></div>
+                    <div><span class="text-gray-400">Info Tambahan</span><p id="surat-detail-extra" class="font-medium text-gray-800">-</p></div>
+                </div>
             </div>
             <form id="surat-form" class="space-y-4">
                 <input type="hidden" id="surat-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Surat</label>
-                    <p id="surat-detail-jenis" class="text-gray-800 font-medium"></p>
-                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                        <p id="surat-detail-nama" class="text-gray-800 font-medium"></p>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="surat-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Diterima">Diterima</option>
+                            <option value="Ditolak">Ditolak</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
-                        <p id="surat-detail-nik" class="text-gray-800 font-medium font-mono"></p>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Surat</label>
+                        <input id="surat-nomor" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Auto-generate jika Diterima">
                     </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select id="surat-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" required>
-                        <option value="Diajukan">Diajukan</option>
-                        <option value="Diproses">Diproses</option>
-                        <option value="Selesai">Selesai</option>
-                        <option value="Ditolak">Ditolak</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Surat <span class="text-xs text-gray-400">(akan digenerate otomatis jika status Selesai)</span></label>
-                    <input id="surat-nomor" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: SURAT-0001/2026">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Ditandatangani Oleh</label>
                     <input id="surat-ttd" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Nama pejabat desa">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
-                    <textarea id="surat-catatan" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="3" placeholder="Catatan internal (opsional)"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Tanda Tangan</label>
+                    <select id="surat-ttd-oleh" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <option value="Kepala Desa">Kepala Desa</option>
+                        <option value="Sekretaris Desa">a.n. Kepala Desa - Sekretaris Desa</option>
+                    </select>
                 </div>
-                <div class="flex gap-2 justify-end">
-                    <button type="button" onclick="closeModal('surat-modal')" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">Batal</button>
-                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+                    <textarea id="surat-catatan" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" rows="2" placeholder="Catatan (opsional)"></textarea>
+                </div>
+                <div class="flex gap-2 justify-between items-center">
+                    <button type="button" id="btn-download-word" onclick="downloadWord()" class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition text-sm flex items-center gap-2">
+                        <i data-lucide="file-down" style="width:16px;height:16px"></i> Download Word
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeModal('surat-modal')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Batal</button>
+                        <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">Simpan</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -709,8 +892,7 @@
                             'bansos': 'Kelola Bansos',
                             'pengaduan': 'Pengaduan Masyarakat',
                             'surat': 'Surat Online',
-                            'pengguna': 'Kelola Pengguna',
-                            'approvals': 'Persetujuan PBB'
+                            'pengguna': 'Kelola Pengguna'
                         };
             document.getElementById('page-title').textContent = titles[page] || page;
             
@@ -726,12 +908,11 @@
             // Load data based on page
             if (page === 'dashboard') loadDashboardStats();
             else if (page === 'berita') loadBerita();
-            else if (page === 'pbb') loadPbbData();
+            else if (page === 'pbb') { loadPbbData(); loadApprovalsTable(); loadRiwayat(); loadTunggakan(); populatePbbFilters(); }
             else if (page === 'bansos') { loadBansosPrograms(); loadBansos(); }
             else if (page === 'pengaduan') loadPengaduan();
                         else if (page === 'surat') loadSurat();
                         else if (page === 'pengguna') loadUsers();
-            else if (page === 'approvals') loadPendingApprovals();
 
             // Close mobile sidebar
             document.getElementById('sidebar').classList.remove('open');
@@ -770,7 +951,7 @@
                 setText('aktivitas-pending', d.pendingPBB ?? '-');
 
                 // Pending badge
-                const badge = document.getElementById('pending-badge');
+                const badge = document.getElementById('pbb-badge');
                 if (badge) {
                     const pending = d.pendingPBB || 0;
                     if (pending > 0) {
@@ -1047,141 +1228,334 @@
         });
 
         // =============================
-        // PBB DATA
+        // PBB — TAB SWITCHING
+        // =============================
+        function switchPbbTab(tabName, btn) {
+            document.querySelectorAll('.pbb-tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('pbb-tab-' + tabName);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('.pbb-tab').forEach(el => {
+                el.className = 'pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 transition';
+            });
+            if (btn) btn.className = 'pbb-tab px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white transition';
+            lucide.createIcons();
+        }
+
+        function populatePbbFilters() {
+            const dusunSelect = document.getElementById('pbb-filter-dusun');
+            if (!dusunSelect || dusunSelect.options.length > 1) return;
+            apiGet(API_BASE_URL + '/pbb/stats/by-dusun').then(res => {
+                if (!res.success) return;
+                const dusuns = res.data || [];
+                dusuns.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.dusun;
+                    opt.textContent = d.dusunNama || d.dusun;
+                    dusunSelect.appendChild(opt);
+                });
+            }).catch(() => {});
+        }
+
+        // =============================
+        // PBB — DATA WAJIB PAJAK
         // =============================
         async function loadPbbData() {
             const tbody = document.getElementById('pbb-table');
             if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
             try {
                 const search = document.getElementById('pbb-search')?.value || '';
-                let url = API_BASE_URL + '/pbb';
-                if (search) url += '?search=' + encodeURIComponent(search);
+                const filterDusun = document.getElementById('pbb-filter-dusun')?.value || '';
+                const filterStatus = document.getElementById('pbb-filter-status')?.value || '';
+                let url = API_BASE_URL + '/pbb/warga-list';
+                const params = [];
+                if (search) params.push('q=' + encodeURIComponent(search));
+                if (filterDusun) params.push('dusun=' + encodeURIComponent(filterDusun));
+                if (filterStatus) params.push('status=' + encodeURIComponent(filterStatus));
+                if (params.length) url += '?' + params.join('&');
                 const res = await apiGet(url);
                 const data = res.success ? (res.data || []) : [];
                 tbody.innerHTML = '';
                 if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">' + (search ? 'Tidak ditemukan data dengan kata kunci "' + escapeHtml(search) + '".' : 'Belum ada data PBB.') + '</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">' + (search ? 'Tidak ditemukan data.' : 'Belum ada data PBB.') + '</td></tr>';
                     return;
                 }
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50 transition';
-                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'bg-green-100 text-green-700' : 
-                                        (item.status || '').toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700';
+                    const status2026 = item.status2026 || item.status || '-';
+                    let statusBadge = '';
+                    if (status2026 === 'Lunas') statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Lunas</span>';
+                    else if (status2026 === 'Pending') statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span>';
+                    else if (status2026 === 'Belum Bayar' || status2026 === 'Menunggak') statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' + status2026 + '</span>';
+                    else statusBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">' + status2026 + '</span>';
+                    const tunggakan = item.tunggakan || 0;
+                    const tungText = tunggakan === 0 ? '<span class="text-emerald-600 text-sm font-medium">Bersih</span>' : '<span class="text-red-600 text-sm font-medium">' + tunggakan + ' tahun</span>';
                     row.innerHTML = `
                         <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusun || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
-                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
-                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${item.pajak || item.totalPajak ? 'Rp ' + Number(item.pajak || item.totalPajak).toLocaleString('id-ID') : '-'}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusunNama || item.dusun || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.rwNama || item.rw || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.rtNama || item.rt || '-')}</td>
+                        <td class="px-6 py-4 text-center">${statusBadge}</td>
+                        <td class="px-6 py-4 text-center">${tungText}</td>
+                        <td class="px-6 py-4 text-center"><button onclick="openWpDetail('${escapeHtml(item.nop || '')}')" class="px-4 py-1.5 border border-emerald-600 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-50 transition">Detail</button></td>
                     `;
                     tbody.appendChild(row);
                 });
             } catch (err) {
                 console.error('Load PBB error:', err);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
             }
         }
 
         // =============================
-        // PENDING APPROVALS
+        // PBB — WP DETAIL MODAL
         // =============================
-        async function loadPendingApprovals() {
-            const container = document.getElementById('approvals-list');
+        async function openWpDetail(nop) {
+            if (!nop) return;
+            try {
+                const res = await apiGet(API_BASE_URL + '/pbb/warga/' + encodeURIComponent(nop));
+                if (!res.success) { showToast('Data WP tidak ditemukan', 'error'); return; }
+                const w = res.data;
+                document.getElementById('wp-detail-nop').textContent = w.nop || '-';
+                document.getElementById('wp-detail-nama').textContent = w.nama || '-';
+                document.getElementById('wp-detail-dusun').textContent = w.dusunNama || w.dusun || '-';
+                document.getElementById('wp-detail-rwrt').textContent = (w.rwNama || w.rw || '-') + ' / ' + (w.rtNama || w.rt || '-');
+                const payTbody = document.getElementById('wp-detail-payments');
+                payTbody.innerHTML = '';
+                const payments = Array.isArray(w.payments) ? w.payments : [];
+                payments.sort((a, b) => b.year - a.year);
+                for (const p of payments) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'bg-white';
+                    let badge = '';
+                    if (p.status === 'Lunas') badge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Lunas</span>';
+                    else if (p.status === 'Pending') badge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span>';
+                    else badge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' + (p.status || 'Belum Bayar') + '</span>';
+                    tr.innerHTML = `<td class="px-4 py-3 text-sm font-semibold text-gray-800">${p.year}</td><td class="px-4 py-3 text-center">${badge}</td>`;
+                    payTbody.appendChild(tr);
+                }
+                openModal('wp-detail-modal');
+                lucide.createIcons();
+            } catch (err) {
+                console.error('WP detail error:', err);
+                showToast('Gagal memuat detail WP', 'error');
+            }
+        }
+
+        // =============================
+        // PBB — APPROVAL PEMBAYARAN
+        // =============================
+        async function loadApprovalsTable() {
+            const tbody = document.getElementById('approvals-table');
             const loading = document.getElementById('approvals-loading');
             const empty = document.getElementById('approvals-empty');
-            if (!container) return;
-            loading.classList.remove('hidden');
-            empty.classList.add('hidden');
-            container.innerHTML = '';
+            if (!tbody) return;
+            if (loading) loading.classList.remove('hidden');
+            if (empty) empty.classList.add('hidden');
+            tbody.innerHTML = '';
             try {
-                const res = await apiGet(API_BASE_URL + '/pbb');
+                const res = await apiGet(API_BASE_URL + '/pbb/approvals');
                 const allData = res.success ? (res.data || []) : [];
-                const pending = allData.filter(item => (item.status || '').toLowerCase() === 'pending');
-                loading.classList.add('hidden');
+                const pending = allData.filter(a => a.status === 'pending' || a.status === 'Pending');
+                if (loading) loading.classList.add('hidden');
+                // Update badge
+                const badge = document.getElementById('pbb-badge');
+                if (badge) {
+                    if (pending.length > 0) { badge.textContent = pending.length; badge.classList.remove('hidden'); }
+                    else { badge.classList.add('hidden'); }
+                }
                 if (pending.length === 0) {
-                    empty.classList.remove('hidden');
+                    if (empty) empty.classList.remove('hidden');
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">Tidak ada data menunggu persetujuan.</td></tr>';
                     return;
                 }
                 pending.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-2xl shadow-lg p-6 border-l-4 border-yellow-400';
-                    const dateStr = item.updatedAt ? new Date(item.updatedAt).toLocaleString('id-ID') : (item.createdAt ? new Date(item.createdAt).toLocaleString('id-ID') : '-');
-                    card.innerHTML = `
-                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                            <div>
-                                <p class="text-xs text-gray-500">NOP</p>
-                                <p class="font-mono font-semibold text-gray-800">${escapeHtml(item.nop || '-')}</p>
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const dateStr = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : (item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : '-');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center font-semibold text-gray-800">${item.tahun || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.petugas || item.penyetor || '-')}</td>
+                        <td class="px-6 py-4 text-center"><button class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-50 transition flex items-center gap-1 mx-auto"><i data-lucide="paperclip" style="width:14px;height:14px"></i> Lihat</button></td>
+                        <td class="px-6 py-4 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span></td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="approvePbbPayment(${item.id}, true)" class="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center" title="Setujui"><i data-lucide="check" style="width:16px;height:16px"></i></button>
+                                <button onclick="approvePbbPayment(${item.id}, false)" class="w-8 h-8 rounded-lg bg-red-600 text-white hover:bg-red-700 transition flex items-center justify-center" title="Tolak"><i data-lucide="x" style="width:16px;height:16px"></i></button>
                             </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Nama</p>
-                                <p class="font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Alamat</p>
-                                <p class="text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Tanggal</p>
-                                <p class="text-sm text-gray-600">${dateStr}</p>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <p class="text-xs text-gray-500">Catatan Pengaju</p>
-                            <p class="text-sm text-gray-700 italic">"${escapeHtml(item.note || item.catatan || '-')}"</p>
-                        </div>
-                        <div class="flex flex-wrap gap-3">
-                            <button onclick="approvePbb(${item.id}, true)" class="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-medium flex items-center gap-2">
-                                <i data-lucide="check" style="width:18px;height:18px"></i> Setujui
-                            </button>
-                            <button onclick="approvePbb(${item.id}, false)" class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium flex items-center gap-2">
-                                <i data-lucide="x" style="width:18px;height:18px"></i> Tolak
-                            </button>
-                        </div>
+                        </td>
                     `;
-                    container.appendChild(card);
+                    tbody.appendChild(row);
                 });
                 lucide.createIcons();
             } catch (err) {
-                console.error('Load pending approvals error:', err);
-                loading.classList.add('hidden');
-                container.innerHTML = '<div class="text-center py-8 text-red-500">Gagal memuat data persetujuan.</div>';
+                console.error('Load approvals error:', err);
+                if (loading) loading.classList.add('hidden');
+                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
 
-        async function approvePbb(pbbId, approve) {
-            const status = approve ? 'Disetujui' : 'Ditolak';
+        async function approvePbbPayment(id, approve) {
             let note = '';
             if (!approve) {
                 note = prompt('Alasan penolakan:');
-                if (note === null) return; // user cancelled
-                if (!note.trim()) {
-                    showToast('Alasan penolakan harus diisi', 'error');
-                    return;
-                }
-            } else {
-                note = prompt('Catatan (opsional):') || '';
+                if (note === null) return;
+                if (!note.trim()) { showToast('Alasan penolakan harus diisi', 'error'); return; }
             }
             try {
                 const user = getAdminUser();
-                const res = await apiPost(API_BASE_URL + '/pbb/' + pbbId + '/approve', {
-                    userId: user?.id || 0,
-                    approveStatus: status,
-                    note: note
+                const res = await apiPost(API_BASE_URL + '/pbb/approve', {
+                    id,
+                    approve,
+                    note: note || (approve ? 'Disetujui' : 'Ditolak')
                 });
                 if (res.success) {
                     showToast('Pembayaran berhasil ' + (approve ? 'disetujui' : 'ditolak'));
-                    loadPendingApprovals();
+                    loadApprovalsTable();
                     loadDashboardStats();
                 } else {
-                    showToast(res.message || 'Gagal memproses persetujuan', 'error');
+                    showToast(res.message || 'Gagal memproses', 'error');
                 }
             } catch (err) {
                 showToast('Gagal memproses persetujuan', 'error');
+            }
+        }
+
+        // =============================
+        // PBB — RIWAYAT PEMBAYARAN
+        // =============================
+        async function loadRiwayat() {
+            const tbody = document.getElementById('riwayat-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const fromDate = document.getElementById('riwayat-from')?.value || '';
+                const toDate = document.getElementById('riwayat-to')?.value || '';
+                const petugas = document.getElementById('riwayat-petugas')?.value || '';
+                let url = API_BASE_URL + '/pbb/approvals';
+                const res = await apiGet(url);
+                let data = res.success ? (res.data || []) : [];
+                // Filter to approved only
+                data = data.filter(a => a.status === 'lunas' || a.status === 'Lunas' || a.status === 'Disetujui' || a.status === 'Diterima');
+                // Apply filters
+                if (fromDate) data = data.filter(a => a.approvedAt >= fromDate || a.tanggal >= fromDate);
+                if (toDate) data = data.filter(a => a.approvedAt <= toDate || a.tanggal <= toDate);
+                if (petugas) data = data.filter(a => (a.approvedBy || '').includes(petugas));
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada data riwayat.</td></tr>';
+                    return;
+                }
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const dateStr = item.approvedAt ? new Date(item.approvedAt).toLocaleDateString('id-ID') : (item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center font-semibold text-gray-800">${item.tahun || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.petugas || item.penyetor || '-')}</td>
+                        <td class="px-6 py-4 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>${escapeHtml(item.approvedBy || 'Admin Desa')}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Load riwayat error:', err);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function exportRiwayatExcel() {
+            const rows = [['Tgl Lunas', 'NOP', 'Nama WP', 'Tahun', 'Petugas', 'Diapprove Oleh']];
+            const tbody = document.getElementById('riwayat-table');
+            if (!tbody) return;
+            const trs = tbody.querySelectorAll('tr');
+            trs.forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 6) {
+                    rows.push([
+                        tds[0].textContent.trim(),
+                        tds[1].textContent.trim(),
+                        tds[2].textContent.trim(),
+                        tds[3].textContent.trim(),
+                        tds[4].textContent.trim(),
+                        tds[5].textContent.trim()
+                    ]);
+                }
+            });
+            let csv = rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(',')).join('\n');
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'riwayat_pembayaran_pbb_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data berhasil diexport');
+        }
+
+        // =============================
+        // PBB — REKAP TUNGGAKAN
+        // =============================
+        async function loadTunggakan() {
+            const tbody = document.getElementById('tunggakan-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
+            try {
+                const res = await apiGet(API_BASE_URL + '/pbb/warga-list');
+                const allData = res.success ? (res.data || []) : [];
+                // Find warga with tunggakan (any year not Lunas)
+                const tunggakanList = [];
+                for (const w of allData) {
+                    const payments = Array.isArray(w.payments) ? w.payments : [];
+                    const unpaidYears = payments.filter(p => p.status !== 'Lunas').map(p => p.year);
+                    if (unpaidYears.length > 0) {
+                        tunggakanList.push({
+                            nop: w.nop,
+                            nama: w.nama,
+                            dusunNama: w.dusunNama || w.dusun || '-',
+                            rwNama: w.rwNama || w.rw || '-',
+                            rtNama: w.rtNama || w.rt || '-',
+                            tahunTunggak: unpaidYears.sort((a, b) => a - b),
+                            jumlah: unpaidYears.length
+                        });
+                    }
+                }
+                // Update summary cards
+                const totalTung = tunggakanList.length;
+                const tung1Thn = tunggakanList.filter(t => t.jumlah === 1).length;
+                const tungMore = tunggakanList.filter(t => t.jumlah > 1).length;
+                document.getElementById('tung-total').textContent = totalTung;
+                document.getElementById('tung-1thn').textContent = tung1Thn;
+                document.getElementById('tung-more').textContent = tungMore;
+                tbody.innerHTML = '';
+                if (tunggakanList.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Tidak ada tunggakan.</td></tr>';
+                    return;
+                }
+                tunggakanList.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 transition';
+                    const tahunStr = item.tahunTunggak.join(', ');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusunNama)} / ${escapeHtml(item.rwNama)} / ${escapeHtml(item.rtNama)}</td>
+                        <td class="px-6 py-4 text-sm text-red-600 font-medium">${tahunStr}</td>
+                        <td class="px-6 py-4 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>${item.jumlah} thn</span></td>
+                        <td class="px-6 py-4 text-center"><button onclick="openWpDetail('${escapeHtml(item.nop || '')}')" class="px-4 py-1.5 border border-emerald-600 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-50 transition">Detail</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Load tunggakan error:', err);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Gagal memuat data.</td></tr>';
             }
         }
 
@@ -1402,8 +1776,7 @@
                                     tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Belum ada permohonan surat.</td></tr>';
                                     return;
                                 }
-                                // Update badge
-                                const pendingCount = data.filter(s => s.status === 'Diajukan' || s.status === 'Diproses').length;
+                                const pendingCount = data.filter(s => s.status === 'Pending').length;
                                 const badge = document.getElementById('surat-badge');
                                 if (badge) {
                                     if (pendingCount > 0) { badge.textContent = pendingCount; badge.classList.remove('hidden'); }
@@ -1413,20 +1786,21 @@
                                     const row = document.createElement('tr');
                                     row.className = 'hover:bg-gray-50 transition';
                                     const dateStr = item.diajukanPada ? new Date(item.diajukanPada).toLocaleDateString('id-ID') : '-';
-                                    let statusClass = 'bg-yellow-100 text-yellow-700';
-                                    if (item.status === 'Diproses') statusClass = 'bg-blue-100 text-blue-700';
-                                    else if (item.status === 'Selesai') statusClass = 'bg-green-100 text-green-700';
+                                    let statusClass = 'bg-amber-100 text-amber-700';
+                                    if (item.status === 'Diterima' || item.status === 'Selesai') statusClass = 'bg-emerald-100 text-emerald-700';
                                     else if (item.status === 'Ditolak') statusClass = 'bg-red-100 text-red-700';
+                                    else if (item.status === 'Diproses') statusClass = 'bg-blue-100 text-blue-700';
                                     row.innerHTML = `
-                                        <td class="px-6 py-4 text-sm text-gray-600 font-mono">#${item.id}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-600 font-mono">#SK-${String(item.id).padStart(4,'0')}</td>
                                         <td class="px-6 py-4 text-sm text-gray-800">${escapeHtml(item.jenis || '-')}</td>
                                         <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
                                         <td class="px-6 py-4 text-sm font-mono text-gray-600">${escapeHtml(item.nik || '-')}</td>
-                                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                                        <td class="px-6 py-4 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass}">${item.status || '-'}</span></td>
                                         <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
-                                        <td class="px-6 py-4 text-center">
-                                            <button onclick="openSuratModal(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Proses</button>
-                                            <button onclick="deleteSurat(${item.id})" class="px-3 py-1.5 bg-red-600 text-white rounded text-xs hover:bg-red-700">Hapus</button>
+                                        <td class="px-6 py-4 text-center space-x-1">
+                                            <button onclick="openSuratModal(${item.id})" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700">Proses</button>
+                                            <button onclick="quickDownloadWord(${item.id})" class="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs hover:bg-violet-700" title="Download Word">Word</button>
+                                            <button onclick="deleteSurat(${item.id})" class="px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200">Hapus</button>
                                         </td>
                                     `;
                                     tbody.appendChild(row);
@@ -1443,21 +1817,38 @@
                                 .then(res => {
                                     const data = res.data || [];
                                     const item = data.find(s => s.id === id);
-                                    if (!item) {
-                                        showToast('Surat tidak ditemukan', 'error');
-                                        return;
-                                    }
+                                    if (!item) { showToast('Surat tidak ditemukan', 'error'); return; }
                                     document.getElementById('surat-id').value = item.id;
+                                    document.getElementById('surat-detail-id').textContent = '#SK-' + String(item.id).padStart(4, '0');
                                     document.getElementById('surat-detail-jenis').textContent = item.jenis || '-';
                                     document.getElementById('surat-detail-nama').textContent = item.nama || '-';
                                     document.getElementById('surat-detail-nik').textContent = item.nik || '-';
-                                    document.getElementById('surat-status').value = item.status || 'Diajukan';
+                                    document.getElementById('surat-detail-ttl').textContent = (item.tempatLahir && item.tanggalLahir) ? `${item.tempatLahir}, ${item.tanggalLahir}` : '-';
+                                    document.getElementById('surat-detail-pekerjaan').textContent = item.pekerjaan || '-';
+                                    document.getElementById('surat-detail-alamat').textContent = item.alamat || '-';
+                                    document.getElementById('surat-detail-rtrw').textContent = (item.rt || item.rw) ? `RT ${item.rt}/RW ${item.rw}` : '-';
+                                    document.getElementById('surat-detail-keperluan').textContent = item.keperluan || '-';
+                                    const extra = item.jenisUsaha || item.keterangan || '-';
+                                    document.getElementById('surat-detail-extra').textContent = extra;
+                                    document.getElementById('surat-status').value = item.status || 'Pending';
                                     document.getElementById('surat-nomor').value = item.nomorSurat || '';
                                     document.getElementById('surat-ttd').value = item.ditandatanganiOleh || '';
+                                    document.getElementById('surat-ttd-oleh').value = item.tandaTanganOleh || 'Kepala Desa';
                                     document.getElementById('surat-catatan').value = item.catatan || '';
                                     openModal('surat-modal');
+                                    lucide.createIcons();
                                 })
                                 .catch(() => showToast('Gagal memuat data surat', 'error'));
+                        }
+
+                        function downloadWord() {
+                            const id = document.getElementById('surat-id').value;
+                            if (!id) { showToast('Pilih surat terlebih dahulu', 'error'); return; }
+                            window.open(API_BASE_URL + '/surat/' + id + '/word', '_blank');
+                        }
+
+                        function quickDownloadWord(id) {
+                            window.open(API_BASE_URL + '/surat/' + id + '/word', '_blank');
                         }
 
                         async function deleteSurat(id) {
@@ -1484,11 +1875,17 @@
                                     const status = document.getElementById('surat-status').value;
                                     const nomorSurat = document.getElementById('surat-nomor').value.trim();
                                     const ditandatanganiOleh = document.getElementById('surat-ttd').value.trim();
+                                    const tandaTanganOleh = document.getElementById('surat-ttd-oleh').value;
                                     const catatan = document.getElementById('surat-catatan').value.trim();
                                     const body = { status };
                                     if (nomorSurat) body.nomorSurat = nomorSurat;
                                     if (ditandatanganiOleh) body.ditandatanganiOleh = ditandatanganiOleh;
+                                    body.tandaTanganOleh = tandaTanganOleh;
                                     if (catatan) body.catatan = catatan;
+                                    // Auto-generate nomor surat when Diterima
+                                    if (status === 'Diterima' && !nomorSurat) {
+                                        body.nomorSurat = 'SK-' + String(id).padStart(4, '0') + '/' + new Date().getFullYear();
+                                    }
 
                                     try {
                                         const res = await apiPut(API_BASE_URL + '/surat/' + id, body);
@@ -1506,6 +1903,18 @@
                             }
                         });
 
+                        // =============================
+                        // RIWAYAT FILTER LISTENERS
+                        // =============================
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const rf = document.getElementById('riwayat-from');
+                            const rt2 = document.getElementById('riwayat-to');
+                            const rp = document.getElementById('riwayat-petugas');
+                            if (rf) rf.addEventListener('change', loadRiwayat);
+                            if (rt2) rt2.addEventListener('change', loadRiwayat);
+                            if (rp) rp.addEventListener('change', loadRiwayat);
+                        });
+                        
                         // =============================
                         // LOGOUT
         // =============================

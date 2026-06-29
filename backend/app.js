@@ -1,277 +1,261 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const {
-  createSeedDatabase,
-  hasSupabaseDatabase,
-  createPool,
-  ensureSchema,
-  seedIfEmpty,
-  loadDatabase,
-  syncDatabase,
-} = require('./supabase-store');
+const store = require('./mysql-store');
+const { createPbbRoutes } = require('./pbb-routes');
+const { Document, Packer, Paragraph, TextRun, AlignmentType, Tab, TabStopPosition, TabStopType } = require('docx');
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-const PORT = process.env.PORT || 3000;
-const pool = createPool();
-let database = createSeedDatabase();
+// Serve static frontend
+app.use(express.static(path.join(__dirname, '..')));
 
-async function persistDatabase() {
-  if (!pool || !hasSupabaseDatabase()) return;
-  await syncDatabase(pool, database);
+const PORT = process.env.PORT || 3000;
+let database = store.createSeedDatabase();
+let pool = null;
+
+async function initDB() {
+  pool = await store.createPool();
+  if (pool) {
+    await store.ensureTables(pool);
+    await store.seedIfEmpty(pool, database);
+    database = await store.loadAll(pool);
+    console.log('🗄️  Database: MySQL');
+  } else {
+    console.log('🗄️  Database: In-Memory (set DB_HOST etc for MySQL)');
+  }
 }
 
-async function bootstrapDatabase() {
-  if (!pool || !hasSupabaseDatabase()) return;
-  await ensureSchema(pool);
-  await seedIfEmpty(pool, database);
-  database = await loadDatabase(pool);
+async function persistDatabase() {
+  if (pool) await store.syncAll(pool, database);
 }
 
 // ==============================
 // HELPERS
 // ==============================
-
 function getWarga() { return database.warga || []; }
 function getPbb() { return database.pbb || []; }
 function getUsers() { return database.users || []; }
 
-// Compute aggregate stats from warga data (with payments array)
-function computeOverviewStats(wargaList) {
-  if (!wargaList || wargaList.length === 0) {
-    return { totalWp: 0, totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0 };
-  }
+function computeOverviewStats(list) {
+  if (!list || list.length === 0) return { totalWp: 0, totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0 };
   let totalPajak = 0, totalLunas = 0, totalBelumBayar = 0, totalPending = 0;
-  for (const w of wargaList) {
-    if (!w.payments || w.payments.length === 0) continue;
+  for (const w of list) {
+    if (!w.payments) continue;
     for (const p of w.payments) {
       totalPajak += p.pajak || 0;
-      if (p.status === 'Lunas') totalLunas += p.pajak || 0;
-      else if (p.status === 'Pending') totalPending += p.pajak || 0;
-      else totalBelumBayar += p.pajak || 0;
+      if (p.status === 'Lunas') totalLunas += p.pajak;
+      else if (p.status === 'Pending') totalPending += p.pajak;
+      else totalBelumBayar += p.pajak;
     }
   }
-  return { totalWp: wargaList.length, totalPajak, totalLunas, totalBelumBayar, totalPending };
+  return { totalWp: list.length, totalPajak, totalLunas, totalBelumBayar, totalPending };
 }
 
-function computePerYearStats(wargaList) {
+function computePerYearStats(list) {
   const byYear = {};
-  for (const w of wargaList) {
+  for (const w of list) {
     if (!w.payments) continue;
     for (const p of w.payments) {
       if (!byYear[p.year]) byYear[p.year] = { year: p.year, total: 0, lunas: 0, pending: 0, belumBayar: 0, countLunas: 0, countPending: 0, countBelumBayar: 0 };
-      byYear[p.year].total += p.pajak || 0;
-      if (p.status === 'Lunas') { byYear[p.year].lunas += p.pajak || 0; byYear[p.year].countLunas++; }
-      else if (p.status === 'Pending') { byYear[p.year].pending += p.pajak || 0; byYear[p.year].countPending++; }
-      else { byYear[p.year].belumBayar += p.pajak || 0; byYear[p.year].countBelumBayar++; }
+      byYear[p.year].total += p.pajak;
+      if (p.status === 'Lunas') { byYear[p.year].lunas += p.pajak; byYear[p.year].countLunas++; }
+      else if (p.status === 'Pending') { byYear[p.year].pending += p.pajak; byYear[p.year].countPending++; }
+      else { byYear[p.year].belumBayar += p.pajak; byYear[p.year].countBelumBayar++; }
     }
   }
   return Object.values(byYear).sort((a, b) => a.year - b.year);
 }
 
-function computeDusunStats(wargaList) {
+function computeDusunStats(list) {
   const byDusun = {};
-  for (const w of wargaList) {
+  for (const w of list) {
     const key = w.dusun || 'luardesa';
     if (!byDusun[key]) byDusun[key] = { dusun: key, dusunNama: w.dusunNama || 'Luar Desa', totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0, count: 0 };
     byDusun[key].count++;
     if (!w.payments) continue;
     for (const p of w.payments) {
-      byDusun[key].totalPajak += p.pajak || 0;
-      if (p.status === 'Lunas') byDusun[key].totalLunas += p.pajak || 0;
-      else if (p.status === 'Pending') byDusun[key].totalPending += p.pajak || 0;
-      else byDusun[key].totalBelumBayar += p.pajak || 0;
+      byDusun[key].totalPajak += p.pajak;
+      if (p.status === 'Lunas') byDusun[key].totalLunas += p.pajak;
+      else if (p.status === 'Pending') byDusun[key].totalPending += p.pajak;
+      else byDusun[key].totalBelumBayar += p.pajak;
     }
   }
   return Object.values(byDusun);
 }
 
 // ==============================
-// AUTH MIDDLEWARE (simple JWT-like for now)
+// AUTH
 // ==============================
-
-function findUserByCredentials({ email, nik, password }) {
+function findUser({ email, nik, password }) {
   const users = getUsers();
-  const normalizedEmail = email ? String(email).trim().toLowerCase() : '';
-  const normalizedNik = nik ? String(nik).trim() : '';
-  const normalizedPassword = password ? String(password) : '';
-  return users.find(u => {
-    if (normalizedEmail && u.email && u.email.toLowerCase() === normalizedEmail && u.password === normalizedPassword) return true;
-    if (normalizedNik && u.nik && String(u.nik) === normalizedNik && u.password === normalizedPassword) return true;
-    return false;
-  });
+  const e = email ? String(email).trim().toLowerCase() : '';
+  const n = nik ? String(nik).trim() : '';
+  const p = password ? String(password) : '';
+  return users.find(u =>
+    (e && u.email && u.email.toLowerCase() === e || n && u.nik && String(u.nik) === n) &&
+    u.password === p
+  );
 }
 
 function handleLogin(req, res) {
   const { email, nik, password } = req.body;
-  const user = findUserByCredentials({ email, nik, password });
+  const user = findUser({ email, nik, password });
   if (!user) return res.status(401).json({ success: false, message: 'Kredensial tidak valid' });
   res.json({
     success: true,
     token: `${user.role}_token_${Date.now()}_${user.id}`,
-    user: { id: user.id, name: user.name, role: user.role, email: user.email || null, nik: user.nik || null, rt: user.rt || null, rw: user.rw || null }
+    user: { id: user.id, name: user.name, role: user.role, email: user.email, nik: user.nik, rt: user.rt, rw: user.rw }
   });
 }
 
 // ==============================
-// ======== AUTH ROUTES =========
+// ROUTES
 // ==============================
-
 app.post(['/api/auth/login', '/auth/login'], handleLogin);
 app.post(['/api/auth/admin-login', '/auth/admin-login'], handleLogin);
 app.post(['/api/auth/user-login', '/auth/user-login'], handleLogin);
 
-// ==============================
-// ====== PUBLIC PBB STATS ======
-// ==============================
-
-// Overall aggregate (no individual data)
+// --- PBB Public Stats ---
 app.get('/api/pbb/stats/overview', (req, res) => {
-  const warga = getWarga();
-  const overview = computeOverviewStats(warga);
-  const perYear = computePerYearStats(warga);
-  const perDusun = computeDusunStats(warga);
-  res.json({ success: true, data: { overview, perYear, perDusun } });
+  const w = getWarga();
+  res.json({ success: true, data: { overview: computeOverviewStats(w), perYear: computePerYearStats(w), perDusun: computeDusunStats(w) } });
 });
-
-// Per year breakdown
-app.get('/api/pbb/stats/per-year', (req, res) => {
-  const warga = getWarga();
-  const perYear = computePerYearStats(warga);
-  res.json({ success: true, data: perYear });
-});
-
-// Stats by dusun
-app.get('/api/pbb/stats/by-dusun', (req, res) => {
-  const warga = getWarga();
-  const perDusun = computeDusunStats(warga);
-  res.json({ success: true, data: perDusun });
-});
-
-// Stats by RW within a dusun
+app.get('/api/pbb/stats/per-year', (req, res) => res.json({ success: true, data: computePerYearStats(getWarga()) }));
+app.get('/api/pbb/stats/by-dusun', (req, res) => res.json({ success: true, data: computeDusunStats(getWarga()) }));
 app.get('/api/pbb/stats/by-dusun/:dusunId', (req, res) => {
-  const warga = getWarga().filter(w => (w.dusun || 'luardesa') === req.params.dusunId);
+  const w = getWarga().filter(w => (w.dusun || 'luardesa') === req.params.dusunId);
   const byRw = {};
-  for (const w of warga) {
-    const key = w.rw || 'luar';
-    if (!byRw[key]) byRw[key] = { rw: key, rwNama: w.rwNama || '-', totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0, count: 0 };
+  for (const ww of w) {
+    const key = ww.rw || 'luar';
+    if (!byRw[key]) byRw[key] = { rw: key, rwNama: ww.rwNama || '-', totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0, count: 0 };
     byRw[key].count++;
-    if (!w.payments) continue;
-    for (const p of w.payments) {
-      byRw[key].totalPajak += p.pajak || 0;
-      if (p.status === 'Lunas') byRw[key].totalLunas += p.pajak || 0;
-      else if (p.status === 'Pending') byRw[key].totalPending += p.pajak || 0;
-      else byRw[key].totalBelumBayar += p.pajak || 0;
+    if (!ww.payments) continue;
+    for (const p of ww.payments) {
+      byRw[key].totalPajak += p.pajak;
+      if (p.status === 'Lunas') byRw[key].totalLunas += p.pajak;
+      else if (p.status === 'Pending') byRw[key].totalPending += p.pajak;
+      else byRw[key].totalBelumBayar += p.pajak;
     }
   }
   res.json({ success: true, data: Object.values(byRw), dusun: req.params.dusunId });
 });
-
-// Stats by RT within a RW in a dusun
 app.get('/api/pbb/stats/by-dusun/:dusunId/rw/:rwId', (req, res) => {
-  const warga = getWarga().filter(w => (w.dusun || 'luardesa') === req.params.dusunId && (w.rw || 'luar') === req.params.rwId);
+  const w = getWarga().filter(w => (w.dusun || 'luardesa') === req.params.dusunId && (w.rw || 'luar') === req.params.rwId);
   const byRt = {};
-  for (const w of warga) {
-    const key = w.rt || 'luar';
-    if (!byRt[key]) byRt[key] = { rt: key, rtNama: w.rtNama || '-', totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0, count: 0 };
+  for (const ww of w) {
+    const key = ww.rt || 'luar';
+    if (!byRt[key]) byRt[key] = { rt: key, rtNama: ww.rtNama || '-', totalPajak: 0, totalLunas: 0, totalBelumBayar: 0, totalPending: 0, count: 0 };
     byRt[key].count++;
-    if (!w.payments) continue;
-    for (const p of w.payments) {
-      byRt[key].totalPajak += p.pajak || 0;
-      if (p.status === 'Lunas') byRt[key].totalLunas += p.pajak || 0;
-      else if (p.status === 'Pending') byRt[key].totalPending += p.pajak || 0;
-      else byRt[key].totalBelumBayar += p.pajak || 0;
+    if (!ww.payments) continue;
+    for (const p of ww.payments) {
+      byRt[key].totalPajak += p.pajak;
+      if (p.status === 'Lunas') byRt[key].totalLunas += p.pajak;
+      else if (p.status === 'Pending') byRt[key].totalPending += p.pajak;
+      else byRt[key].totalBelumBayar += p.pajak;
     }
   }
   res.json({ success: true, data: Object.values(byRt), dusun: req.params.dusunId, rw: req.params.rwId });
 });
 
-// **** NOP CHECK (PUBLIC) ****
+// --- PBB Check NOP ---
 app.post('/api/pbb/check-nop', (req, res) => {
   const { nop } = req.body;
   if (!nop) return res.status(400).json({ success: false, message: 'NOP wajib diisi' });
-  const warga = getWarga().find(w => w.nop === String(nop).trim());
-  if (!warga) return res.status(404).json({ success: false, message: 'NOP tidak ditemukan' });
-
-  // Return only this NOP's data — no leak of other warga data
-  const perYear = (warga.payments || []).map(p => ({
-    year: p.year, status: p.status, pajak: p.pajak
-  }));
-  const totalBelumBayar = perYear.filter(p => p.status === 'Belum Bayar' || p.status === 'Pending').reduce((s, p) => s + p.pajak, 0);
-  const totalLunas = perYear.filter(p => p.status === 'Lunas').reduce((s, p) => s + p.pajak, 0);
-
+  const w = getWarga().find(w => w.nop === String(nop).trim());
+  if (!w) return res.status(404).json({ success: false, message: 'NOP tidak ditemukan' });
+  const perYear = (w.payments || []).map(p => ({ year: p.year, status: p.status, pajak: p.pajak }));
   res.json({
     success: true,
     data: {
-      nop: warga.nop,
-      nama: warga.nama,
-      alamat: warga.alamat,
-      dusun: warga.dusunNama,
-      rw: warga.rwNama,
-      rt: warga.rtNama,
-      totalPajak: warga.totalPajak || perYear.reduce((s, p) => s + p.pajak, 0),
-      totalLunas,
-      totalBelumBayar,
-      perYear,
+      nop: w.nop, nama: w.nama, alamat: w.alamat, dusun: w.dusunNama,
+      rw: w.rwNama, rt: w.rtNama,
+      totalPajak: w.totalPajak, totalLunas: w.totalLunas, totalBelumBayar: w.totalBelumBayar,
+      perYear
     }
   });
 });
 
-// ==============================
-// ====== LEGACY PBB ENDPOINTS (remain for admin use) ======
-// ==============================
-
-// Get all PBB (admin only - returns individual data)
-app.get('/api/pbb', (req, res) => {
-  res.json({ success: true, data: getPbb() });
-});
-
-// Get PBB summary counts
-app.get('/api/pbb/summary', (req, res) => {
-  const pbbData = getPbb();
-  const total = pbbData.length;
-  const lunas = pbbData.filter(p => p.status === 'Lunas').length;
-  const nunggak = pbbData.filter(p => p.status !== 'Lunas').length;
-  res.json({ success: true, data: { total, lunas, nunggak } });
-});
-
-// Check PBB by NOP (admin)
-app.post('/api/pbb/check', (req, res) => {
-  const { nop, nama } = req.body;
-  const pbbData = getPbb().find(p => p.nop === nop && p.nama === nama);
-  if (pbbData) {
-    res.json({ success: true, data: { nop: pbbData.nop, nama: pbbData.nama, alamat: pbbData.alamat, pajak: pbbData.pajak, status: pbbData.status, year: pbbData.year, proofs: pbbData.proofs } });
-  } else {
-    res.status(404).json({ success: false, message: 'Data PBB tidak ditemukan' });
-  }
-});
-
+// --- PBB Accessible (for user portal by NIK) ---
 app.post('/api/pbb/accessible', (req, res) => {
-  const { userId } = req.body;
-  const user = getUsers().find(u => u.id === Number(userId));
-  if (!user) return res.status(401).json({ success: false, message: 'User tidak ditemukan' });
-  let data = [];
-  if (user.role === 'admin') data = getPbb();
-  else if (user.role === 'kolektor' || user.role === 'rt') data = getPbb(); // simplified
-  else if (user.role === 'penduduk') data = getPbb().filter(p => p.nik === user.nik);
-  res.json({ success: true, data, user: { id: user.id, role: user.role, rt: user.rt || null, rw: user.rw || null } });
+  const { userId, nik } = req.body;
+  if (!nik && !userId) return res.status(400).json({ success: false, message: 'NIK atau userId diperlukan' });
+  const pbb = getPbb();
+  if (!pbb || pbb.length === 0) return res.json({ success: true, data: [] });
+  // Filter by NIK or try user ID
+  let hasil;
+  if (nik) {
+    hasil = pbb.filter(p => p.nik === String(nik).trim());
+  } else {
+    const user = getUsers().find(u => u.id === Number(userId));
+    if (!user) return res.json({ success: true, data: [] });
+    hasil = user.nik ? pbb.filter(p => p.nik === user.nik) : [];
+  }
+  res.json({ success: true, data: hasil });
+});
+
+// --- PBB Warga List (for table view) ---
+app.get('/api/pbb/warga-list', (req, res) => {
+  let w = getWarga();
+  const { q, dusun, status } = req.query;
+  // Filter
+  if (q) {
+    const lq = q.toLowerCase();
+    w = w.filter(x => (x.nama || '').toLowerCase().includes(lq) || (x.nop || '').includes(lq) || (x.rtNama || '').toLowerCase().includes(lq) || (x.rwNama || '').toLowerCase().includes(lq));
+  }
+  if (dusun) w = w.filter(x => (x.dusun || '') === dusun);
+  if (status) w = w.filter(x => {
+    const p2026 = (x.payments || []).find(p => p.year === 2026);
+    return p2026 && p2026.status === status;
+  });
+  const list = w.map(warga => {
+    const payments = warga.payments || [];
+    const totalPajak = payments.reduce((s, p) => s + (p.pajak || 0), 0);
+    const totalLunas = payments.filter(p => p.status === 'Lunas').reduce((s, p) => s + (p.pajak || 0), 0);
+    const totalBelumBayar = payments.filter(p => p.status !== 'Lunas' && p.status !== 'Pending').reduce((s, p) => s + (p.pajak || 0), 0);
+    const totalPending = payments.filter(p => p.status === 'Pending').reduce((s, p) => s + (p.pajak || 0), 0);
+    const p2026 = payments.find(p => p.year === 2026);
+    const status2026 = p2026 ? p2026.status : 'Belum Bayar';
+    const tunggakan = payments.filter(p => p.status !== 'Lunas').length;
+    return {
+      nop: warga.nop, nama: warga.nama, alamat: warga.alamat,
+      dusun: warga.dusun, dusunNama: warga.dusunNama || '-',
+      rw: warga.rw, rwNama: warga.rwNama || '-',
+      rt: warga.rt, rtNama: warga.rtNama || '-',
+      status: warga.status, status2026,
+      tunggakan,
+      totalPajak, totalLunas, totalBelumBayar, totalPending,
+      payments,
+      perYear: payments.map(p => ({ year: p.year, status: p.status, pajak: p.pajak }))
+    };
+  });
+  res.json({ success: true, data: list });
+});
+
+// --- PBB Admin CRUD ---
+app.get('/api/pbb', (req, res) => res.json({ success: true, data: getPbb() }));
+app.get('/api/pbb/summary', (req, res) => {
+  const p = getPbb();
+  const lunas = p.filter(x => x.status === 'Lunas').length;
+  const pending = p.filter(x => x.status === 'Pending').length;
+  res.json({ success: true, data: { total: p.length, lunas, pending, nunggak: p.length - lunas - pending } });
 });
 
 app.post('/api/pbb/upload', async (req, res) => {
   const { data } = req.body;
-  if (!Array.isArray(data) || data.length === 0) return res.status(400).json({ success: false, message: 'Data upload tidak valid' });
-  const pbbData = getPbb();
-  const added = data.map(item => {
-    const id = Math.max(...pbbData.map(p => p.id), 0) + 1;
-    const record = { id, nop: item.nop, nama: item.nama, alamat: item.alamat, rt: item.rt, rw: item.rw, year: item.year, pajak: Number(item.pajak) || 0, status: item.status || 'Nunggak', proofs: [] };
-    pbbData.push(record);
-    return record;
+  if (!Array.isArray(data) || !data.length) return res.status(400).json({ success: false, message: 'Data tidak valid' });
+  const pbb = getPbb();
+  const maxId = pbb.length ? Math.max(...pbb.map(p => p.id)) : 0;
+  const added = data.map((item, i) => {
+    const id = maxId + i + 1;
+    return { id, nop: item.nop, nama: item.nama, nik: item.nik, alamat: item.alamat, rt: item.rt, rw: item.rw, year: item.year, pajak: Number(item.pajak) || 0, status: item.status || 'Nunggak', payments: [], proofs: [] };
   });
+  pbb.push(...added);
   await persistDatabase();
   res.status(201).json({ success: true, data: added });
 });
@@ -280,273 +264,326 @@ app.post('/api/pbb/:id/proof', async (req, res) => {
   const { id } = req.params;
   const { userId, note, proofUrl } = req.body;
   const user = getUsers().find(u => u.id === Number(userId));
-  const pbbData = getPbb().find(p => p.id === Number(id));
-  if (!user || !pbbData) return res.status(404).json({ success: false, message: 'User atau data PBB tidak ditemukan' });
-  if (user.role !== 'kolektor' && user.role !== 'rt') return res.status(403).json({ success: false, message: 'Akses terbatas: hanya kolektor atau RT' });
-  const proof = { timestamp: new Date().toISOString(), uploader: user.name, role: user.role, note: note || '', proofUrl: proofUrl || null, status: 'Menunggu Persetujuan' };
-  pbbData.proofs.push(proof);
-  pbbData.status = 'Pending';
+  const pbb = getPbb().find(p => p.id === Number(id));
+  if (!user || !pbb) return res.status(404).json({ success: false, message: 'Not found' });
+  if (user.role !== 'kolektor' && user.role !== 'rt') return res.status(403).json({ success: false });
+  if (!pbb.proofs) pbb.proofs = [];
+  pbb.proofs.push({ timestamp: new Date().toISOString(), uploader: user.name, role: user.role, note: note || '', proofUrl: proofUrl || null, status: 'Menunggu Persetujuan' });
+  pbb.status = 'Pending';
   await persistDatabase();
-  res.status(201).json({ success: true, data: proof });
+  res.status(201).json({ success: true, data: pbb.proofs[pbb.proofs.length - 1] });
 });
 
 app.post('/api/pbb/:id/approve', async (req, res) => {
   const { id } = req.params;
   const { userId, approveStatus, note } = req.body;
   const user = getUsers().find(u => u.id === Number(userId));
-  const pbbData = getPbb().find(p => p.id === Number(id));
-  if (!user || !pbbData) return res.status(404).json({ success: false, message: 'User atau data PBB tidak ditemukan' });
-  if (user.role !== 'admin') return res.status(403).json({ success: false, message: 'Akses terbatas: hanya admin' });
-  const approval = { id: (database.approvals || []).length + 1, pbbId: pbbData.id, nop: pbbData.nop, nama: pbbData.nama, approvedBy: user.name, approveStatus: approveStatus || 'Disetujui', note: note || '', approvedAt: new Date().toISOString() };
-  database.approvals.push(approval);
-  pbbData.status = approveStatus === 'Ditolak' ? 'Nunggak' : 'Lunas';
+  const pbb = getPbb().find(p => p.id === Number(id));
+  if (!user || !pbb) return res.status(404).json({ success: false, message: 'Not found' });
+  if (user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin only' });
+  database.approvals.push({
+    id: (database.approvals || []).length + 1, pbbId: pbb.id, nop: pbb.nop, nama: pbb.nama,
+    approvedBy: user.name, approveStatus: approveStatus || 'Disetujui', note: note || '',
+    approvedAt: new Date().toISOString()
+  });
+  pbb.status = approveStatus === 'Ditolak' ? 'Nunggak' : 'Lunas';
   await persistDatabase();
-  res.json({ success: true, data: approval });
+  res.json({ success: true, data: pbb });
 });
 
-app.get('/api/pbb/approvals', (req, res) => {
-  const { date } = req.query;
-  let approvals = [...(database.approvals || [])];
-  if (date) approvals = approvals.filter(a => a.approvedAt.startsWith(date));
-  res.json({ success: true, data: approvals });
-});
+app.get('/api/pbb/approvals', (req, res) => res.json({ success: true, data: database.approvals || [] }));
 
 app.get('/api/pbb/approvals/export', (req, res) => {
   const rows = [['ID', 'PBB ID', 'NOP', 'Nama', 'Approved By', 'Status', 'Note', 'Approved At']];
   (database.approvals || []).forEach(a => rows.push([a.id, a.pbbId, a.nop, a.nama, a.approvedBy, a.approveStatus, a.note, a.approvedAt]));
-  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename="approval-history.csv"');
-  res.send(csv);
+  res.send(rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n'));
 });
 
-// ==============================
-// ======== BERITA ROUTES =======
-// ==============================
-
+// --- Berita CRUD ---
 app.get('/api/berita', (req, res) => res.json({ success: true, data: database.berita }));
 app.get('/api/berita/:id', (req, res) => {
-  const berita = database.berita.find(b => b.id == req.params.id);
-  if (berita) res.json({ success: true, data: berita });
-  else res.status(404).json({ success: false, message: 'Berita tidak ditemukan' });
+  const b = database.berita.find(x => x.id == req.params.id);
+  b ? res.json({ success: true, data: b }) : res.status(404).json({ success: false, message: 'Not found' });
 });
 app.post('/api/berita', async (req, res) => {
   const { title, category, content } = req.body;
-  const newBerita = { id: Math.max(...database.berita.map(b => b.id), 0) + 1, title, category, date: new Date().toISOString().split('T')[0], content };
-  database.berita.push(newBerita);
-  await persistDatabase();
-  res.status(201).json({ success: true, data: newBerita });
-});
-app.put('/api/berita/:id', async (req, res) => {
-  const { title, category, content } = req.body;
-  const index = database.berita.findIndex(b => b.id == req.params.id);
-  if (index !== -1) { database.berita[index] = { ...database.berita[index], title, category, content }; await persistDatabase(); res.json({ success: true, data: database.berita[index] }); }
-  else res.status(404).json({ success: false, message: 'Berita tidak ditemukan' });
-});
-app.delete('/api/berita/:id', async (req, res) => {
-  const index = database.berita.findIndex(b => b.id == req.params.id);
-  if (index !== -1) { const deleted = database.berita.splice(index, 1); await persistDatabase(); res.json({ success: true, message: 'Berita dihapus', data: deleted[0] }); }
-  else res.status(404).json({ success: false, message: 'Berita tidak ditemukan' });
-});
-
-// ==============================
-// ======== BANSOS ROUTES =======
-// ==============================
-
-app.get('/api/bansos', (req, res) => res.json({ success: true, data: database.bansos }));
-app.get('/api/bansos/programs', (req, res) => res.json({ success: true, data: database.bansosPrograms || [] }));
-app.get('/api/bansos/rt/:rt', (req, res) => {
-  const filtered = database.bansos.filter(b => b.rt && b.rt.startsWith(req.params.rt));
-  res.json({ success: true, data: filtered });
-});
-app.post('/api/bansos', async (req, res) => {
-  const { nama, alamat, rt, program, status } = req.body;
-  const id = Math.max(...database.bansos.map(b => b.id), 0) + 1;
-  const item = { id, no: id, nama, alamat, rt, program, status: status || 'Aktif' };
-  database.bansos.push(item);
+  const id = Math.max(...database.berita.map(b => b.id), 0) + 1;
+  const item = { id, title, category, date: new Date().toISOString().split('T')[0], content };
+  database.berita.push(item);
   await persistDatabase();
   res.status(201).json({ success: true, data: item });
 });
-app.put('/api/bansos/:id', async (req, res) => {
+app.put('/api/berita/:id', async (req, res) => {
+  const i = database.berita.findIndex(b => b.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false, message: 'Not found' });
+  Object.assign(database.berita[i], req.body);
+  await persistDatabase();
+  res.json({ success: true, data: database.berita[i] });
+});
+app.delete('/api/berita/:id', async (req, res) => {
+  const i = database.berita.findIndex(b => b.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  database.berita.splice(i, 1);
+  await persistDatabase();
+  res.json({ success: true, message: 'Dihapus' });
+});
+
+// --- Bansos CRUD ---
+app.get('/api/bansos', (req, res) => res.json({ success: true, data: database.bansos }));
+app.get('/api/bansos/programs', (req, res) => res.json({ success: true, data: database.bansosPrograms || [] }));
+app.post('/api/bansos', async (req, res) => {
   const { nama, alamat, rt, program, status } = req.body;
-  const idx = database.bansos.findIndex(b => b.id == req.params.id);
-  if (idx !== -1) { database.bansos[idx] = { ...database.bansos[idx], nama, alamat, rt, program, status }; await persistDatabase(); res.json({ success: true, data: database.bansos[idx] }); }
-  else res.status(404).json({ success: false, message: 'Data bansos tidak ditemukan' });
+  const id = Math.max(...database.bansos.map(b => b.id), 0) + 1;
+  database.bansos.push({ id, no: id, nama, alamat, rt, program, status: status || 'Aktif' });
+  await persistDatabase();
+  res.status(201).json({ success: true, data: { id } });
+});
+app.put('/api/bansos/:id', async (req, res) => {
+  const i = database.bansos.findIndex(b => b.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  Object.assign(database.bansos[i], req.body);
+  await persistDatabase();
+  res.json({ success: true, data: database.bansos[i] });
 });
 app.delete('/api/bansos/:id', async (req, res) => {
-  const idx = database.bansos.findIndex(b => b.id == req.params.id);
-  if (idx !== -1) { database.bansos.splice(idx, 1); await persistDatabase(); res.json({ success: true, message: 'Dihapus' }); }
-  else res.status(404).json({ success: false, message: 'Data bansos tidak ditemukan' });
+  const i = database.bansos.findIndex(b => b.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  database.bansos.splice(i, 1);
+  await persistDatabase();
+  res.json({ success: true, message: 'Dihapus' });
 });
 
-// ==============================
-// ====== PENGADUAN ROUTES ======
-// ==============================
-
+// --- Pengaduan CRUD ---
 app.get('/api/pengaduan', (req, res) => res.json({ success: true, data: database.pengaduan }));
 app.post('/api/pengaduan', async (req, res) => {
   const { name, contact, type, message } = req.body;
-  const newComplaint = { id: (database.pengaduan || []).length + 1, name, contact, type, message, submittedAt: new Date().toISOString(), status: 'Diterima' };
-  database.pengaduan.push(newComplaint);
+  const id = (database.pengaduan || []).length + 1;
+  database.pengaduan.push({ id, name, contact, type, message, submittedAt: new Date().toISOString(), status: 'Diterima' });
   await persistDatabase();
-  res.status(201).json({ success: true, data: newComplaint });
+  res.status(201).json({ success: true, data: { id } });
 });
 app.put('/api/pengaduan/:id', async (req, res) => {
-  const { status, balasan } = req.body;
-  const idx = (database.pengaduan || []).findIndex(p => p.id == req.params.id);
-  if (idx !== -1) { database.pengaduan[idx] = { ...database.pengaduan[idx], status, balasan }; await persistDatabase(); res.json({ success: true, data: database.pengaduan[idx] }); }
-  else res.status(404).json({ success: false, message: 'Pengaduan tidak ditemukan' });
-  });
+  const i = (database.pengaduan || []).findIndex(p => p.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  Object.assign(database.pengaduan[i], req.body);
+  await persistDatabase();
+  res.json({ success: true, data: database.pengaduan[i] });
+});
 
-  // ==============================
-  // ====== SURAT ONLINE ==========
-  // ==============================
+// --- Surat Online CRUD ---
+app.get('/api/surat', (req, res) => res.json({ success: true, data: database.surat || [] }));
+app.post('/api/surat', async (req, res) => {
+  const { jenis, nama, nik, alamat, keperluan, tempatLahir, tanggalLahir, pekerjaan, jenisUsaha, rt, rw, dusun, keterangan, fileKtp, fileKk, fileKtpName, fileKkName } = req.body;
+  if (!jenis || !nama || !nik) return res.status(400).json({ success: false, message: 'Jenis, nama, dan NIK wajib' });
+  if (!fileKtp || !fileKk) return res.status(400).json({ success: false, message: 'Upload KTP dan KK wajib dilengkapi' });
+  const id = (database.surat || []).length + 1;
+  const surat = {
+    id, jenis, nama, nik, alamat: alamat || '', keperluan: keperluan || '',
+    tempatLahir: tempatLahir || '', tanggalLahir: tanggalLahir || '',
+    pekerjaan: pekerjaan || '', jenisUsaha: jenisUsaha || '',
+    rt: rt || '', rw: rw || '', dusun: dusun || '', keterangan: keterangan || '',
+    fileKtp: fileKtp || null, fileKtpName: fileKtpName || null,
+    fileKk: fileKk || null, fileKkName: fileKkName || null,
+    status: 'Pending', nomorSurat: null, ditandatanganiOleh: null,
+    catatan: '', diajukanPada: new Date().toISOString(), diprosesPada: null
+  };
+  if (!database.surat) database.surat = [];
+  database.surat.push(surat);
+  await persistDatabase();
+  res.status(201).json({ success: true, data: surat });
+});
+app.put('/api/surat/:id', async (req, res) => {
+  const i = (database.surat || []).findIndex(s => s.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  const { status, catatan, nomorSurat, ditandatanganiOleh, tandaTanganOleh } = req.body;
+  if (status) database.surat[i].status = status;
+  if (catatan !== undefined) database.surat[i].catatan = catatan;
+  if (nomorSurat) database.surat[i].nomorSurat = nomorSurat;
+  if (ditandatanganiOleh) database.surat[i].ditandatanganiOleh = ditandatanganiOleh;
+  if (tandaTanganOleh) database.surat[i].tandaTanganOleh = tandaTanganOleh;
+  if (status === 'Selesai' && !database.surat[i].nomorSurat) {
+    database.surat[i].nomorSurat = 'SURAT-' + String(database.surat[i].id).padStart(4, '0') + '/' + new Date().getFullYear();
+  }
+  await persistDatabase();
+  res.json({ success: true, data: database.surat[i] });
+});
+app.delete('/api/surat/:id', async (req, res) => {
+  const i = (database.surat || []).findIndex(s => s.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  database.surat.splice(i, 1);
+  await persistDatabase();
+  res.json({ success: true, message: 'Dihapus' });
+});
 
-  app.get('/api/surat', (req, res) => {
-    res.json({ success: true, data: database.surat || [] });
-  });
+// --- Surat Word Document Generation ---
+app.get('/api/surat/:id/word', async (req, res) => {
+  const surat = (database.surat || []).find(s => s.id == req.params.id);
+  if (!surat) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
 
-  app.post('/api/surat', async (req, res) => {
-    const { jenis, nama, nik, alamat, keperluan } = req.body;
-    if (!jenis || !nama || !nik) return res.status(400).json({ success: false, message: 'Jenis, nama, dan NIK wajib diisi' });
-    const id = (database.surat || []).length + 1;
-    const surat = {
-      id,
-      jenis,
-      nama,
-      nik,
-      alamat: alamat || '',
-      keperluan: keperluan || '',
-      status: 'Diajukan',
-      nomorSurat: null,
-      ditandatanganiOleh: null,
-      catatan: '',
-      diajukanPada: new Date().toISOString(),
-      diprosesPada: null,
-    };
-    if (!database.surat) database.surat = [];
-    database.surat.push(surat);
-    await persistDatabase();
-    res.status(201).json({ success: true, data: surat });
-  });
+  const jenisLabels = {
+    'Surat Keterangan Usaha': 'SURAT KETERANGAN USAHA',
+    'Surat Keterangan Domisili': 'SURAT KETERANGAN DOMISILI',
+    'Surat Keterangan Tidak Mampu (SKTM)': 'SURAT KETERANGAN TIDAK MAMPU',
+    'Surat Pengantar KTP': 'SURAT PENGANTAR KTP',
+    'Surat Pengantar KK': 'SURAT PENGANTAR KARTU KELUARGA',
+    'Surat Keterangan Kematian': 'SURAT KETERANGAN KEMATIAN',
+    'Surat Keterangan Kelahiran': 'SURAT KETERANGAN KELAHIRAN'
+  };
 
-  app.put('/api/surat/:id', async (req, res) => {
-    const { status, catatan, nomorSurat, ditandatanganiOleh } = req.body;
-    const idx = (database.surat || []).findIndex(s => s.id == req.params.id);
-    if (idx === -1) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
-    if (status) database.surat[idx].status = status;
-    if (catatan !== undefined) database.surat[idx].catatan = catatan;
-    if (nomorSurat) database.surat[idx].nomorSurat = nomorSurat;
-    if (ditandatanganiOleh) database.surat[idx].ditandatanganiOleh = ditandatanganiOleh;
-    if (status === 'Diproses' && !database.surat[idx].diprosesPada) database.surat[idx].diprosesPada = new Date().toISOString();
-    if (status === 'Selesai' && !database.surat[idx].nomorSurat) database.surat[idx].nomorSurat = 'SURAT-' + String(database.surat[idx].id).padStart(4, '0') + '/' + new Date().getFullYear();
-    await persistDatabase();
-    res.json({ success: true, data: database.surat[idx] });
-  });
+  const title = jenisLabels[surat.jenis] || 'SURAT KETERANGAN';
+  const nomorSurat = surat.nomorSurat || `${String(surat.id).padStart(4, '0')}/SK/${new Date().getFullYear()}`;
+  const tgl = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  app.delete('/api/surat/:id', async (req, res) => {
-    const idx = (database.surat || []).findIndex(s => s.id == req.params.id);
-    if (idx === -1) return res.status(404).json({ success: false, message: 'Surat tidak ditemukan' });
-    database.surat.splice(idx, 1);
-    await persistDatabase();
-    res.json({ success: true, message: 'Surat dihapus' });
-  });
+  const children = [];
 
-  // ==============================
-  // ====== USER MANAGEMENT =======
-  // ==============================
+  // Header
+  children.push(
+    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'PEMERINTAH DESA KASOMALANG KULON', bold: true, size: 28 })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'KECAMATAN KASOMALANG — KABUPATEN SUBANG', size: 22 })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: 'Jl. Raya Kasomalang Kulon, Jawa Barat', size: 20, italics: true })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 200 }, children: [new TextRun({ text: '═══════════════════════════════════════════════════', size: 20 })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 300 }, children: [new TextRun({ text: title, bold: true, size: 28, underline: {} })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: `Nomor: ${nomorSurat}`, size: 22 })] })
+  );
 
+  // Body
+  children.push(
+    new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `Yang bertanda tangan di bawah ini Kepala Desa Kasomalang Kulon, dengan ini menerangkan bahwa:`, size: 24 })] }),
+    new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `Nama\t\t: ${surat.nama}`, size: 24 })] }),
+    new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `NIK\t\t: ${surat.nik}`, size: 24 })] }),
+  );
+
+  if (surat.tempatLahir && surat.tanggalLahir) {
+    children.push(new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `TTL\t\t: ${surat.tempatLahir}, ${surat.tanggalLahir}`, size: 24 })] }));
+  }
+  if (surat.pekerjaan) {
+    children.push(new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `Pekerjaan\t: ${surat.pekerjaan}`, size: 24 })] }));
+  }
+  children.push(new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `Alamat\t\t: ${surat.alamat}`, size: 24 })] }));
+  if (surat.rt) children.push(new Paragraph({ spacing: { after: 80 }, children: [new TextRun({ text: `RT/RW\t\t: ${surat.rt}/${surat.rw}`, size: 24 })] }));
+
+  // Type-specific content
+  if (surat.jenis === 'Surat Keterangan Usaha' && surat.jenisUsaha) {
+    children.push(
+      new Paragraph({ spacing: { before: 200, after: 200 }, children: [new TextRun({ text: `Adalah benar warga desa kami yang memiliki usaha:`, size: 24 })] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `Jenis Usaha\t: ${surat.jenisUsaha}`, bold: true, size: 24 })] })
+    );
+  }
+
+  if (surat.keperluan) {
+    children.push(new Paragraph({ spacing: { before: 200, after: 200 }, children: [new TextRun({ text: `Surat keterangan ini diberikan untuk keperluan: ${surat.keperluan}`, size: 24 })] }));
+  }
+
+  if (surat.keterangan) {
+    children.push(new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: `Keterangan: ${surat.keterangan}`, size: 24 })] }));
+  }
+
+  // Closing & signature
+  const ttdOleh = surat.tandaTanganOleh || 'Kepala Desa'; // 'Kepala Desa' or 'a.n. Kepala Desa - Sekretaris Desa'
+  const ttdNama = surat.ditandatanganiOleh || '(....................................)';
+  
+  children.push(
+    new Paragraph({ spacing: { before: 200, after: 100 }, children: [new TextRun({ text: `Demikian surat keterangan ini diberikan untuk dapat dipergunakan sebagaimana mestinya.`, size: 24 })] }),
+    new Paragraph({ spacing: { before: 200 }, alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `Kasomalang Kulon, ${tgl}`, size: 24 })] })
+  );
+  
+  if (ttdOleh && ttdOleh.includes('Sekretaris')) {
+    // a.n. Kepala Desa, Sekretaris Desa
+    children.push(
+      new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: 'a.n. Kepala Desa Kasomalang Kulon', size: 24 })] }),
+      new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: 'Sekretaris Desa', size: 24 })] }),
+      new Paragraph({ spacing: { before: 800 }, alignment: AlignmentType.RIGHT, children: [new TextRun({ text: ttdNama, bold: true, size: 24 })] })
+    );
+  } else {
+    // Kepala Desa directly
+    children.push(
+      new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: 'Kepala Desa Kasomalang Kulon', size: 24 })] }),
+      new Paragraph({ spacing: { before: 800 }, alignment: AlignmentType.RIGHT, children: [new TextRun({ text: ttdNama, bold: true, size: 24 })] })
+    );
+  }
+
+  const doc = new Document({ sections: [{ children }] });
+  const buffer = await Packer.toBuffer(doc);
+
+  const filename = `${title.replace(/ /g, '_')}_${surat.nama.replace(/ /g, '_')}.docx`;
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(buffer);
+});
+
+// --- Users CRUD ---
 app.get('/api/users', (req, res) => {
   res.json({ success: true, data: getUsers().map(u => ({ id: u.id, name: u.name, email: u.email, role: u.role, rt: u.rt, rw: u.rw })) });
 });
 app.post('/api/users', async (req, res) => {
   const { name, email, password, role, rt, rw } = req.body;
   const id = Math.max(...getUsers().map(u => u.id), 0) + 1;
-  const user = { id, name, email, password, role, rt: rt || null, rw: rw || null };
-  database.users.push(user);
+  database.users.push({ id, name, email, password, role, rt: rt || null, rw: rw || null });
   await persistDatabase();
-  res.status(201).json({ success: true, data: { id, name, email, role, rt, rw } });
+  res.status(201).json({ success: true, data: { id, name, email, role } });
 });
 app.put('/api/users/:id', async (req, res) => {
-  const idx = getUsers().findIndex(u => u.id == req.params.id);
-  if (idx !== -1) {
-    const { name, email, password, role, rt, rw } = req.body;
-    database.users[idx] = { ...database.users[idx], name: name || database.users[idx].name, email: email || database.users[idx].email, password: password || database.users[idx].password, role: role || database.users[idx].role, rt: rt !== undefined ? rt : database.users[idx].rt, rw: rw !== undefined ? rw : database.users[idx].rw };
-    await persistDatabase();
-    res.json({ success: true, data: { id: database.users[idx].id, name: database.users[idx].name, email: database.users[idx].email, role: database.users[idx].role } });
-  } else res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+  const i = getUsers().findIndex(u => u.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  Object.assign(database.users[i], req.body);
+  await persistDatabase();
+  res.json({ success: true, data: database.users[i] });
 });
 app.delete('/api/users/:id', async (req, res) => {
-  const idx = getUsers().findIndex(u => u.id == req.params.id);
-  if (idx !== -1) { database.users.splice(idx, 1); await persistDatabase(); res.json({ success: true, message: 'User dihapus' }); }
-  else res.status(404).json({ success: false, message: 'User tidak ditemukan' });
+  const i = getUsers().findIndex(u => u.id == req.params.id);
+  if (i === -1) return res.status(404).json({ success: false });
+  database.users.splice(i, 1);
+  await persistDatabase();
+  res.json({ success: true, message: 'Dihapus' });
 });
 
-// ==============================
-// ======== DASHBOARD ===========
-// ==============================
-
+// --- Dashboard Stats ---
 app.get('/api/dashboard/stats', (req, res) => {
-  const warga = getWarga();
-  const pbbData = getPbb();
-  const totalPenduduk = warga.length;
-  const totalPajakTerkumpul = pbbData.reduce((sum, item) => item.status === 'Lunas' ? sum + item.pajak : sum, 0);
-  const lunasCount = pbbData.filter(item => item.status === 'Lunas').length;
-  const totalPBB = pbbData.length;
+  const w = getWarga();
+  const p = getPbb();
   res.json({
-    success: true, data: {
-      totalPenduduk,
-      totalKK: Math.max(1, Math.floor(totalPenduduk / 3)),
+    success: true,
+    data: {
+      totalPenduduk: database.penduduk ? database.penduduk.length : w.length,
+      totalKK: Math.max(1, Math.floor((database.penduduk ? database.penduduk.length : w.length) / 3)),
       totalBerita: database.berita.length,
-      totalPBB,
+      totalPBB: p.length,
       totalBansos: database.bansos.length,
-      totalPajakTerkumpul,
-      tingkatPembayaranPBB: totalPBB ? Math.round((lunasCount / totalPBB) * 100) : 0,
-      pendingPBB: pbbData.filter(p => p.status === 'Pending').length,
+      totalPajakTerkumpul: p.reduce((s, i) => i.status === 'Lunas' ? s + i.pajak : s, 0),
+      tingkatPembayaranPBB: p.length ? Math.round(p.filter(i => i.status === 'Lunas').length / p.length * 100) : 0,
+      pendingPBB: p.filter(p => p.status === 'Pending').length,
     }
   });
 });
 
-// ==============================
-// ======== HEALTH ==============
-// ==============================
-
+// --- Health ---
 app.get(['/api/health', '/health'], (req, res) => {
-  res.json({ success: true, message: 'API SI-KASKUL - OK', dataCount: getWarga().length, time: new Date().toISOString() });
+  res.json({
+    success: true, message: 'API SI-KASKUL - OK',
+    dataCount: getWarga().length,
+    db: pool ? 'MySQL' : 'In-Memory',
+    time: new Date().toISOString()
+  });
 });
 
-// ==============================
-// ====== 404 + ERROR ===========
-// ==============================
+// --- PBB Routes ---
+createPbbRoutes(app, getWarga, getPbb, database, persistDatabase);
 
+// --- 404 ---
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' }));
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
-});
+app.use((err, req, res, next) => { console.error(err); res.status(500).json({ success: false, message: 'Server error' }); });
 
-// ==============================
-// ====== START SERVER ==========
-// ==============================
-
-if (require.main === module) {
-  bootstrapDatabase()
-    .catch(error => console.error('Gagal inisialisasi database:', error.message))
-    .finally(() => {
-      app.listen(PORT, () => {
-        console.log(`✅ SI-KASKUL API running at http://localhost:${PORT}`);
-        console.log(`📊 Warga terdaftar: ${getWarga().length} orang`);
-        console.log(`📅 Data PBB: 2020-2026`);
-        if (hasSupabaseDatabase()) console.log('🗄️  Database: Supabase Postgres');
-        console.log('📚 New endpoints:');
-        console.log('   GET  /api/pbb/stats/overview     (Aggregate stats)');
-        console.log('   GET  /api/pbb/stats/per-year     (Per year breakdown)');
-        console.log('   GET  /api/pbb/stats/by-dusun     (By dusun)');
-        console.log('   GET  /api/pbb/stats/by-dusun/:id (By RW in dusun)');
-        console.log('   GET  /api/pbb/stats/by-dusun/:id/rw/:rw (By RT in RW)');
-        console.log('   POST /api/pbb/check-nop          (NOP check - public)');
-      });
-    });
+// --- Start ---
+async function start() {
+  await initDB();
+  app.listen(PORT, () => {
+    console.log(`✅ SI-KASKUL API running at http://localhost:${PORT}`);
+    console.log(`📊 Warga: ${getWarga().length} | PBB: ${getPbb().length}`);
+    console.log(`🗄️  Database: ${pool ? 'MySQL' : 'In-Memory'}`);
+  });
 }
+start().catch(e => { console.error('Fatal:', e); process.exit(1); });
 
 module.exports = app;
