@@ -955,6 +955,94 @@ body {
     opacity: 1;
 }
 
+/* ══ 3D Animated Title ═══ */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.text-3d-title {
+    display: inline-block;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow:
+        0 1px 0 #ccc,
+        0 2px 0 #c9c9c9,
+        0 3px 0 #bbb,
+        0 4px 0 #b9b9b9,
+        0 5px 0 #aaa,
+        0 6px 1px rgba(0,0,0,.1),
+        0 0 5px rgba(0,0,0,.1),
+        0 1px 3px rgba(0,0,0,.3),
+        0 3px 5px rgba(0,0,0,.2),
+        0 5px 10px rgba(0,0,0,.25),
+        0 10px 10px rgba(0,0,0,.2),
+        0 20px 20px rgba(0,0,0,.15);
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+}
+
+.text-3d-title:hover {
+    transform: rotateX(10deg) rotateY(-5deg) scale(1.05);
+}
+
+@keyframes float-3d {
+    0%, 100% {
+        transform: translateY(0) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+        transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+    }
+    50% {
+        transform: translateY(-5px) rotateX(0deg) rotateY(10deg);
+    }
+    75% {
+        transform: translateY(-15px) rotateX(-5deg) rotateY(5deg);
+    }
+}
+
+.animate-float-3d {
+    animation: float-3d 6s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% {
+        text-shadow:
+            0 1px 0 #ccc,
+            0 2px 0 #c9c9c9,
+            0 3px 0 #bbb,
+            0 4px 0 #b9b9b9,
+            0 5px 0 #aaa,
+            0 6px 1px rgba(0,0,0,.1),
+            0 0 5px rgba(0,0,0,.1),
+            0 1px 3px rgba(0,0,0,.3),
+            0 3px 5px rgba(0,0,0,.2),
+            0 5px 10px rgba(0,0,0,.25),
+            0 10px 10px rgba(0,0,0,.2),
+            0 20px 20px rgba(0,0,0,.15);
+    }
+    50% {
+        text-shadow:
+            0 1px 0 #ccc,
+            0 2px 0 #c9c9c9,
+            0 3px 0 #bbb,
+            0 4px 0 #b9b9b9,
+            0 5px 0 #aaa,
+            0 6px 1px rgba(0,0,0,.1),
+            0 0 10px rgba(16,185,129,0.5),
+            0 0 20px rgba(16,185,129,0.3),
+            0 0 30px rgba(16,185,129,0.2),
+            0 1px 3px rgba(0,0,0,.3),
+            0 3px 5px rgba(0,0,0,.2),
+            0 5px 10px rgba(0,0,0,.25),
+            0 10px 10px rgba(0,0,0,.2),
+            0 20px 20px rgba(0,0,0,.15);
+    }
+}
+
+.text-3d-title {
+    animation: float-3d 6s ease-in-out infinite, glow-pulse 4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;

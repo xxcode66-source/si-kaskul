@@ -66,10 +66,10 @@
                 </div>
 
                 <div class="space-y-5">
-                    <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] animate-slideUp" style="animation-delay:0.1s">
-                        Desa<br>
-                        <span class="text-shimmer">Kasomalang</span><br>
-                        Kulon
+                    <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl leading-[0.95] animate-slideUp perspective-1000" style="animation-delay:0.1s">
+                        <span class="block text-3d-title animate-float-3d" style="animation-delay: 0s">Desa</span>
+                        <span class="block text-3d-title text-shimmer animate-float-3d" style="animation-delay: 0.2s">Kasomalang</span>
+                        <span class="block text-3d-title animate-float-3d" style="animation-delay: 0.4s">Kulon</span>
                     </h1>
                     <p class="text-emerald-50/80 text-lg md:text-xl max-w-xl leading-relaxed animate-slideUp" style="animation-delay:0.2s">
                         Platform digital terpadu untuk layanan publik, transparansi data, 
@@ -130,71 +130,6 @@
                     <a href="pages/lapak-desa.html" class="px-8 py-4 rounded-2xl border border-white/25 bg-white/10 backdrop-blur-sm text-white font-semibold hover:bg-white/20 transition-all duration-300 text-center hover:-translate-y-1">
                         Lapak Desa
                     </a>
-                </div>
-            </div>
-
-            <!-- Right Content — Prayer Widget -->
-            <div class="relative hidden lg:block">
-                <div class="absolute -left-8 top-12 h-32 w-32 bg-emerald-400/10 blur-3xl rounded-full animate-float"></div>
-                <div class="absolute -right-8 bottom-12 h-40 w-40 bg-cyan-400/10 blur-3xl rounded-full animate-float" style="animation-delay:3s"></div>
-                
-                <div class="hero-card rounded-[2.5rem] overflow-hidden p-5 animate-slideUp" style="animation-delay:0.25s">
-                    <div class="grid gap-5">
-                        <!-- Carousel Preview Card -->
-                        <div class="relative overflow-hidden rounded-[2rem] shadow-2xl group">
-                            <div class="carousel-preview-img w-full h-[200px] bg-cover bg-center transition-all duration-1000" id="carousel-preview" style="background-image:url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=800&fit=crop')"></div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-emerald-900/20 to-transparent"></div>
-                            
-                            <!-- Location Badge -->
-                            <div class="absolute left-5 top-5 glass-dark rounded-full px-4 py-2 flex items-center gap-2">
-                                <i data-lucide="map-pin" style="width:14px;height:14px;color:#34d399"></i>
-                                <span class="text-sm font-medium text-white">Subang, Jawa Barat</span>
-                            </div>
-
-                            <!-- Slide Caption -->
-                            <div class="absolute left-5 right-5 bottom-5">
-                                <div class="glass-dark rounded-2xl px-4 py-3">
-                                    <p class="text-[10px] uppercase tracking-[0.2em] text-emerald-100/80" id="slide-caption-label">Panorama</p>
-                                    <p class="text-sm font-medium text-white mt-1" id="slide-caption-text">Hamparan sawah & gotong royong</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Prayer Times Widget -->
-                        <div class="rounded-[2rem] bg-gradient-to-br from-gray-50 to-white p-6 border border-gray-100/50">
-                            <div class="flex items-center justify-between gap-4 mb-5">
-                                <div>
-                                    <p class="text-[10px] uppercase tracking-[0.25em] text-emerald-600 font-semibold">Jadwal Salat Hari Ini</p>
-                                    <h2 class="text-xl font-bold text-emerald-950 mt-1">Kasomalang Kulon</h2>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] text-gray-400 uppercase tracking-wider">Waktu sekarang</p>
-                                    <p id="current-time" class="text-lg font-bold text-emerald-800 tabular-nums">--:--:--</p>
-                                </div>
-                            </div>
-
-                            <!-- Countdown -->
-                            <div class="flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-cyan-50 px-5 py-4 mb-5 border border-emerald-100/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white flex items-center justify-center shadow-lg shadow-emerald-200/50">
-                                        <i data-lucide="clock-3" style="width:20px;height:20px"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] uppercase tracking-[0.2em] text-emerald-600 font-medium">Menuju salat berikutnya</p>
-                                        <p id="next-prayer-name" class="font-bold text-emerald-950">--</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p id="next-prayer-countdown" class="font-bold text-emerald-800 text-2xl tabular-nums">--:--:--</p>
-                                    <p id="next-prayer-label" class="text-[10px] text-gray-500">--</p>
-                                </div>
-                            </div>
-
-                            <!-- Prayer Grid -->
-                            <div id="prayer-times" class="grid grid-cols-5 gap-2 text-sm"></div>
-                            <p class="mt-4 text-[10px] text-gray-400 text-center">Estimasi WIB untuk Subang & sekitarnya</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -578,75 +513,9 @@
             startCarouselAutoplay();
         }
 
-        // ─── Prayer Times Logic ───────────────────────
-        const prayerTimes = [
-            { name: 'Subuh', time: '04:23' },
-            { name: 'Dzuhur', time: '11:50' },
-            { name: 'Ashar', time: '15:11' },
-            { name: 'Maghrib', time: '17:58' },
-            { name: 'Isya', time: '19:08' }
-        ];
-
-        function formatClock(date) {
-            return new Intl.DateTimeFormat('id-ID', {
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            }).format(date);
-        }
-
-        function pad(n) { return String(n).padStart(2, '0'); }
-
-        function formatCountdown(totalSeconds) {
-            const s = Math.max(0, totalSeconds);
-            return `${pad(Math.floor(s/3600))}:${pad(Math.floor((s%3600)/60))}:${pad(s%60)}`;
-        }
-
-        function getPrayerDate(timeString) {
-            const [h, m] = timeString.split(':').map(Number);
-            const d = new Date();
-            d.setHours(h, m, 0, 0);
-            return d;
-        }
-
-        function renderPrayerTimes() {
-            const container = document.getElementById('prayer-times');
-            if (!container) return;
-
-            container.innerHTML = prayerTimes.map(prayer => `
-                <div class="rounded-xl border border-gray-100 bg-gradient-to-b from-gray-50 to-white px-3 py-3 text-center transition-all duration-300 hover:border-emerald-200 hover:shadow-sm">
-                    <p class="text-[9px] uppercase tracking-[0.2em] text-emerald-600 font-semibold">${prayer.name}</p>
-                    <p class="mt-1 text-base font-bold text-emerald-950 tabular-nums">${prayer.time}</p>
-                </div>
-            `).join('');
-        }
-
-        function updatePrayerWidget() {
-            const now = new Date();
-            const currentTimeEl = document.getElementById('current-time');
-            const nextPrayerNameEl = document.getElementById('next-prayer-name');
-            const nextPrayerCountdownEl = document.getElementById('next-prayer-countdown');
-            const nextPrayerLabelEl = document.getElementById('next-prayer-label');
-
-            if (currentTimeEl) currentTimeEl.textContent = formatClock(now);
-
-            const schedule = prayerTimes.map(p => ({ ...p, date: getPrayerDate(p.time) }));
-            let next = schedule.find(item => item.date > now);
-            if (!next) {
-                next = schedule[0];
-                next.date = new Date(next.date.getTime() + 24*60*60*1000);
-            }
-
-            const countdown = Math.floor((next.date.getTime() - now.getTime()) / 1000);
-            if (nextPrayerNameEl) nextPrayerNameEl.textContent = next.name;
-            if (nextPrayerCountdownEl) nextPrayerCountdownEl.textContent = formatCountdown(countdown);
-            if (nextPrayerLabelEl) nextPrayerLabelEl.textContent = `Adzan ${next.name} pukul ${next.time}`;
-        }
-
         // ─── Initialize ───────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             initCarousel();
-            renderPrayerTimes();
-            updatePrayerWidget();
-            setInterval(updatePrayerWidget, 1000);
         });
     </script>
 </body>
