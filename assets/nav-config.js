@@ -25,6 +25,7 @@ const NAV_CONFIG = {
       ]
     },
     { href: '/pages/pbb.html', label: 'PBB', key: 'pbb', icon: 'receipt' },
+    { href: '/pages/lapak-desa.html', label: 'Lapak Desa', key: 'lapak', icon: 'shopping-bag' },
     {
       label: 'Bansos', key: 'bansos', icon: 'heart-handshake',
       children: [
