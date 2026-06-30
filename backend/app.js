@@ -606,6 +606,24 @@ app.get('/api/penduduk', (req, res) => {
   });
 });
 
+// Lightweight filter options endpoint
+app.get('/api/penduduk/filters', (req, res) => {
+  const penduduk = database.penduduk || [];
+  const rtSet = [...new Set(penduduk.map(p => p.rt))].sort();
+  const agamaSet = [...new Set(penduduk.map(p => p.agama).filter(Boolean))].sort();
+  const total = penduduk.length;
+  const lk = penduduk.filter(p => p.jenisKelamin === 'LAKI-LAKI').length;
+  res.json({ success: true, data: { rt: rtSet, agama: agamaSet, total, lakiLaki: lk, perempuan: total - lk } });
+});
+
+// Single record lookup by NIK
+app.get('/api/penduduk/:nik', (req, res) => {
+  const penduduk = database.penduduk || [];
+  const p = penduduk.find(d => d.nik === req.params.nik);
+  if (!p) return res.status(404).json({ success: false, message: 'Not found' });
+  res.json({ success: true, data: p });
+});
+
 // --- Dashboard Stats ---
 app.get('/api/dashboard/stats', (req, res) => {
   const w = getWarga();

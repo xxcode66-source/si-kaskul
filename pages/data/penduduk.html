@@ -108,10 +108,6 @@
         </div>
         <select id="filter-agama" class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-emerald-500 cursor-pointer">
           <option value="">Semua Agama</option>
-          <option value="ISLAM">Islam</option>
-          <option value="KRISTEN">Kristen</option>
-          <option value="KATHOLI K">Katolik</option>
-          <option value="KHONG">Khonghucu</option>
         </select>
         <select id="filter-jk" class="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-emerald-500 cursor-pointer">
           <option value="">Semua</option>
@@ -206,34 +202,45 @@ renderNavbar('data');
 window.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   lucide.createIcons();
-  loadStats();
-  loadAgamaOptions();
+  loadFilters();
   loadData();
   PageLoader.hide();
 });
 
-// Stats
-async function loadStats() {
+// Load filter options from lightweight endpoint
+async function loadFilters() {
   try {
-    const res = await fetch(`${API_BASE}/api/penduduk?limit=1`);
+    const res = await fetch(`${API_BASE}/api/penduduk/filters`);
     const json = await res.json();
-    if (json.stats) {
-      document.getElementById('stat-total').textContent = json.stats.total.toLocaleString('id-ID');
-      document.getElementById('stat-laki').textContent = json.stats.lakiLaki.toLocaleString('id-ID');
-      document.getElementById('stat-perempuan').textContent = json.stats.perempuan.toLocaleString('id-ID');
-      document.getElementById('stat-rt').textContent = json.stats.uniqueRT;
-    }
-  } catch (e) { console.error('Stats error:', e); }
-}
+    if (!json.success) return;
+    const { rt, agama, total, lakiLaki, perempuan } = json.data;
 
-// Load RT options
-async function loadAgamaOptions() {
-  // We'll populate RT from first large fetch
-  try {
-    const res = await fetch(`${API_BASE}/api/penduduk?limit=1`);
-    const json = await res.json();
-    // RT options will be populated dynamically
-  } catch(e) {}
+    // Stats
+    document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+    document.getElementById('stat-laki').textContent = lakiLaki.toLocaleString('id-ID');
+    document.getElementById('stat-perempuan').textContent = perempuan.toLocaleString('id-ID');
+    document.getElementById('stat-rt').textContent = rt.length;
+
+    // Populate RT filter
+    const rtSelect = document.getElementById('filter-rt');
+    rt.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = `RT ${r}`;
+      rtSelect.appendChild(opt);
+    });
+
+    // Populate agama filter
+    const agamaSelect = document.getElementById('filter-agama');
+    // Clear existing hardcoded options, repopulate from data
+    agamaSelect.innerHTML = '<option value="">Semua Agama</option>';
+    agama.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a.charAt(0) + a.slice(1).toLowerCase();
+      agamaSelect.appendChild(opt);
+    });
+  } catch (e) { console.error('Filter load error:', e); }
 }
 
 // Load data
@@ -255,35 +262,12 @@ async function loadData() {
     const pagination = { page: json.page, limit: json.limit, total: json.total, totalPages: json.totalPages };
     renderTable(json.data, pagination);
     renderPagination(pagination);
-    populateRTFilter(json.data);
     document.getElementById('result-count').textContent =
       `Menampilkan ${json.data.length} dari ${json.total} penduduk`;
   } catch (e) {
     console.error('Load error:', e);
     document.getElementById('table-body').innerHTML =
       '<tr><td colspan="9" class="px-4 py-8 text-center text-red-400">Gagal memuat data. Pastikan backend berjalan.</td></tr>';
-  }
-}
-
-let rtFilterPopulated = false;
-function populateRTFilter(data) {
-  if (rtFilterPopulated) return;
-  // Get unique RTs from stats
-  const rtSelect = document.getElementById('filter-rt');
-  if (rtSelect.options.length <= 1) {
-    // Fetch unique RTs
-    fetch(`${API_BASE}/api/penduduk?limit=10000`)
-      .then(r => r.json())
-      .then(json => {
-        const rts = [...new Set(json.data.map(d => d.rt))].sort();
-        rts.forEach(rt => {
-          const opt = document.createElement('option');
-          opt.value = rt;
-          opt.textContent = `RT ${rt}`;
-          rtSelect.appendChild(opt);
-        });
-        rtFilterPopulated = true;
-      }).catch(() => {});
   }
 }
 
@@ -299,7 +283,7 @@ function renderTable(data, pagination) {
     const jkBadge = p.jenisKelamin === 'LAKI-LAKI'
       ? '<span class="badge badge-l">L</span>'
       : '<span class="badge badge-p">P</span>';
-    return `<tr class="table-row border-b border-gray-50 cursor-pointer" onclick="showDetail(${p.id})">
+    return `<tr class="table-row border-b border-gray-50 cursor-pointer" data-nik="${p.nik}">
       <td class="px-4 py-3 text-gray-500">${startIdx + i + 1}</td>
       <td class="px-4 py-3 font-mono text-xs text-gray-600">${p.nik}</td>
       <td class="px-4 py-3 font-medium text-gray-800">${p.nama}</td>
@@ -309,7 +293,7 @@ function renderTable(data, pagination) {
       <td class="px-4 py-3 text-gray-600 hidden lg:table-cell text-xs">${p.agama}</td>
       <td class="px-4 py-3 text-gray-600 hidden lg:table-cell text-xs truncate max-w-[120px]">${p.pendidikan}</td>
       <td class="px-4 py-3">
-        <button onclick="event.stopPropagation();showDetail(${p.id})" class="text-emerald-600 hover:text-emerald-700">
+        <button class="btn-detail text-emerald-600 hover:text-emerald-700" data-nik="${p.nik}">
           <i data-lucide="eye" class="w-4 h-4"></i>
         </button>
       </td>
@@ -317,6 +301,14 @@ function renderTable(data, pagination) {
   }).join('');
   lucide.createIcons();
 }
+
+// Event delegation for table row clicks
+document.getElementById('table-body').addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-detail');
+  const row = e.target.closest('[data-nik]');
+  const nik = btn ? btn.dataset.nik : (row ? row.dataset.nik : null);
+  if (nik) showDetail(nik);
+});
 
 function renderPagination(pagination) {
   const { page, limit, total } = pagination;
@@ -366,17 +358,17 @@ function goPage(p) {
 }
 
 // Detail modal
-async function showDetail(id) {
+async function showDetail(nik) {
   const modal = document.getElementById('detail-modal');
   const content = document.getElementById('modal-content');
   content.innerHTML = '<div class="text-center py-8"><div class="skeleton w-32 h-4 mx-auto mb-2"></div><div class="skeleton w-48 h-4 mx-auto mb-2"></div><div class="skeleton w-40 h-4 mx-auto"></div></div>';
   modal.classList.add('show');
 
   try {
-    const res = await fetch(`${API_BASE}/api/penduduk?limit=10000`);
+    const res = await fetch(`${API_BASE}/api/penduduk/${nik}`);
     const json = await res.json();
-    const p = json.data.find(d => d.id === id);
-    if (!p) { content.innerHTML = '<p class="text-center text-gray-400">Data tidak ditemukan</p>'; return; }
+    if (!json.success || !json.data) { content.innerHTML = '<p class="text-center text-gray-400">Data tidak ditemukan</p>'; return; }
+    const p = json.data;
 
     const fields = [
       ['NIK', p.nik], ['No. KK', p.kk], ['Nama Lengkap', p.nama],
@@ -427,23 +419,3 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
 </script>
 </body>
 </html>
-<!doctype html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Data Penduduk - Desa Kasomalang Kulon</title>
-<script src="https://cdn.tailwindcss.com/3.4.17"></script><script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/style.css">
-</head><body class="bg-gray-50 min-h-screen">
-<div id="page-loader" class="page-loader"><div class="loader-content"><div class="loader-spinner"></div><p class="loader-text">Memuat...</p></div></div>
-<div id="navbar-container"></div>
-<div class="pt-28 pb-16 px-4 hero-grid-bg text-white"><div class="max-w-4xl mx-auto text-center">
-<h1 class="font-display text-5xl font-bold mb-4">Data Penduduk</h1>
-<p class="text-emerald-100 text-lg">Desa Kasomalang Kulon</p>
-</div></div>
-<section class="py-16 px-4"><div class="max-w-4xl mx-auto bg-white rounded-[2rem] p-10 shadow-xl">
-<p class="text-gray-600 text-lg leading-relaxed">Statistik penduduk berdasarkan usia, pendidikan, pekerjaan, agama.</p>
-<p class="text-gray-400 mt-4">Halaman ini akan segera dilengkapi dengan data dan fitur interaktif.</p>
-</div></section>
-<footer class="py-10 px-4 text-center bg-emerald-900 text-white"><p class="text-sm">&copy; 2024 Desa Kasomalang Kulon</p></footer>
-<script src="../../assets/nav-config.js"></script><script src="../../assets/script.js"></script>
-<script>renderNavbar('data');window.addEventListener('DOMContentLoaded',()=>{initScrollAnimations();PageLoader.hide();lucide.createIcons()});</script>
-</body></html>
