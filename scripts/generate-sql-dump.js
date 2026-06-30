@@ -239,22 +239,219 @@ function generateSQL(penduduk, pbbWarga, pbbRecords) {
   const lines = [];
   const BATCH = 500;
 
+  // ====== SCHEMA (CREATE TABLE) ======
   lines.push('-- ============================================');
-  lines.push('-- SI-KASKUL Database Dump');
+  lines.push('-- SI-KASKUL Complete Database Dump');
   lines.push('-- Generated: ' + new Date().toISOString().split('T')[0]);
   lines.push('-- Source: MONOGRAFI DESA.xlsx + SPPT PBB 2026.xlsx');
+  lines.push('-- Contains: Schema + Data (import this single file)');
   lines.push('-- ============================================');
+  lines.push('');
+  lines.push('CREATE DATABASE IF NOT EXISTS si_kaskul CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;');
+  lines.push('USE si_kaskul;');
   lines.push('');
   lines.push('SET NAMES utf8mb4;');
   lines.push('SET FOREIGN_KEY_CHECKS = 0;');
+  lines.push('');
+
+  // -- Users
+  lines.push('-- ============================================');
+  lines.push('-- TABLE: users');
+  lines.push('-- ============================================');
+  lines.push(`CREATE TABLE IF NOT EXISTS users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(50) NOT NULL,
+  nik VARCHAR(50) UNIQUE,
+  rt VARCHAR(100),
+  rw VARCHAR(50)
+) ENGINE=InnoDB;`);
+  lines.push('');
+
+  // -- Penduduk
+  lines.push('-- ============================================');
+  lines.push('-- TABLE: penduduk');
+  lines.push('-- ============================================');
+  lines.push(`CREATE TABLE IF NOT EXISTS penduduk (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nik VARCHAR(50) UNIQUE NOT NULL,
+  kk VARCHAR(50),
+  nama VARCHAR(255) NOT NULL,
+  tempatLahir VARCHAR(100),
+  tanggalLahir VARCHAR(50),
+  jenisKelamin VARCHAR(20),
+  kampung VARCHAR(255),
+  rt VARCHAR(10),
+  rw VARCHAR(10),
+  alamat TEXT,
+  umur INT,
+  shdk VARCHAR(50),
+  agama VARCHAR(50),
+  pendidikan VARCHAR(100),
+  pekerjaan VARCHAR(100),
+  ayah VARCHAR(255),
+  ibu VARCHAR(255),
+  INDEX idx_rt (rt),
+  INDEX idx_rw (rw),
+  INDEX idx_agama (agama),
+  INDEX idx_jk (jenisKelamin),
+  INDEX idx_nama (nama)
+) ENGINE=InnoDB;`);
+  lines.push('');
+
+  // -- PBB Warga
+  lines.push('-- ============================================');
+  lines.push('-- TABLE: pbb_warga');
+  lines.push('-- ============================================');
+  lines.push(`CREATE TABLE IF NOT EXISTS pbb_warga (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nik VARCHAR(50),
+  nop VARCHAR(100) NOT NULL,
+  nama VARCHAR(255) NOT NULL,
+  alamat TEXT,
+  dusun VARCHAR(50),
+  dusunNama VARCHAR(100),
+  rw VARCHAR(50),
+  rwNama VARCHAR(50),
+  rt VARCHAR(50),
+  rtNama VARCHAR(50),
+  pajak2026 BIGINT DEFAULT 0,
+  status VARCHAR(50),
+  totalPajak BIGINT DEFAULT 0,
+  totalLunas BIGINT DEFAULT 0,
+  totalBelumBayar BIGINT DEFAULT 0,
+  payments JSON DEFAULT NULL,
+  INDEX idx_nop (nop),
+  INDEX idx_nik (nik),
+  INDEX idx_dusun (dusun),
+  INDEX idx_rw (rw),
+  INDEX idx_rt (rt),
+  INDEX idx_status (status),
+  INDEX idx_nama (nama)
+) ENGINE=InnoDB;`);
+  lines.push('');
+
+  // -- PBB Records
+  lines.push('-- ============================================');
+  lines.push('-- TABLE: pbb_records');
+  lines.push('-- ============================================');
+  lines.push(`CREATE TABLE IF NOT EXISTS pbb_records (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nop VARCHAR(100) NOT NULL,
+  nik VARCHAR(50),
+  nama VARCHAR(255) NOT NULL,
+  alamat TEXT,
+  dusun VARCHAR(50),
+  dusunNama VARCHAR(100),
+  rw VARCHAR(50),
+  rwNama VARCHAR(50),
+  rt VARCHAR(50),
+  rtNama VARCHAR(50),
+  year INT NOT NULL,
+  pajak BIGINT DEFAULT 0,
+  wajibBayar BIGINT DEFAULT 0,
+  status VARCHAR(50),
+  paidAt VARCHAR(100),
+  namaPenyetor VARCHAR(255),
+  keterangan TEXT,
+  INDEX idx_nop (nop),
+  INDEX idx_year (year),
+  INDEX idx_status (status),
+  INDEX idx_rw (rw),
+  INDEX idx_rt (rt)
+) ENGINE=InnoDB;`);
+  lines.push('');
+
+  // -- Other tables
+  lines.push('-- ============================================');
+  lines.push('-- TABLE: berita, bansos, pengaduan, approvals, surat, activity_logs');
+  lines.push('-- ============================================');
+  lines.push(`CREATE TABLE IF NOT EXISTS berita (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  category VARCHAR(100),
+  date VARCHAR(50) NOT NULL,
+  content TEXT NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS bansos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  no INT,
+  nama VARCHAR(255) NOT NULL,
+  alamat TEXT,
+  rt VARCHAR(50),
+  program VARCHAR(255),
+  status VARCHAR(50)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS bansos_programs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nama VARCHAR(255) NOT NULL,
+  sumber VARCHAR(100),
+  periode VARCHAR(50),
+  kuota INT,
+  deskripsi TEXT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pengaduan (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  contact VARCHAR(100),
+  type VARCHAR(100),
+  message TEXT,
+  submittedAt VARCHAR(100) NOT NULL,
+  status VARCHAR(50) DEFAULT 'Diterima',
+  balasan TEXT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS approvals (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  pbbId INT NOT NULL,
+  nop VARCHAR(100),
+  nama VARCHAR(255),
+  approvedBy VARCHAR(255),
+  approveStatus VARCHAR(50),
+  note TEXT,
+  approvedAt VARCHAR(100)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS surat (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  jenis VARCHAR(255) NOT NULL,
+  nama VARCHAR(255) NOT NULL,
+  nik VARCHAR(50) NOT NULL,
+  alamat TEXT,
+  keperluan TEXT,
+  status VARCHAR(50) DEFAULT 'Diajukan',
+  nomorSurat VARCHAR(100),
+  ditandatanganiOleh VARCHAR(255),
+  catatan TEXT,
+  diajukanPada VARCHAR(100) NOT NULL,
+  diprosesPada VARCHAR(100)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  action VARCHAR(255) NOT NULL,
+  userId INT,
+  userName VARCHAR(255),
+  details TEXT,
+  createdAt VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;`);
+  lines.push('');
+
+  // ====== DATA (INSERT) ======
+  lines.push('-- ============================================');
+  lines.push('-- DATA INSERTS');
+  lines.push('-- ============================================');
   lines.push('');
 
   // --- PENDUDUK ---
   lines.push('-- ============================================');
   lines.push(`-- PENDUDUK: ${penduduk.length} records`);
   lines.push('-- ============================================');
-  lines.push('TRUNCATE TABLE penduduk;');
-  lines.push('');
 
   for (let i = 0; i < penduduk.length; i += BATCH) {
     const batch = penduduk.slice(i, i + BATCH);
@@ -270,9 +467,6 @@ function generateSQL(penduduk, pbbWarga, pbbRecords) {
   lines.push('-- ============================================');
   lines.push(`-- PBB_WARGA: ${pbbWarga.length} records`);
   lines.push('-- ============================================');
-  lines.push('TRUNCATE TABLE pbb_warga;');
-  lines.push('');
-
   for (let i = 0; i < pbbWarga.length; i += BATCH) {
     const batch = pbbWarga.slice(i, i + BATCH);
     lines.push('INSERT INTO pbb_warga (nik, nop, nama, alamat, dusun, dusunNama, rw, rwNama, rt, rtNama, pajak2026, status, totalPajak, totalLunas, totalBelumBayar, payments) VALUES');
@@ -287,9 +481,6 @@ function generateSQL(penduduk, pbbWarga, pbbRecords) {
   lines.push('-- ============================================');
   lines.push(`-- PBB_RECORDS: ${pbbRecords.length} records`);
   lines.push('-- ============================================');
-  lines.push('TRUNCATE TABLE pbb_records;');
-  lines.push('');
-
   for (let i = 0; i < pbbRecords.length; i += BATCH) {
     const batch = pbbRecords.slice(i, i + BATCH);
     lines.push('INSERT INTO pbb_records (nop, nik, nama, alamat, dusun, dusunNama, rw, rwNama, rt, rtNama, year, pajak, wajibBayar, status, paidAt, namaPenyetor, keterangan) VALUES');
