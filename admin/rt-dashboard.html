@@ -388,9 +388,9 @@
 
     <!-- ==================== MODAL CEK NOP RESULT ==================== -->
     <div id="nop-modal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width:720px">
             <div class="flex justify-between items-center mb-4">
-                <h4 class="text-lg font-bold text-gray-800">Data NOP</h4>
+                <h4 class="text-lg font-bold text-gray-800">Detail PBB Warga</h4>
                 <button onclick="closeModal('nop-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
             </div>
             <div id="nop-modal-body" class="space-y-3">
@@ -847,11 +847,22 @@
                     body.innerHTML = '<p class="text-red-500">Data tidak ditemukan untuk NOP: ' + escapeHtml(nop) + '</p>';
                 } else {
                     const d = res.data;
-                    body.innerHTML = `
-                        <div class="grid grid-cols-2 gap-4">
+                    const perYear = d.perYear || [];
+
+                    // Status badge helper
+                    const statusBadge = (s) => {
+                        const sl = (s || '').toLowerCase();
+                        if (sl === 'lunas') return '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Lunas</span>';
+                        if (sl === 'pending') return '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>';
+                        return '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Belum Bayar</span>';
+                    };
+
+                    // Info grid
+                    let html = `
+                        <div class="grid grid-cols-2 gap-3 mb-4">
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <p class="text-xs text-gray-500">NOP</p>
-                                <p class="font-mono font-semibold text-gray-800">${escapeHtml(d.nop || nop)}</p>
+                                <p class="font-mono font-semibold text-gray-800 text-sm">${escapeHtml(d.nop || nop)}</p>
                             </div>
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <p class="text-xs text-gray-500">Nama</p>
@@ -866,24 +877,106 @@
                                 <p class="text-sm text-gray-800">${escapeHtml(d.dusun || '-')}</p>
                             </div>
                             <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-xs text-gray-500">RW/RT</p>
-                                <p class="text-sm text-gray-800">${d.rw || '-'}/${d.rt || '-'}</p>
-                            </div>
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-xs text-gray-500">Status</p>
-                                <p class="text-sm font-semibold ${(d.status || '').toLowerCase() === 'lunas' ? 'text-green-600' : 'text-red-600'}">${d.status || '-'}</p>
+                                <p class="text-xs text-gray-500">RW / RT</p>
+                                <p class="text-sm text-gray-800">${d.rw || '-'} / ${d.rt || '-'}</p>
                             </div>
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <p class="text-xs text-gray-500">Total Pajak</p>
-                                <p class="text-sm font-semibold text-gray-800">${d.pajak || d.totalPajak ? 'Rp ' + Number(d.pajak || d.totalPajak).toLocaleString('id-ID') : '-'}</p>
+                                <p class="text-sm font-semibold text-gray-800">Rp ${Number(d.totalPajak || 0).toLocaleString('id-ID')}</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-500">Tunggakan</p>
+                                <p class="text-sm font-semibold text-red-600">Rp ${Number(d.totalBelumBayar || 0).toLocaleString('id-ID')}</p>
                             </div>
                         </div>
                     `;
+
+                    // Per-year breakdown table
+                    if (perYear.length > 0) {
+                        html += '<div class="mb-4"><h5 class="text-sm font-bold text-gray-700 mb-2">Rincian Per Tahun</h5>';
+                        html += '<div class="overflow-hidden rounded-lg border border-gray-200"><table class="w-full text-sm"><thead><tr class="bg-gray-100">';
+                        html += '<th class="px-3 py-2 text-left font-semibold text-gray-600">Tahun</th>';
+                        html += '<th class="px-3 py-2 text-right font-semibold text-gray-600">Pajak</th>';
+                        html += '<th class="px-3 py-2 text-center font-semibold text-gray-600">Status</th>';
+                        html += '</tr></thead><tbody class="divide-y divide-gray-100">';
+                        perYear.forEach(p => {
+                            html += `<tr class="hover:bg-gray-50">
+                                <td class="px-3 py-2 font-medium">${p.year}</td>
+                                <td class="px-3 py-2 text-right">Rp ${Number(p.pajak || 0).toLocaleString('id-ID')}</td>
+                                <td class="px-3 py-2 text-center">${statusBadge(p.status)}</td>
+                            </tr>`;
+                        });
+                        html += '</tbody></table></div></div>';
+                    }
+
+                    // Upload proof section
+                    html += `
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <h5 class="text-sm font-bold text-gray-700 mb-3">Upload Bukti Pembayaran</h5>
+                            <div class="flex flex-col gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Tahun Pembayaran</label>
+                                    <select id="proof-year" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                        ${perYear.filter(p => (p.status || '').toLowerCase() !== 'lunas').map(p => '<option value="' + p.year + '">' + p.year + ' - Rp ' + Number(p.pajak || 0).toLocaleString('id-ID') + '</option>').join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">File Bukti (Foto/PDF)</label>
+                                    <input type="file" id="proof-file" accept="image/*,.pdf" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, atau PDF (maks. 5MB)</p>
+                                </div>
+                                <button onclick="uploadProof('${escapeHtml(d.nop || nop)}')" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition flex items-center justify-center gap-2">
+                                    <i data-lucide="upload" style="width:16px;height:16px"></i> Upload Bukti
+                                </button>
+                                <div id="proof-upload-status" class="text-sm"></div>
+                            </div>
+                        </div>
+                    `;
+
+                    body.innerHTML = html;
+                    lucide.createIcons();
                 }
                 openModal('nop-modal');
             } catch (err) {
                 console.error('Check NOP error:', err);
                 showToast('Gagal mengecek NOP', 'error');
+            }
+        }
+
+        async function uploadProof(nop) {
+            const yearEl = document.getElementById('proof-year');
+            const fileEl = document.getElementById('proof-file');
+            const statusEl = document.getElementById('proof-upload-status');
+            if (!yearEl || !yearEl.value) { showToast('Pilih tahun pembayaran', 'error'); return; }
+            if (!fileEl || !fileEl.files[0]) { showToast('Pilih file bukti', 'error'); return; }
+
+            const file = fileEl.files[0];
+            if (file.size > 5 * 1024 * 1024) { showToast('Ukuran file maksimal 5MB', 'error'); return; }
+
+            statusEl.innerHTML = '<span class="text-gray-500">Mengupload...</span>';
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const user = getAdminUser();
+                    const body = {
+                        userId: user.id,
+                        year: parseInt(yearEl.value),
+                        proofData: reader.result,
+                        proofName: file.name
+                    };
+                    const res = await apiPost(API_BASE_URL + '/pbb/warga/' + encodeURIComponent(nop) + '/proof', body);
+                    if (res.success) {
+                        statusEl.innerHTML = '<span class="text-emerald-600 font-medium">Bukti berhasil diupload! Menunggu approval admin desa.</span>';
+                        fileEl.value = '';
+                        showToast('Bukti pembayaran berhasil diupload', 'success');
+                    } else {
+                        statusEl.innerHTML = '<span class="text-red-600">' + (res.message || 'Gagal upload') + '</span>';
+                    }
+                };
+                reader.onerror = () => { statusEl.innerHTML = '<span class="text-red-600">Gagal membaca file</span>'; };
+            } catch (err) {
+                statusEl.innerHTML = '<span class="text-red-600">Gagal upload bukti</span>';
             }
         }
 

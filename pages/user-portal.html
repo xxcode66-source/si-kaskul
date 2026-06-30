@@ -17,8 +17,7 @@
         </div>
     </div>
 
-        <!-- Navigation -->
-        <div id="navbar-container"></div>
+        <!-- Navigation removed for penduduk portal -->
 
         <main class="relative min-h-screen overflow-hidden">
         <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at 20% 20%, rgba(255,255,255,.18) 0, transparent 22%), radial-gradient(circle at 80% 0%, rgba(16,185,129,.45) 0, transparent 24%), radial-gradient(circle at 90% 80%, rgba(255,255,255,.1) 0, transparent 18%);"></div>
@@ -27,7 +26,7 @@
                 <div>
                     <p class="uppercase tracking-[0.28em] text-emerald-200 text-xs mb-3">Portal Penduduk</p>
                     <h1 class="font-display text-4xl lg:text-5xl font-bold text-white">Desa Kasomalang Kulon</h1>
-                    <p class="text-emerald-100 mt-3 max-w-2xl">Pantau data PBB yang terhubung dengan NIK Anda, lihat status pembayaran, dan akses layanan dasar desa dari satu tempat.</p>
+                    <p class="text-emerald-100 mt-3 max-w-2xl">Akses layanan dasar desa dari satu tempat. Ajukan surat online dan pantau informasi penting desa Anda.</p>
                 </div>
                 <div class="flex gap-3">
                     <a href="../index.html" class="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-white/10 border border-white/15 hover:bg-white/15 transition">Beranda</a>
@@ -50,34 +49,7 @@
                 </div>
             </section>
 
-            <section class="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
-                <div class="bg-white rounded-3xl shadow-2xl p-6 lg:p-8 text-slate-800 fade-in">
-                    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-6">
-                        <div>
-                            <p class="text-sm uppercase tracking-[0.25em] text-emerald-700">Data PBB Terkait</p>
-                            <h3 class="text-2xl font-bold text-emerald-950 mt-1">Riwayat pajak Anda</h3>
-                        </div>
-                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold">
-                            <i data-lucide="building-2" style="width:18px;height:18px"></i>
-                            <span id="pbb-count">0 data</span>
-                        </div>
-                    </div>
-
-                    <div class="overflow-hidden rounded-2xl border border-slate-200">
-                        <table class="w-full">
-                            <thead class="bg-emerald-700 text-white">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold">NOP</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold">Tahun</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold">Pajak</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pbb-table" class="divide-y divide-slate-200 bg-white"></tbody>
-                        </table>
-                    </div>
-                </div>
-
+            <section class="grid gap-6 lg:grid-cols-2">
                 <div class="space-y-6">
                     <!-- Surat Online Card -->
                     <div class="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/10 shadow-2xl fade-in">
@@ -121,7 +93,7 @@
                         <p class="text-sm text-emerald-100">Panduan Singkat</p>
                         <div class="space-y-4 mt-4 text-sm text-emerald-50">
                             <p class="flex gap-3"><i data-lucide="circle-check-big" style="width:18px;height:18px" class="flex-shrink-0 mt-0.5"></i><span>Login memakai NIK dan password penduduk.</span></p>
-                            <p class="flex gap-3"><i data-lucide="circle-check-big" style="width:18px;height:18px" class="flex-shrink-0 mt-0.5"></i><span>Data PBB ditampilkan jika NIK Anda cocok dengan data desa.</span></p>
+                            <p class="flex gap-3"><i data-lucide="circle-check-big" style="width:18px;height:18px" class="flex-shrink-0 mt-0.5"></i><span>Ajukan surat online dan pantau statusnya di sini.</span></p>
                             <p class="flex gap-3"><i data-lucide="circle-check-big" style="width:18px;height:18px" class="flex-shrink-0 mt-0.5"></i><span>Gunakan tombol logout setelah selesai.</span></p>
                         </div>
                     </div>
@@ -276,8 +248,6 @@
         </div>
     </div>
 
-    <script src="../assets/nav-config.js"></script>
-    <script>renderNavbar('login');</script>
     <script src="../assets/script.js"></script>
     <script>
         function getLoggedUser() {
@@ -312,46 +282,7 @@
             document.getElementById('profile-name').textContent = user.name || 'Penduduk';
             document.getElementById('profile-nik').textContent = user.nik || '-';
             document.getElementById('profile-status').textContent = 'Penduduk Terverifikasi';
-            loadUserPbbData(user);
             loadUserSurat();
-        }
-
-        function loadUserPbbData(user) {
-            fetchWithLoader(`${API_BASE_URL}/pbb/accessible`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.id })
-            })
-                .then(response => {
-                    if (!response.success) throw new Error('Gagal memuat data PBB');
-                    const data = response.data || [];
-                    document.getElementById('pbb-count').textContent = `${data.length} data`;
-                    const tbody = document.getElementById('pbb-table');
-                    tbody.innerHTML = '';
-
-                    if (data.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Belum ada data PBB yang terhubung dengan akun Anda.</td></tr>';
-                        return;
-                    }
-
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="px-4 py-4 text-sm text-slate-700">${item.nop}</td>
-                            <td class="px-4 py-4 text-sm text-slate-700">${item.year || '-'}</td>
-                            <td class="px-4 py-4 text-sm text-slate-700">Rp ${Number(item.pajak || 0).toLocaleString('id-ID')}</td>
-                            <td class="px-4 py-4 text-sm">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${String(item.status).toLowerCase() === 'lunas' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(() => {
-                    document.getElementById('pbb-count').textContent = '0 data';
-                    const tbody = document.getElementById('pbb-table');
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">Gagal memuat data PBB.</td></tr>';
-                });
         }
 
         function loadUserSurat() {

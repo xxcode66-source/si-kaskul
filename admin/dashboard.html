@@ -1474,9 +1474,9 @@
             if (empty) empty.classList.add('hidden');
             tbody.innerHTML = '';
             try {
-                const res = await apiGet(API_BASE_URL + '/pbb/approvals');
+                const res = await apiGet(API_BASE_URL + '/pbb/proofs');
                 const allData = res.success ? (res.data || []) : [];
-                const pending = allData.filter(a => a.status === 'pending' || a.status === 'Pending');
+                const pending = allData.filter(a => a.status === 'Menunggu Approval');
                 if (loading) loading.classList.add('hidden');
                 // Update badge
                 const badge = document.getElementById('pbb-badge');
@@ -1486,25 +1486,30 @@
                 }
                 if (pending.length === 0) {
                     if (empty) empty.classList.remove('hidden');
-                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">Tidak ada data menunggu persetujuan.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">Tidak ada bukti pembayaran menunggu persetujuan.</td></tr>';
                     return;
                 }
                 pending.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50 transition';
-                    const dateStr = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : (item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : '-');
+                    const dateStr = item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString('id-ID') : '-';
+                    const isImage = item.proofData && item.proofData.startsWith('data:image');
                     row.innerHTML = `
                         <td class="px-6 py-4 text-sm text-gray-600">${dateStr}</td>
                         <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
                         <td class="px-6 py-4 text-sm font-semibold text-gray-800">${escapeHtml(item.nama || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-center font-semibold text-gray-800">${item.tahun || '-'}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.petugas || item.penyetor || '-')}</td>
-                        <td class="px-6 py-4 text-center"><button class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-50 transition flex items-center gap-1 mx-auto"><i data-lucide="paperclip" style="width:14px;height:14px"></i> Lihat</button></td>
-                        <td class="px-6 py-4 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span></td>
+                        <td class="px-6 py-4 text-sm text-center font-semibold text-gray-800">${item.year || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.uploadedBy || '-')}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="viewProof('${escapeHtml(item.proofData || '')}', '${escapeHtml(item.proofName || 'bukti')}')" class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg text-xs hover:bg-gray-50 transition flex items-center gap-1 mx-auto">
+                                <i data-lucide="eye" style="width:14px;height:14px"></i> Lihat
+                            </button>
+                        </td>
+                        <td class="px-6 py-4 text-center"><span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Menunggu</span></td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                                <button onclick="approvePbbPayment(${item.id}, true)" class="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center" title="Setujui"><i data-lucide="check" style="width:16px;height:16px"></i></button>
-                                <button onclick="approvePbbPayment(${item.id}, false)" class="w-8 h-8 rounded-lg bg-red-600 text-white hover:bg-red-700 transition flex items-center justify-center" title="Tolak"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+                                <button onclick="approveProof(${item.id}, true)" class="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition flex items-center justify-center" title="Setujui"><i data-lucide="check" style="width:16px;height:16px"></i></button>
+                                <button onclick="approveProof(${item.id}, false)" class="w-8 h-8 rounded-lg bg-red-600 text-white hover:bg-red-700 transition flex items-center justify-center" title="Tolak"><i data-lucide="x" style="width:16px;height:16px"></i></button>
                             </div>
                         </td>
                     `;
@@ -1518,7 +1523,17 @@
             }
         }
 
-        async function approvePbbPayment(id, approve) {
+        function viewProof(proofData, proofName) {
+            if (!proofData) { showToast('Tidak ada data bukti', 'error'); return; }
+            const win = window.open('', '_blank', 'width=800,height=600');
+            if (proofData.startsWith('data:image')) {
+                win.document.write('<html><head><title>' + proofName + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#111;min-height:100vh"><img src="' + proofData + '" style="max-width:100%;max-height:100vh;object-fit:contain" /></body></html>');
+            } else {
+                win.document.write('<html><head><title>' + proofName + '</title></head><body style="margin:0"><iframe src="' + proofData + '" style="width:100%;height:100vh;border:none"></iframe></body></html>');
+            }
+        }
+
+        async function approveProof(id, approve) {
             let note = '';
             if (!approve) {
                 note = prompt('Alasan penolakan:');
@@ -1527,9 +1542,9 @@
             }
             try {
                 const user = getAdminUser();
-                const res = await apiPost(API_BASE_URL + '/pbb/approve', {
-                    id,
-                    approve,
+                const res = await apiPost(API_BASE_URL + '/pbb/proof/' + id + '/approve', {
+                    userId: user.id,
+                    approveStatus: approve ? 'Disetujui' : 'Ditolak',
                     note: note || (approve ? 'Disetujui' : 'Ditolak')
                 });
                 if (res.success) {

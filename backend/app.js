@@ -333,6 +333,94 @@ app.get('/api/pbb/approvals/export', (req, res) => {
   res.send(rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n'));
 });
 
+// --- Payment Proofs (pbb_warga based) ---
+if (!database.payment_proofs) database.payment_proofs = [];
+
+// Upload proof for a NOP + year (RT/Kolektor)
+app.post('/api/pbb/warga/:nop/proof', async (req, res) => {
+  const { nop } = req.params;
+  const { userId, year, proofData, proofName } = req.body;
+  if (!year || !proofData) return res.status(400).json({ success: false, message: 'Tahun dan bukti wajib diisi' });
+  const user = getUsers().find(u => u.id === Number(userId));
+  if (!user || (user.role !== 'rt' && user.role !== 'kolektor' && user.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Role tidak diizinkan' });
+  }
+  const warga = getWarga().find(w => w.nop === nop);
+  if (!warga) return res.status(404).json({ success: false, message: 'NOP tidak ditemukan' });
+
+  if (!database.payment_proofs) database.payment_proofs = [];
+  const maxId = database.payment_proofs.length ? Math.max(...database.payment_proofs.map(p => p.id)) : 0;
+  const proof = {
+    id: maxId + 1,
+    nop, nama: warga.nama, year: parseInt(year),
+    proofData, proofName: proofName || 'bukti',
+    uploadedBy: user.name, uploadedById: user.id,
+    uploadedAt: new Date().toISOString(),
+    status: 'Menunggu Approval'
+  };
+  database.payment_proofs.push(proof);
+  await persistDatabase();
+  res.status(201).json({ success: true, data: proof });
+});
+
+// List all payment proofs (admin)
+app.get('/api/pbb/proofs', (req, res) => {
+  const proofs = database.payment_proofs || [];
+  res.json({ success: true, data: proofs });
+});
+
+// Approve/reject a proof (admin only)
+app.post('/api/pbb/proof/:id/approve', async (req, res) => {
+  const { id } = req.params;
+  const { userId, approveStatus, note } = req.body;
+  const user = getUsers().find(u => u.id === Number(userId));
+  if (!user || user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin only' });
+
+  const proof = (database.payment_proofs || []).find(p => p.id === Number(id));
+  if (!proof) return res.status(404).json({ success: false, message: 'Proof tidak ditemukan' });
+
+  const status = approveStatus || 'Disetujui';
+  proof.status = status === 'Ditolak' ? 'Ditolak' : 'Disetujui';
+  proof.reviewedBy = user.name;
+  proof.reviewedAt = new Date().toISOString();
+  proof.note = note || '';
+
+  if (proof.status === 'Disetujui') {
+    // Update pbb_warga payment status for that year
+    const warga = getWarga().find(w => w.nop === proof.nop);
+    if (warga && Array.isArray(warga.payments)) {
+      const payment = warga.payments.find(p => p.year === proof.year);
+      if (payment) {
+        payment.status = 'Lunas';
+        payment.paidAt = new Date().toISOString();
+        payment.namaPenyetor = warga.nama;
+        payment.keterangan = 'Disetujui admin - bukti upload RT';
+      }
+      // Recalculate totals
+      warga.totalLunas = warga.payments.filter(p => p.status === 'Lunas').reduce((s, p) => s + (p.pajak || 0), 0);
+      warga.totalBelumBayar = warga.payments.filter(p => p.status !== 'Lunas').reduce((s, p) => s + (p.pajak || 0), 0);
+      const lunasCount = warga.payments.filter(p => p.status === 'Lunas').length;
+      const years = warga.payments.length;
+      if (lunasCount === years) warga.status = 'Lunas';
+      else if (lunasCount >= 3) warga.status = 'Sebagian';
+      else if (lunasCount === 0) warga.status = 'Menunggak';
+      else warga.status = 'Belum Bayar';
+    }
+  }
+
+  // Add to approvals log
+  if (!database.approvals) database.approvals = [];
+  database.approvals.push({
+    id: (database.approvals || []).length + 1,
+    pbbId: proof.id, nop: proof.nop, nama: proof.nama,
+    approvedBy: user.name, approveStatus: proof.status,
+    note: note || '', approvedAt: proof.reviewedAt
+  });
+
+  await persistDatabase();
+  res.json({ success: true, data: proof });
+});
+
 // --- Berita CRUD ---
 app.get('/api/berita', (req, res) => res.json({ success: true, data: database.berita }));
 app.get('/api/berita/:id', (req, res) => {
