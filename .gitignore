@@ -39,3 +39,7 @@ Thumbs.db
 temp/
 tmp/
 *.tmp
+
+# Screenshots
+screenshot-*.png
+screenshot-*.jpg
