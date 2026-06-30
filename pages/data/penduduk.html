@@ -154,7 +154,7 @@ function animateCount(el, target) {
 
 async function loadStats() {
   try {
-    const res = await fetch('http://localhost:3000/api/penduduk/stats');
+    const res = await fetch(API_BASE_URL + '/penduduk/stats');
     const json = await res.json();
     if (!json.success) return;
     const d = json.data;

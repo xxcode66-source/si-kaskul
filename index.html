@@ -526,7 +526,7 @@
         // ─── Load Stats from API ─────────────────────
         async function loadHomepageStats() {
             try {
-                const res = await fetch('http://localhost:3000/api/penduduk/filters');
+                const res = await fetch(API_BASE_URL + '/penduduk/filters');
                 const json = await res.json();
                 if (!json.success) return;
                 const { total, lakiLaki } = json.data;

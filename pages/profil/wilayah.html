@@ -90,7 +90,7 @@ window.addEventListener('DOMContentLoaded', () => { initScrollAnimations(); Page
 
 async function loadWilayahData() {
   try {
-    const res = await fetch('http://localhost:3000/api/penduduk?limit=10000');
+    const res = await fetch(API_BASE_URL + '/penduduk?limit=10000');
     const json = await res.json();
     const data = json.data || [];
     

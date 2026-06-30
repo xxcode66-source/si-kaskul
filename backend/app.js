@@ -272,10 +272,10 @@ app.get('/api/pbb/warga-list', (req, res) => {
 // --- PBB Admin CRUD ---
 app.get('/api/pbb', (req, res) => res.json({ success: true, data: getPbb() }));
 app.get('/api/pbb/summary', (req, res) => {
-  const p = getPbb();
-  const lunas = p.filter(x => x.status === 'Lunas').length;
-  const pending = p.filter(x => x.status === 'Pending').length;
-  res.json({ success: true, data: { total: p.length, lunas, pending, nunggak: p.length - lunas - pending } });
+  const w = getWarga();
+  const lunas = w.filter(x => x.status === 'Lunas').length;
+  const sebagian = w.filter(x => x.status === 'Sebagian').length;
+  res.json({ success: true, data: { total: w.length, lunas, sebagian, nunggak: w.length - lunas - sebagian } });
 });
 
 app.post('/api/pbb/upload', async (req, res) => {
@@ -763,18 +763,19 @@ app.get('/api/penduduk/:nik', (req, res) => {
 // --- Dashboard Stats ---
 app.get('/api/dashboard/stats', (req, res) => {
   const w = getWarga();
-  const p = getPbb();
+  const totalPajak = w.reduce((s, i) => s + (i.totalLunas || 0), 0);
+  const totalTarget = w.reduce((s, i) => s + (i.totalPajak || 0), 0);
   res.json({
     success: true,
     data: {
       totalPenduduk: database.penduduk ? database.penduduk.length : w.length,
       totalKK: Math.max(1, Math.floor((database.penduduk ? database.penduduk.length : w.length) / 3)),
       totalBerita: database.berita.length,
-      totalPBB: p.length,
+      totalPBB: w.length,
       totalBansos: database.bansos.length,
-      totalPajakTerkumpul: p.reduce((s, i) => i.status === 'Lunas' ? s + i.pajak : s, 0),
-      tingkatPembayaranPBB: p.length ? Math.round(p.filter(i => i.status === 'Lunas').length / p.length * 100) : 0,
-      pendingPBB: p.filter(p => p.status === 'Pending').length,
+      totalPajakTerkumpul: totalPajak,
+      tingkatPembayaranPBB: totalTarget ? Math.round(totalPajak / totalTarget * 100) : 0,
+      pendingPBB: 0,
     }
   });
 });
@@ -801,7 +802,7 @@ async function start() {
   await initDB();
   app.listen(PORT, () => {
     console.log(`✅ SI-KASKUL API running at http://localhost:${PORT}`);
-    console.log(`📊 Warga: ${getWarga().length} | PBB: ${getPbb().length}`);
+    console.log(`📊 Warga: ${getWarga().length} | Penduduk: ${(database.penduduk || []).length}`);
     console.log(`🗄️  Database: ${pool ? 'MySQL' : 'In-Memory'}`);
   });
 }
