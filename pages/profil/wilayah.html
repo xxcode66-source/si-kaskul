@@ -8,13 +8,133 @@
 <div id="navbar-container"></div>
 <div class="pt-28 pb-16 px-4 hero-grid-bg text-white"><div class="max-w-4xl mx-auto text-center">
 <h1 class="font-display text-5xl font-bold mb-4">Wilayah Administratif</h1>
-<p class="text-emerald-100 text-lg">Desa Kasomalang Kulon</p>
+<p class="text-emerald-100 text-lg">Desa Kasomalang Kulon, Kecamatan Kasomalang, Kabupaten Subang</p>
 </div></div>
-<section class="py-16 px-4"><div class="max-w-4xl mx-auto bg-white rounded-[2rem] p-10 shadow-xl">
-<p class="text-gray-600 text-lg leading-relaxed">Informasi pembagian wilayah: dusun, RW, RT di Desa Kasomalang Kulon.</p>
-<p class="text-gray-400 mt-4">Halaman ini akan segera dilengkapi dengan data dan fitur interaktif.</p>
+
+<section class="py-16 px-4"><div class="max-w-6xl mx-auto">
+
+<!-- Info Umum -->
+<div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+<p class="text-3xl font-bold text-emerald-700">3</p><p class="text-sm text-gray-500 mt-1">Dusun</p>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
+<p class="text-3xl font-bold text-cyan-700">8</p><p class="text-sm text-gray-500 mt-1">RW</p>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center" id="stat-rt">
+<p class="text-3xl font-bold text-amber-700">—</p><p class="text-sm text-gray-500 mt-1">RT</p>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center" id="stat-pend">
+<p class="text-3xl font-bold text-purple-700">—</p><p class="text-sm text-gray-500 mt-1">Penduduk</p>
+</div>
+</div>
+
+<!-- Dusun Cards -->
+<p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-6">Pembagian Wilayah</p>
+<div class="grid md:grid-cols-3 gap-6 mb-12">
+<div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-6 text-white shadow-lg">
+<div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"><i data-lucide="map" class="w-5 h-5"></i></div><h3 class="font-display text-xl font-bold">Dusun 01</h3></div>
+<div class="space-y-2 text-sm text-emerald-50">
+<p>Kampung: Karihkil, Cisaat, Sukamaju</p>
+<p>RW: 01, 02</p>
+<p id="d1-rt">RT: Memuat...</p>
+<p id="d1-pop">Penduduk: Memuat...</p>
+</div>
+</div>
+<div class="bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl p-6 text-white shadow-lg">
+<div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"><i data-lucide="map" class="w-5 h-5"></i></div><h3 class="font-display text-xl font-bold">Dusun 02</h3></div>
+<div class="space-y-2 text-sm text-cyan-50">
+<p>Kampung: Pasir, Cisarua, Mulyasari</p>
+<p>RW: 03, 04, 05, 06</p>
+<p id="d2-rt">RT: Memuat...</p>
+<p id="d2-pop">Penduduk: Memuat...</p>
+</div>
+</div>
+<div class="bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl p-6 text-white shadow-lg">
+<div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"><i data-lucide="map" class="w-5 h-5"></i></div><h3 class="font-display text-xl font-bold">Dusun 03</h3></div>
+<div class="space-y-2 text-sm text-amber-50">
+<p>Kampung: Bojong, Cidahu, Sukamulya</p>
+<p>RW: 07, 08</p>
+<p id="d3-rt">RT: Memuat...</p>
+<p id="d3-pop">Penduduk: Memuat...</p>
+</div>
+</div>
+</div>
+
+<!-- Detail RW/RT Table -->
+<p class="text-xs uppercase tracking-[0.3em] text-emerald-600 font-semibold mb-6">Detail per RW</p>
+<div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<thead><tr class="bg-gray-50 border-b border-gray-100">
+<th class="text-left px-4 py-3 font-semibold text-gray-600">Dusun</th>
+<th class="text-left px-4 py-3 font-semibold text-gray-600">RW</th>
+<th class="text-left px-4 py-3 font-semibold text-gray-600">Jumlah RT</th>
+<th class="text-left px-4 py-3 font-semibold text-gray-600">Jiwa</th>
+<th class="text-left px-4 py-3 font-semibold text-gray-600">KK</th>
+</tr></thead>
+<tbody id="rw-table-body">
+<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">Memuat data...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
 </div></section>
+
 <footer class="py-10 px-4 text-center bg-emerald-900 text-white"><p class="text-sm">&copy; 2024 Desa Kasomalang Kulon</p></footer>
 <script src="../../assets/nav-config.js"></script><script src="../../assets/script.js"></script>
-<script>renderNavbar('profil');window.addEventListener('DOMContentLoaded',()=>{initScrollAnimations();PageLoader.hide();lucide.createIcons()});</script>
-</body></html>
+<script>
+renderNavbar('profil');
+window.addEventListener('DOMContentLoaded', () => { initScrollAnimations(); PageLoader.hide(); lucide.createIcons(); loadWilayahData(); });
+
+async function loadWilayahData() {
+  try {
+    const res = await fetch('http://localhost:3000/api/penduduk?limit=10000');
+    const json = await res.json();
+    const data = json.data || [];
+    
+    // Compute stats
+    const rtSet = new Set(data.map(d => d.rt));
+    document.getElementById('stat-rt').querySelector('p').textContent = rtSet.size;
+    document.getElementById('stat-pend').querySelector('p').textContent = json.total.toLocaleString('id-ID');
+    
+    // Group by RW
+    const byRW = {};
+    data.forEach(d => {
+      const rw = d.rw;
+      if (!byRW[rw]) byRW[rw] = { rw, rts: new Set(), kk: new Set(), count: 0 };
+      byRW[rw].rts.add(d.rt);
+      if (d.kk) byRW[rw].kk.add(d.kk);
+      byRW[rw].count++;
+    });
+    
+    // Dusun mapping
+    const dusunMap = { '001':'Dusun 01','002':'Dusun 01','003':'Dusun 02','004':'Dusun 02','005':'Dusun 02','006':'Dusun 02','007':'Dusun 03','008':'Dusun 03' };
+    
+    // Dusun stats
+    const dusunStats = {};
+    Object.entries(byRW).forEach(([rw, info]) => {
+      const d = dusunMap[rw] || 'Lainnya';
+      if (!dusunStats[d]) dusunStats[d] = { rt: 0, pop: 0 };
+      dusunStats[d].rt += info.rts.size;
+      dusunStats[d].pop += info.count;
+    });
+    if (dusunStats['Dusun 01']) { document.getElementById('d1-rt').textContent = 'RT: ' + dusunStats['Dusun 01'].rt; document.getElementById('d1-pop').textContent = 'Penduduk: ' + dusunStats['Dusun 01'].pop.toLocaleString('id-ID'); }
+    if (dusunStats['Dusun 02']) { document.getElementById('d2-rt').textContent = 'RT: ' + dusunStats['Dusun 02'].rt; document.getElementById('d2-pop').textContent = 'Penduduk: ' + dusunStats['Dusun 02'].pop.toLocaleString('id-ID'); }
+    if (dusunStats['Dusun 03']) { document.getElementById('d3-rt').textContent = 'RT: ' + dusunStats['Dusun 03'].rt; document.getElementById('d3-pop').textContent = 'Penduduk: ' + dusunStats['Dusun 03'].pop.toLocaleString('id-ID'); }
+    
+    // Table
+    const tbody = document.getElementById('rw-table-body');
+    const sorted = Object.values(byRW).sort((a,b) => a.rw.localeCompare(b.rw));
+    tbody.innerHTML = sorted.map(info => `<tr class="border-b border-gray-50 hover:bg-emerald-50/30">
+      <td class="px-4 py-3 text-gray-700">${dusunMap[info.rw] || '-'}</td>
+      <td class="px-4 py-3 font-semibold text-gray-800">RW ${info.rw}</td>
+      <td class="px-4 py-3 text-gray-600">${info.rts.size}</td>
+      <td class="px-4 py-3 text-gray-600">${info.count.toLocaleString('id-ID')}</td>
+      <td class="px-4 py-3 text-gray-600">${info.kk.size.toLocaleString('id-ID')}</td>
+    </tr>`).join('');
+  } catch(e) { console.error(e); }
+}
+</script>
+</body></html

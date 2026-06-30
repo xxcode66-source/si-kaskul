@@ -46,3 +46,7 @@ screenshot-*.jpg
 
 # Generated data
 backend/imported-data.json
+database/si-kaskul-data.sql
+
+# Excel source files (too large for GitHub)
+*.xlsx

@@ -1,8 +1,15 @@
 <!doctype html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Profil - Desa Kasomalang Kulon</title>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Struktur Organisasi - Desa Kasomalang Kulon</title>
 <script src="https://cdn.tailwindcss.com/3.4.17"></script><script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/style.css">
+<style>
+.org-card{background:white;border-radius:1.25rem;padding:1.5rem;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.06);border:1px solid #e2e8f0;transition:all .25s}
+.org-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.1);border-color:#a7f3d0}
+.org-card .avatar{width:64px;height:64px;border-radius:50%;margin:0 auto .75rem;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:white}
+.org-line{width:2px;height:28px;background:linear-gradient(to bottom,#10b981,#0ea5e9);margin:0 auto}
+.org-line-h{height:2px;background:linear-gradient(to right,#10b981,#0ea5e9)}
+</style>
 </head><body class="bg-gray-50 min-h-screen">
 <div id="page-loader" class="page-loader"><div class="loader-content"><div class="loader-spinner"></div><p class="loader-text">Memuat...</p></div></div>
 <div id="navbar-container"></div>
@@ -10,11 +17,95 @@
 <h1 class="font-display text-5xl font-bold mb-4">Struktur Organisasi</h1>
 <p class="text-emerald-100 text-lg">Pemerintah Desa Kasomalang Kulon</p>
 </div></div>
-<section class="py-16 px-4"><div class="max-w-4xl mx-auto bg-white rounded-[2rem] p-10 shadow-xl text-center">
-<p class="text-gray-500 text-lg">Bagan struktur organisasi akan ditampilkan di sini.</p>
-<p class="text-gray-400 mt-2">Kepala Desa, Perangkat Desa, BPD, LPM, dll.</p>
-</div></section>
+
+<section class="py-16 px-4">
+<div class="max-w-6xl mx-auto">
+
+<!-- Kepala Desa -->
+<div class="flex justify-center mb-2"><div class="org-card w-64 border-2 border-emerald-200 bg-emerald-50/50">
+<div class="avatar bg-gradient-to-br from-emerald-500 to-emerald-700">KD</div>
+<h3 class="font-bold text-gray-800">H. AEPA SURYANA, S.Pd</h3>
+<p class="text-emerald-600 text-sm font-semibold">Kepala Desa</p>
+<p class="text-gray-400 text-xs mt-1">Periode 2022 - 2028</p>
+</div></div>
+<div class="org-line"></div>
+
+<!-- Sekretaris Desa -->
+<div class="flex justify-center mb-2"><div class="org-card w-64">
+<div class="avatar bg-gradient-to-br from-cyan-500 to-cyan-700">SEK</div>
+<h3 class="font-bold text-gray-800">DADAN SUGANDI, S.E</h3>
+<p class="text-cyan-600 text-sm font-semibold">Sekretaris Desa</p>
+</div></div>
+<div class="org-line"></div>
+
+<!-- Horizontal line connecting Kaur & Kasi -->
+<div class="flex justify-center"><div class="org-line-h w-full max-w-4xl"></div></div>
+
+<!-- Row: Kaur & Kasi -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 mb-2">
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-blue-500 to-blue-700">KAP</div>
+<h3 class="font-bold text-gray-800 text-sm">ERWIN SYAHRUDIN</h3>
+<p class="text-blue-600 text-xs font-semibold">Kaur Pemerintahan</p>
+</div><div class="org-line"></div></div>
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-purple-500 to-purple-700">KAK</div>
+<h3 class="font-bold text-gray-800 text-sm">NENENG ROHMAWATI</h3>
+<p class="text-purple-600 text-xs font-semibold">Kaur Keuangan</p>
+</div><div class="org-line"></div></div>
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-amber-500 to-amber-700">KAP</div>
+<h3 class="font-bold text-gray-800 text-sm">UJANG RAHMAT</h3>
+<p class="text-amber-600 text-xs font-semibold">Kaur Perencanaan</p>
+</div><div class="org-line"></div></div>
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-rose-500 to-rose-700">KAK</div>
+<h3 class="font-bold text-gray-800 text-sm">SITI NURHAIDAR</h3>
+<p class="text-rose-600 text-xs font-semibold">Kaur Kesra</p>
+</div><div class="org-line"></div></div>
+</div>
+
+<!-- Kasi Row -->
+<div class="flex justify-center"><div class="org-line-h w-full max-w-3xl"></div></div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4 mb-2">
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-teal-500 to-teal-700">KAS</div>
+<h3 class="font-bold text-gray-800 text-sm">AHMAD SAEPUDIN</h3>
+<p class="text-teal-600 text-xs font-semibold">Kasi Pelayanan</p>
+</div><div class="org-line"></div></div>
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-indigo-500 to-indigo-700">KAS</div>
+<h3 class="font-bold text-gray-800 text-sm">RUDI HARTONO</h3>
+<p class="text-indigo-600 text-xs font-semibold">Kasi Pemerintahan</p>
+</div><div class="org-line"></div></div>
+<div class="flex flex-col items-center"><div class="org-card w-full">
+<div class="avatar bg-gradient-to-br from-orange-500 to-orange-700">KAS</div>
+<h3 class="font-bold text-gray-800 text-sm">DEDEN KOSWARA</h3>
+<p class="text-orange-600 text-xs font-semibold">Kasi Kesejahteraan</p>
+</div><div class="org-line"></div></div>
+</div>
+
+<!-- BPD & LPM -->
+<div class="flex justify-center mt-8"><div class="org-line-h w-full max-w-2xl"></div></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+<div class="flex justify-center"><div class="org-card w-64 border-l-4 border-l-emerald-500">
+<div class="avatar bg-gradient-to-br from-emerald-600 to-teal-600">BPD</div>
+<h3 class="font-bold text-gray-800">BADAN PERMUSYAWARATAN DESA</h3>
+<p class="text-emerald-600 text-sm font-semibold mt-1">Ketua: H. ENANG RUSWANDI</p>
+<p class="text-gray-400 text-xs mt-1">9 Anggota BPD</p>
+</div></div>
+<div class="flex justify-center"><div class="org-card w-64 border-l-4 border-l-cyan-500">
+<div class="avatar bg-gradient-to-br from-cyan-600 to-blue-600">LPM</div>
+<h3 class="font-bold text-gray-800">LEMBAGA PEMBERDAYAAN MASYARAKAT</h3>
+<p class="text-cyan-600 text-sm font-semibold mt-1">Ketua: DRS. SUHENDI</p>
+<p class="text-gray-400 text-xs mt-1">7 Pengurus LPM</p>
+</div></div>
+</div>
+
+</div>
+</section>
+
 <footer class="py-10 px-4 text-center bg-emerald-900 text-white"><p class="text-sm">&copy; 2024 Desa Kasomalang Kulon</p></footer>
 <script src="../../assets/nav-config.js"></script><script src="../../assets/script.js"></script>
 <script>renderNavbar('profil');window.addEventListener('DOMContentLoaded',()=>{initScrollAnimations();PageLoader.hide();lucide.createIcons()});</script>
-</body></html>
+</body></html

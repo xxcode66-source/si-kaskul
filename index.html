@@ -520,7 +520,32 @@
         // ─── Initialize ───────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             initCarousel();
+            loadHomepageStats();
         });
+
+        // ─── Load Stats from API ─────────────────────
+        async function loadHomepageStats() {
+            try {
+                const res = await fetch('http://localhost:3000/api/penduduk/filters');
+                const json = await res.json();
+                if (!json.success) return;
+                const { total, lakiLaki } = json.data;
+                const kk = Math.floor(total / 3.3);
+                
+                // Update all counter targets
+                document.querySelectorAll('[data-count-target]').forEach(el => {
+                    const label = el.closest('.prayer-chip, .stat-card');
+                    const text = label ? label.textContent.toLowerCase() : '';
+                    if (text.includes('penduduk')) {
+                        el.setAttribute('data-count-target', total);
+                        el.textContent = total;
+                    } else if (text.includes('kepala keluarga') || text.includes('kk')) {
+                        el.setAttribute('data-count-target', kk);
+                        el.textContent = kk;
+                    }
+                });
+            } catch (e) { console.error('Stats load error:', e); }
+        }
     </script>
 </body>
 </html>
