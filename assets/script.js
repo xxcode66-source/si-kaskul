@@ -280,7 +280,7 @@ const API_BASE_URL = window.__API_BASE_URL__ || (
     window.location.protocol === 'file:' || 
     window.location.hostname === 'localhost' || 
     window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3003/api'
+        ? 'http://localhost:3000/api'
         : `${window.location.origin}/api`
 );
 
