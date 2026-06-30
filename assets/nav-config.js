@@ -128,6 +128,19 @@ function renderNavbar(activeKey) {
           }).join('')}
         </ul>
 
+        <!-- Utility Buttons -->
+        <div class="flex items-center gap-2">
+          <!-- Search Button -->
+          <button onclick="GlobalSearch.open()" class="p-2 rounded-xl hover:bg-emerald-50 text-gray-600 hover:text-emerald-700 transition-all duration-300" aria-label="Search">
+            <i data-lucide="search" style="width:20px;height:20px"></i>
+          </button>
+          
+          <!-- Dark Mode Toggle -->
+          <button onclick="DarkMode.toggle(); this.querySelector('i').setAttribute('data-lucide', DarkMode.isEnabled() ? 'sun' : 'moon'); if(typeof lucide !== 'undefined') lucide.createIcons();" class="p-2 rounded-xl hover:bg-emerald-50 text-gray-600 hover:text-emerald-700 transition-all duration-300" aria-label="Toggle Dark Mode">
+            <i data-lucide="moon" style="width:20px;height:20px"></i>
+          </button>
+        </div>
+
         <!-- Mobile Toggle -->
         <button id="mobile-toggle" class="lg:hidden text-emerald-800 p-2 rounded-xl hover:bg-emerald-50 transition" onclick="toggleMobileMenu()" aria-label="Menu">
           <i data-lucide="menu" style="width:24px;height:24px"></i>
@@ -136,6 +149,16 @@ function renderNavbar(activeKey) {
 
       <!-- Mobile Menu -->
       <div id="mobile-menu" class="hidden lg:hidden border-t border-gray-100/80 bg-white/95 backdrop-blur-xl px-4 py-4 text-sm font-medium text-gray-700 max-h-[75vh] overflow-y-auto">
+        <!-- Mobile Utility Buttons -->
+        <div class="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
+          <button onclick="GlobalSearch.open()" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition">
+            <i data-lucide="search" style="width:16px;height:16px"></i>
+            Cari
+          </button>
+          <button onclick="DarkMode.toggle(); this.querySelector('i').setAttribute('data-lucide', DarkMode.isEnabled() ? 'sun' : 'moon'); if(typeof lucide !== 'undefined') lucide.createIcons();" class="p-2.5 px-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+            <i data-lucide="moon" style="width:16px;height:16px"></i>
+          </button>
+        </div>
         ${NAV_CONFIG.items.map(item => {
           if (item.children) {
             return `

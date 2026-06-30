@@ -1050,3 +1050,213 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════ */
+.dark body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+}
+
+.dark .nav-blur {
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .nav-blur.scrolled {
+    background: rgba(15, 23, 42, 0.98);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dark .glass-card {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .hero-card {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .bg-white {
+    background-color: #1e293b !important;
+}
+
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+    background-color: #0f172a !important;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-900 {
+    color: #e2e8f0 !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-700 {
+    color: #94a3b8 !important;
+}
+
+.dark .border-gray-200,
+.dark .border-gray-300 {
+    border-color: #334155 !important;
+}
+
+.dark .shadow-lg {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOAST NOTIFICATIONS
+   ═══════════════════════════════════════════════════════ */
+#toast-container {
+    pointer-events: none;
+}
+
+.toast-item {
+    pointer-events: auto;
+    max-width: 360px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADERS
+   ═══════════════════════════════════════════════════════ */
+.skeleton-card {
+    background: #f1f5f9;
+}
+
+.dark .skeleton-card {
+    background: #334155;
+}
+
+.skeleton-card .bg-gray-200 {
+    background-color: #e2e8f0;
+}
+
+.dark .skeleton-card .bg-gray-200 {
+    background-color: #475569;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MICRO-INTERACTIONS
+   ═══════════════════════════════════════════════════════ */
+.btn-micro {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-micro:hover {
+    transform: translateY(-1px);
+}
+
+.btn-micro:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Page transition */
+.page-transition {
+    animation: pageEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE TABLE RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-responsive table {
+        min-width: 600px;
+    }
+    
+    /* Card layout for mobile */
+    .table-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .table-card-item {
+        background: white;
+        border-radius: 1rem;
+        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .dark .table-card-item {
+        background: #1e293b;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SEARCH MODAL
+   ═══════════════════════════════════════════════════════ */
+#search-modal {
+    animation: fadeIn 0.2s ease;
+}
+
+#search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+#search-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#search-results::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.dark #search-results::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BREADCRUMBS
+   ═══════════════════════════════════════════════════════ */
+#breadcrumbs nav a {
+    transition: color 0.2s ease;
+}
+
+.dark #breadcrumbs nav {
+    color: #94a3b8;
+}
+
+.dark #breadcrumbs nav a:hover {
+    color: #34d399;
+}
+
+.dark #breadcrumbs nav span {
+    color: #e2e8f0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FORM VALIDATION
+   ═══════════════════════════════════════════════════════ */
+.field-error {
+    animation: slideDown 0.2s ease;
+}
+
+input.border-red-500 {
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}

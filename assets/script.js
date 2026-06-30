@@ -300,6 +300,315 @@ async function fetchWithLoader(url, options = {}) {
     }
 }
 
+// ═══════════════════════════════════════════════════════
+// TOAST NOTIFICATION SYSTEM
+// ═══════════════════════════════════════════════════════
+const Toast = {
+    container: null,
+    
+    init() {
+        if (this.container) return;
+        this.container = document.createElement('div');
+        this.container.id = 'toast-container';
+        this.container.className = 'fixed top-24 right-4 z-[9999] flex flex-col gap-3 max-w-sm pointer-events-none';
+        document.body.appendChild(this.container);
+    },
+    
+    show(message, type = 'info', duration = 4000) {
+        this.init();
+        
+        const icons = {
+            success: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+            error: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+            warning: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+            info: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+        };
+        
+        const colors = {
+            success: 'bg-emerald-500',
+            error: 'bg-red-500',
+            warning: 'bg-amber-500',
+            info: 'bg-blue-500'
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-item pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-2xl text-white transform transition-all duration-300 translate-x-full opacity-0 ${colors[type] || colors.info}`;
+        toast.innerHTML = `
+            <div class="flex-shrink-0 mt-0.5">${icons[type] || icons.info}</div>
+            <div class="flex-1 text-sm font-medium">${message}</div>
+            <button onclick="this.parentElement.remove()" class="flex-shrink-0 opacity-70 hover:opacity-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        `;
+        
+        this.container.appendChild(toast);
+        
+        // Animate in
+        requestAnimationFrame(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+        });
+        
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.add('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    },
+    
+    success(message, duration) { this.show(message, 'success', duration); },
+    error(message, duration) { this.show(message, 'error', duration); },
+    warning(message, duration) { this.show(message, 'warning', duration); },
+    info(message, duration) { this.show(message, 'info', duration); }
+};
+
+// ═══════════════════════════════════════════════════════
+// SKELETON LOADER
+// ═══════════════════════════════════════════════════════
+const Skeleton = {
+    card(count = 3) {
+        return Array(count).fill(0).map(() => `
+            <div class="skeleton-card bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                    <div class="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                </div>
+                <div class="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div class="h-3 bg-gray-200 rounded w-2/3"></div>
+            </div>
+        `).join('');
+    },
+    
+    table(rows = 5) {
+        return `
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                <div class="h-12 bg-gray-200"></div>
+                ${Array(rows).fill(0).map(() => `
+                    <div class="border-b border-gray-100 p-4 flex gap-4">
+                        <div class="h-4 bg-gray-200 rounded w-1/12"></div>
+                        <div class="h-4 bg-gray-200 rounded w-3/12"></div>
+                        <div class="h-4 bg-gray-200 rounded w-3/12"></div>
+                        <div class="h-4 bg-gray-200 rounded w-2/12"></div>
+                        <div class="h-6 bg-gray-200 rounded-full w-2/12"></div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+    
+    text(lines = 3) {
+        return Array(lines).fill(0).map((_, i) => `
+            <div class="h-4 bg-gray-200 rounded ${i === lines - 1 ? 'w-3/4' : 'w-full'} mb-2 animate-pulse"></div>
+        `).join('');
+    }
+};
+
+// ═══════════════════════════════════════════════════════
+// LOADING BUTTON STATE
+// ═══════════════════════════════════════════════════════
+function setLoading(button, loading, text = 'Memuat...') {
+    if (!button) return;
+    if (loading) {
+        button.dataset.originalText = button.textContent;
+        button.disabled = true;
+        button.innerHTML = `<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>${text}`;
+    } else {
+        button.disabled = false;
+        button.textContent = button.dataset.originalText || text;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════════════════
+const DarkMode = {
+    init() {
+        const saved = localStorage.getItem('darkMode');
+        if (saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    },
+    
+    toggle() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', isDark);
+        return isDark;
+    },
+    
+    isEnabled() {
+        return document.documentElement.classList.contains('dark');
+    }
+};
+
+// ═══════════════════════════════════════════════════════
+// BREADCRUMBS
+// ═══════════════════════════════════════════════════════
+function renderBreadcrumbs(items) {
+    const container = document.getElementById('breadcrumbs');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <a href="/index.html" class="hover:text-emerald-600 transition flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Beranda
+            </a>
+            ${items.map((item, i) => `
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                ${item.href ? `<a href="${item.href}" class="hover:text-emerald-600 transition">${item.label}</a>` : `<span class="text-gray-800 font-medium">${item.label}</span>`}
+            `).join('')}
+        </nav>
+    `;
+}
+
+// ═══════════════════════════════════════════════════════
+// REAL-TIME FORM VALIDATION
+// ═══════════════════════════════════════════════════════
+function initFormValidation() {
+    document.querySelectorAll('input[required], textarea[required], select[required]').forEach(field => {
+        const showError = (msg) => {
+            field.classList.add('border-red-500', 'focus:ring-red-500');
+            field.classList.remove('border-gray-200', 'focus:ring-emerald-500');
+            let errorEl = field.parentElement.querySelector('.field-error');
+            if (!errorEl) {
+                errorEl = document.createElement('p');
+                errorEl.className = 'field-error text-red-500 text-xs mt-1';
+                field.parentElement.appendChild(errorEl);
+            }
+            errorEl.textContent = msg;
+        };
+        
+        const clearError = () => {
+            field.classList.remove('border-red-500', 'focus:ring-red-500');
+            field.classList.add('border-gray-200', 'focus:ring-emerald-500');
+            const errorEl = field.parentElement.querySelector('.field-error');
+            if (errorEl) errorEl.remove();
+        };
+        
+        field.addEventListener('blur', () => {
+            if (!field.value.trim()) {
+                showError('Field ini wajib diisi');
+            } else {
+                clearError();
+            }
+        });
+        
+        field.addEventListener('input', () => {
+            if (field.classList.contains('border-red-500') && field.value.trim()) {
+                clearError();
+            }
+        });
+    });
+    
+    // NIK validation (16 digits)
+    document.querySelectorAll('input[data-validate="nik"]').forEach(field => {
+        field.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 16);
+        });
+        
+        field.addEventListener('blur', () => {
+            if (field.value && field.value.length !== 16) {
+                const errorEl = field.parentElement.querySelector('.field-error') || document.createElement('p');
+                errorEl.className = 'field-error text-red-500 text-xs mt-1';
+                errorEl.textContent = 'NIK harus 16 digit';
+                if (!field.parentElement.querySelector('.field-error')) {
+                    field.parentElement.appendChild(errorEl);
+                }
+                field.classList.add('border-red-500');
+            }
+        });
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// GLOBAL SEARCH
+// ══════════════════════════════════════════════════════
+const GlobalSearch = {
+    items: [],
+    
+    init(items) {
+        this.items = items;
+        this.createModal();
+    },
+    
+    createModal() {
+        const modal = document.createElement('div');
+        modal.id = 'search-modal';
+        modal.className = 'fixed inset-0 z-[9999] hidden';
+        modal.innerHTML = `
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="GlobalSearch.close()"></div>
+            <div class="absolute top-24 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
+                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div class="flex items-center gap-3 p-4 border-b border-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input id="search-input-global" type="text" placeholder="Cari halaman, layanan, informasi..." class="flex-1 outline-none text-sm" oninput="GlobalSearch.filter(this.value)">
+                        <kbd class="hidden sm:inline-block px-2 py-1 text-xs bg-gray-100 rounded">ESC</kbd>
+                    </div>
+                    <div id="search-results" class="max-h-96 overflow-y-auto p-2"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                this.open();
+            }
+            if (e.key === 'Escape') {
+                this.close();
+            }
+        });
+    },
+    
+    open() {
+        const modal = document.getElementById('search-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            setTimeout(() => document.getElementById('search-input-global')?.focus(), 100);
+        }
+    },
+    
+    close() {
+        const modal = document.getElementById('search-modal');
+        if (modal) modal.classList.add('hidden');
+        const input = document.getElementById('search-input-global');
+        if (input) input.value = '';
+    },
+    
+    filter(query) {
+        const results = document.getElementById('search-results');
+        if (!query || query.length < 2) {
+            results.innerHTML = '<p class="text-sm text-gray-500 text-center py-8">Ketik minimal 2 karakter untuk mencari</p>';
+            return;
+        }
+        
+        const q = query.toLowerCase();
+        const filtered = this.items.filter(item => 
+            item.label.toLowerCase().includes(q) || 
+            (item.desc && item.desc.toLowerCase().includes(q))
+        );
+        
+        if (filtered.length === 0) {
+            results.innerHTML = '<p class="text-sm text-gray-500 text-center py-8">Tidak ada hasil ditemukan</p>';
+            return;
+        }
+        
+        results.innerHTML = filtered.map(item => `
+            <a href="${item.href}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 transition">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-800">${item.label}</p>
+                    ${item.desc ? `<p class="text-xs text-gray-500">${item.desc}</p>` : ''}
+                </div>
+            </a>
+        `).join('');
+    }
+};
+
 // ─── Magnetic Hover Effect ────────────────────────────
 function initMagneticHover() {
     document.querySelectorAll('[data-magnetic]').forEach(el => {
@@ -394,10 +703,36 @@ window.addEventListener('DOMContentLoaded', () => {
     initTiltEffect();
     initMagneticHover();
     initCounters();
+    DarkMode.init();
+    initFormValidation();
     PageLoader.hide();
+    
+    // Initialize Global Search with all pages
+    GlobalSearch.init([
+        { label: 'Beranda', desc: 'Halaman utama desa', href: '/index.html' },
+        { label: 'Berita', desc: 'Informasi dan berita terkini', href: '/pages/berita.html' },
+        { label: 'Galeri', desc: 'Dokumentasi kegiatan desa', href: '/pages/gallery.html' },
+        { label: 'Lapak Desa', desc: 'Produk UMKM warga', href: '/pages/lapak-desa.html' },
+        { label: 'Pengaduan', desc: 'Laporan dan pengaduan warga', href: '/pages/pengaduan.html' },
+        { label: 'Bansos', desc: 'Data bantuan sosial', href: '/pages/bansos.html' },
+        { label: 'PBB', desc: 'Pajak bumi dan bangunan', href: '/pages/pbb.html' },
+        { label: 'Permohonan Surat Online', desc: 'Ajukan surat dari rumah', href: '/pages/login.html' },
+        { label: 'Sejarah Desa', desc: 'Sejarah Desa Kasomalang Kulon', href: '/pages/profil/sejarah.html' },
+        { label: 'Perangkat Desa', desc: 'Struktur organisasi desa', href: '/pages/profil/perangkat.html' },
+        { label: 'Peta Wilayah', desc: 'Peta wilayah desa', href: '/pages/profil/wilayah.html' },
+        { label: 'Data Penduduk', desc: 'Portal layanan warga', href: '/pages/user-portal.html' },
+        { label: 'Formulir Pengajuan', desc: 'Formulir pengajuan layanan', href: '/pages/layanan/formulir.html' }
+    ]);
     
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
+    }
+    
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then((reg) => console.log('[PWA] Service Worker registered:', reg.scope))
+            .catch((err) => console.log('[PWA] Service Worker registration failed:', err));
     }
 });

@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#059669">
     <title>Bansos - Desa Kasomalang Kulon</title>
+    <link rel="manifest" href="/manifest.json">
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -51,6 +53,9 @@
     <!-- Content -->
     <section class="py-12 px-4">
         <div class="max-w-7xl mx-auto">
+            <!-- Breadcrumbs -->
+            <div id="breadcrumbs"></div>
+            
             <!-- Stats -->
             <div class="grid md:grid-cols-4 gap-6 mb-10 fade-in">
                 <div class="bg-white p-6 rounded-[1.75rem] shadow-lg border border-gray-100 hover:shadow-xl transition">
@@ -390,8 +395,14 @@
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
             renderBansos();
+            renderBreadcrumbs([
+                { label: 'Layanan', href: '#' },
+                { label: 'Bantuan Sosial' }
+            ]);
             lucide.createIcons();
         });
     </script>
+    <script src="/assets/nav-config.js"></script>
+    <script src="/assets/script.js"></script>
 </body>
 </html>

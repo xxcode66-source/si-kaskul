@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#059669">
+    <title>Analytics Dashboard - SI-KASKUL</title>
+    <link rel="manifest" href="/manifest.json">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body class="w-full min-h-screen bg-gray-50">
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="ls-emblem">🏛️</div>
+            <div class="ls-title">SI<b>KASKUL</b></div>
+            <div class="ls-sub">Memuat Analytics...</div>
+            <div class="ls-track"><div class="ls-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-16 px-4 sm:px-6">
+        <div class="max-w-7xl mx-auto">
+            <!-- Breadcrumbs -->
+            <div id="breadcrumbs"></div>
+
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-display font-bold text-gray-900">Analytics Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Statistik dan analitik Desa Kasomalang Kulon</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <select id="period-select" class="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="7">7 Hari Terakhir</option>
+                        <option value="30" selected>30 Hari Terakhir</option>
+                        <option value="90">90 Hari Terakhir</option>
+                        <option value="365">1 Tahun</option>
+                    </select>
+                    <button onclick="exportToPDF()" class="btn-hover-glow px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold flex items-center gap-2">
+                        <i data-lucide="download" style="width:16px;height:16px"></i>
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <i data-lucide="users" style="width:20px;height:20px;color:#059669"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12%</span>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900" data-count-target="4521">0</p>
+                    <p class="text-sm text-gray-500 mt-1">Total Penduduk</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <i data-lucide="home" style="width:20px;height:20px;color:#2563eb"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">+3%</span>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900" data-count-target="1287">0</p>
+                    <p class="text-sm text-gray-500 mt-1">Kepala Keluarga</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                            <i data-lucide="file-text" style="width:20px;height:20px;color:#d97706"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">+28%</span>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900" data-count-target="156">0</p>
+                    <p class="text-sm text-gray-500 mt-1">Surat Diajukan</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <i data-lucide="receipt" style="width:20px;height:20px;color:#7c3aed"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-1 rounded-full">85%</span>
+                    </div>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900" data-count-target="892">0</p>
+                    <p class="text-sm text-gray-500 mt-1">PBB Lunas</p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Population Chart -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Pertumbuhan Penduduk</h3>
+                        <span class="text-xs text-gray-500">6 bulan terakhir</span>
+                    </div>
+                    <canvas id="populationChart" height="200"></canvas>
+                </div>
+
+                <!-- Service Usage Chart -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Penggunaan Layanan</h3>
+                        <span class="text-xs text-gray-500">Bulan ini</span>
+                    </div>
+                    <canvas id="serviceChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Second Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- PBB Collection -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Realisasi PBB</h3>
+                        <span class="text-xs text-gray-500">Tahun 2024</span>
+                    </div>
+                    <canvas id="pbbChart" height="200"></canvas>
+                </div>
+
+                <!-- Bansos Distribution -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Distribusi Bansos</h3>
+                        <span class="text-xs text-gray-500">Per jenis</span>
+                    </div>
+                    <canvas id="bansosChart" height="200"></canvas>
+                </div>
+
+                <!-- Complaints Status -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-gray-900">Status Pengaduan</h3>
+                        <span class="text-xs text-gray-500">Total: 45</span>
+                    </div>
+                    <canvas id="complaintChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-900">Aktivitas Terbaru</h3>
+                    <a href="#" class="text-sm text-emerald-600 hover:text-emerald-700 font-medium">Lihat Semua</a>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                            <i data-lucide="file-text" style="width:18px;height:18px;color:#059669"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Surat Keterangan Domisili diajukan</p>
+                            <p class="text-xs text-gray-500">oleh Ahmad Suryadi • 2 jam lalu</p>
+                        </div>
+                        <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Pending</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i data-lucide="receipt" style="width:18px;height:18px;color:#2563eb"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">PBB dibayar - RT 03/RW 02</p>
+                            <p class="text-xs text-gray-500">oleh Budi Santoso • 5 jam lalu</p>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Lunas</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                            <i data-lucide="message-square" style="width:18px;height:18px;color:#7c3aed"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Pengaduan baru: Jalan rusak di RT 05</p>
+                            <p class="text-xs text-gray-500">oleh Siti Aminah • 1 hari lalu</p>
+                        </div>
+                        <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Diproses</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                            <i data-lucide="user-plus" style="width:18px;height:18px;color:#059669"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">Penduduk baru terdaftar</p>
+                            <p class="text-xs text-gray-500">Dewi Lestari • 2 hari lalu</p>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Aktif</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-gray-400 text-sm">&copy; 2024 SI-KASKUL - Desa Kasomalang Kulon</p>
+        </div>
+    </footer>
+
+    <script src="/assets/nav-config.js"></script>
+    <script src="/assets/script.js"></script>
+    <script>
+        // Initialize page
+        renderNavbar('analytics');
+        
+        // Set breadcrumbs
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBreadcrumbs([
+                { label: 'Admin', href: '/admin/dashboard.html' },
+                { label: 'Analytics' }
+            ]);
+            
+            // Initialize charts
+            initCharts();
+            
+            // Initialize counters
+            document.querySelectorAll('[data-count-target]').forEach(el => {
+                const target = parseInt(el.dataset.countTarget);
+                animateCounter(el, target, 2000);
+            });
+        });
+
+        // Charts
+        function initCharts() {
+            // Population Chart
+            new Chart(document.getElementById('populationChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Penduduk',
+                        data: [4450, 4470, 4485, 4498, 4510, 4521],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Service Chart
+            new Chart(document.getElementById('serviceChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Surat Domisili', 'SKTM', 'SKU', 'Surat Pengantar'],
+                    datasets: [{
+                        data: [45, 32, 28, 51],
+                        backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { padding: 15 } } },
+                    cutout: '60%'
+                }
+            });
+
+            // PBB Chart
+            new Chart(document.getElementById('pbbChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Dusun 1', 'Dusun 2', 'Dusun 3'],
+                    datasets: [{
+                        label: 'Lunas',
+                        data: [320, 285, 287],
+                        backgroundColor: '#10b981',
+                        borderRadius: 8
+                    }, {
+                        label: 'Belum',
+                        data: [45, 62, 38],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Bansos Chart
+            new Chart(document.getElementById('bansosChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['PKH', 'BPNT', 'BLT', 'BST'],
+                    datasets: [{
+                        data: [125, 210, 85, 45],
+                        backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom', labels: { padding: 15 } } }
+                }
+            });
+
+            // Complaint Chart
+            new Chart(document.getElementById('complaintChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Diproses', 'Selesai', 'Ditolak'],
+                    datasets: [{
+                        data: [12, 28, 5],
+                        backgroundColor: ['#0ea5e9', '#10b981', '#ef4444'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            Toast.info('Menyiapkan export PDF...');
+            setTimeout(() => {
+                window.print();
+                Toast.success('PDF siap di-download!');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
