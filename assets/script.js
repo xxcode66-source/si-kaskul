@@ -3,7 +3,7 @@
 // ==============================
 
 // ─── Page Loader ───────────────────────────────────────
-const PageLoader = {
+window.PageLoader = {
     show(message = 'Memuat...') {
         const loader = document.getElementById('page-loader');
         if (loader) {
@@ -276,7 +276,7 @@ function formatDate(date) {
 }
 
 // ─── API Base URL ─────────────────────────────────────
-const API_BASE_URL = window.__API_BASE_URL__ || (
+window.API_BASE_URL = window.__API_BASE_URL__ || (
     window.location.protocol === 'file:' || 
     window.location.hostname === 'localhost' || 
     window.location.hostname === '127.0.0.1'
@@ -303,7 +303,7 @@ async function fetchWithLoader(url, options = {}) {
 // ═══════════════════════════════════════════════════════
 // TOAST NOTIFICATION SYSTEM
 // ═══════════════════════════════════════════════════════
-const Toast = {
+window.Toast = {
     container: null,
     
     init() {
@@ -365,7 +365,7 @@ const Toast = {
 // ═══════════════════════════════════════════════════════
 // SKELETON LOADER
 // ═══════════════════════════════════════════════════════
-const Skeleton = {
+window.Skeleton = {
     card(count = 3) {
         return Array(count).fill(0).map(() => `
             <div class="skeleton-card bg-white rounded-2xl shadow-lg p-6 animate-pulse">
@@ -421,7 +421,7 @@ function setLoading(button, loading, text = 'Memuat...') {
 // ═══════════════════════════════════════════════════════
 // DARK MODE
 // ═══════════════════════════════════════════════════════
-const DarkMode = {
+window.DarkMode = {
     init() {
         const saved = localStorage.getItem('darkMode');
         if (saved === 'true' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -523,7 +523,7 @@ function initFormValidation() {
 // ═══════════════════════════════════════════════════════
 // GLOBAL SEARCH
 // ══════════════════════════════════════════════════════
-const GlobalSearch = {
+window.GlobalSearch = {
     items: [],
     
     init(items) {
@@ -633,7 +633,8 @@ function initMagneticHover() {
 }
 
 // ─── Text Scramble Effect ─────────────────────────────
-class TextScramble {
+if (typeof window.TextScramble === 'undefined') {
+window.TextScramble = class TextScramble {
     constructor(el) {
         this.el = el;
         this.chars = '!<>-_\\/[]{}—=+*^?#________';
@@ -688,6 +689,7 @@ class TextScramble {
             this.frame++;
         }
     }
+};
 }
 
 // ─── Initialize Everything ────────────────────────────

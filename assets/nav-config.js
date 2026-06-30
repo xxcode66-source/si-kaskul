@@ -2,7 +2,7 @@
 // NAVBAR — Premium Glassmorphism Design
 // ==============================
 
-const NAV_CONFIG = {
+window.NAV_CONFIG = {
   items: [
     { href: '/index.html', label: 'Beranda', key: 'beranda', icon: 'home' },
     {

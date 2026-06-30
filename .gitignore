@@ -43,3 +43,6 @@ tmp/
 # Screenshots
 screenshot-*.png
 screenshot-*.jpg
+
+# Generated data
+backend/imported-data.json

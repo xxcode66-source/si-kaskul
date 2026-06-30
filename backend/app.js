@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const store = require('./mysql-store');
 const { createPbbRoutes } = require('./pbb-routes');
 const { Document, Packer, Paragraph, TextRun, AlignmentType, Tab, TabStopPosition, TabStopType } = require('docx');
@@ -18,6 +19,29 @@ app.use(express.static(path.join(__dirname, '..')));
 const PORT = process.env.PORT || 3000;
 let database = store.createSeedDatabase();
 let pool = null;
+
+// Load imported Excel data if available
+function loadImportedData() {
+  const importedFile = path.join(__dirname, 'imported-data.json');
+  if (fs.existsSync(importedFile)) {
+    try {
+      const imported = JSON.parse(fs.readFileSync(importedFile, 'utf-8'));
+      // Merge imported data with seed data (keep users, berita, etc from seed)
+      const seed = store.createSeedDatabase();
+      database = {
+        ...seed,
+        penduduk: imported.penduduk || seed.penduduk,
+        warga: imported.warga || seed.warga,
+        pbb: imported.pbb || seed.pbb,
+      };
+      console.log(`📊 Imported data loaded: ${database.penduduk.length} penduduk, ${database.warga.length} PBB warga`);
+    } catch (e) {
+      console.error('⚠️ Failed to load imported data:', e.message);
+    }
+  }
+}
+
+loadImportedData();
 
 async function initDB() {
   pool = await store.createPool();
@@ -537,6 +561,49 @@ app.delete('/api/users/:id', async (req, res) => {
   database.users.splice(i, 1);
   await persistDatabase();
   res.json({ success: true, message: 'Dihapus' });
+});
+
+// --- Penduduk (Resident) API ---
+app.get('/api/penduduk', (req, res) => {
+  const penduduk = database.penduduk || [];
+  const { search, rt, rw, agama, pendidikan, pekerjaan, jenisKelamin, page = 1, limit = 50 } = req.query;
+  
+  let filtered = [...penduduk];
+  
+  if (search) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(p => 
+      (p.nama && p.nama.toLowerCase().includes(q)) ||
+      (p.nik && p.nik.includes(q)) ||
+      (p.kk && p.kk.includes(q)) ||
+      (p.alamat && p.alamat.toLowerCase().includes(q))
+    );
+  }
+  if (rt) filtered = filtered.filter(p => p.rt === rt);
+  if (rw) filtered = filtered.filter(p => p.rw === rw);
+  if (agama) filtered = filtered.filter(p => p.agama && p.agama.toLowerCase() === agama.toLowerCase());
+  if (jenisKelamin) filtered = filtered.filter(p => p.jenisKelamin === jenisKelamin);
+  if (pendidikan) filtered = filtered.filter(p => p.pendidikan && p.pendidikan.toLowerCase().includes(pendidikan.toLowerCase()));
+  if (pekerjaan) filtered = filtered.filter(p => p.pekerjaan && p.pekerjaan.toLowerCase().includes(pekerjaan.toLowerCase()));
+  
+  const total = filtered.length;
+  const start = (page - 1) * limit;
+  const paginated = filtered.slice(start, start + parseInt(limit));
+  
+  // Stats
+  const lk = filtered.filter(p => p.jenisKelamin === 'LAKI-LAKI').length;
+  const pr = filtered.filter(p => p.jenisKelamin === 'PEREMPUAN').length;
+  const rtSet = new Set(filtered.map(p => `${p.rt}/${p.rw}`));
+  
+  res.json({
+    success: true,
+    data: paginated,
+    total,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    totalPages: Math.ceil(total / limit),
+    stats: { total, lakiLaki: lk, perempuan: pr, uniqueRT: rtSet.size }
+  });
 });
 
 // --- Dashboard Stats ---

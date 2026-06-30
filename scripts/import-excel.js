@@ -1,277 +1,304 @@
-#!/usr/bin/env node
 /**
- * SI-KASKUL Excel Import Script
+ * Import Excel data into SI-KASKUL database
+ * - MONOGRAFI DESA.xlsx -> penduduk (resident) database
+ * - SPPT PBB 2026.xlsx -> PBB (property tax) database with 7 year sheets (2020-2026)
  * 
- * Usage:
- *   node import-excel.js --penduduk data-penduduk.xlsx --pbb data-pbb.xlsx
- * 
- * This script reads Excel files and imports data into MySQL.
- * 
- * Untuk jalanin, install dulu: npm install xlsx mysql2
+ * Usage: node scripts/import-excel.js
  */
 
-const XLSX = require('xlsx');
-const mysql = require('mysql2/promise');
-const path = require('path');
+const XLSX = require('../backend/node_modules/xlsx');
 const fs = require('fs');
+const path = require('path');
 
 // ==============================
-// CONFIG — edit sesuai data lo
+// CONFIGURATION
 // ==============================
-const DB_CONFIG = {
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306'),
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'si_kaskul',
-};
-
-const TAHUN_PBB = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
-const LOKASI_DUSUN = {
-  // Mapping NOP range to dusun — LO SESUAIKAN
-  defaultDusun: 'dusun1',
-  defaultDusunNama: 'Dusun 01',
-};
+const MONOGRAFI_FILE = path.join(__dirname, '..', 'MONOGRAFI DESA.xlsx');
+const SPPT_FILE = path.join(__dirname, '..', 'SPPT PBB 2026.xlsx');
+const OUTPUT_FILE = path.join(__dirname, '..', 'backend', 'imported-data.json');
 
 // ==============================
-// HELPERS
+// MONOGRAFI -> PENDUDUK
 // ==============================
-function cleanNIK(val) {
-  if (!val) return '';
-  let s = String(val).trim();
-  // Remove non-digit characters (Rp, dots, spaces)
-  s = s.replace(/[^0-9]/g, '');
-  // Pad with leading zeros if needed (NIK is 16 digits)
-  while (s.length < 16) s = '0' + s;
-  return s;
-}
-
-function cleanNOP(val) {
-  if (!val) return '';
-  let s = String(val).trim();
-  // Remove spaces, standardize format
-  s = s.replace(/\s+/g, '.');
-  return s;
-}
-
-function cleanRupiah(val) {
-  if (!val) return 0;
-  if (typeof val === 'number') return val;
-  let s = String(val).trim();
-  s = s.replace(/[^0-9]/g, '');
-  return parseInt(s) || 0;
-}
-
-function mapHeader(header) {
-  const map = {
-    'nik': 'nik', 'n i k': 'nik', 'no induk': 'nik',
-    'nop': 'nop', 'no objek pajak': 'nop',
-    'nama': 'nama', 'nama wp': 'nama', 'nama wajib pajak': 'nama', 'nama penduduk': 'nama',
-    'alamat': 'alamat', 'alamat wp': 'alamat', 'alamat objek pajak': 'alamat', 'alamat op': 'alamat',
-    'rt': 'rt', 'r t': 'rt',
-    'rw': 'rw', 'r w': 'rw',
-    'dusun': 'dusun', 'kampung': 'dusun', 'lingkungan': 'dusun',
-    'pajak': 'pajak', 'jumlah': 'pajak', 'nominal': 'pajak', 'besar pajak': 'pajak', 'pbb': 'pajak', 'jumlah pbb': 'pajak',
-    'tahun': 'year', 'tahun pajak': 'year', 'thn': 'year',
-    'status': 'status', 'ket': 'status', 'keterangan': 'status',
-  };
-  const key = header.toLowerCase().trim();
-  return map[key] || key;
-}
-
-// ==============================
-// IMPORT PENDUDUK
-// ==============================
-async function importPenduduk(filePath, conn) {
-  console.log(`\n📄 Membaca file penduduk: ${filePath}`);
-  const wb = XLSX.readFile(filePath);
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  const data = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-  console.log(`   Ditemukan ${data.length} baris data`);
-  
-  let imported = 0, skipped = 0;
-  for (const row of data) {
-    try {
-      const nik = cleanNIK(row['NIK'] || row['nik'] || row['Nik'] || '');
-      const nama = (row['NAMA'] || row['nama'] || row['Nama'] || '').trim();
-      
-      if (!nik || !nama) { skipped++; continue; }
-      
-      const alamat = (row['ALAMAT'] || row['alamat'] || row['Alamat'] || '').trim();
-      const rt = String(row['RT'] || row['rt'] || '').trim();
-      const rw = String(row['RW'] || row['rw'] || '').trim();
-
-      await conn.query(
-        'INSERT INTO penduduk (nik, nama, alamat, rt, rw) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama=VALUES(nama), alamat=VALUES(alamat), rt=VALUES(rt), rw=VALUES(rw)',
-        [nik, nama, alamat, rt, rw]
-      );
-      imported++;
-    } catch (e) {
-      console.error(`   ⚠️  Gagal import baris: ${e.message}`);
-      skipped++;
+function importMonografi() {
+    console.log('\n📋 Importing MONOGRAFI DESA.xlsx...');
+    
+    if (!fs.existsSync(MONOGRAFI_FILE)) {
+        console.error('❌ File not found:', MONOGRAFI_FILE);
+        return [];
     }
-  }
-  console.log(`   ✅ ${imported} diimport, ${skipped} dilewati`);
-  return imported;
+
+    const wb = XLSX.readFile(MONOGRAFI_FILE);
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+    // Headers in rows 3-4 (0-indexed):
+    // Row 3: NO, NIK, KK, NAMA LENGKAP, null, TEMPAT TGL LAHIR, null, JK, ALAMAT(KAMPUNG), null(RT), null(RW), UMUR, SHDK, AGAMA, PENDIDIKAN, PEKERJAAN, AYAH, IBU
+    // Row 4: sub-headers KAMPUNG, RT, RW
+    // Data starts row 5
+    
+    const penduduk = [];
+    let skipped = 0;
+
+    for (let i = 5; i < data.length; i++) {
+        const row = data[i];
+        if (!row || !row[1] || String(row[1]).trim() === '') { skipped++; continue; }
+
+        const nik = String(row[1] || '').trim();
+        if (nik.length < 10) { skipped++; continue; }
+
+        penduduk.push({
+            id: penduduk.length + 1,
+            nik: nik,
+            kk: String(row[2] || '').trim(),
+            nama: String(row[3] || '').trim(),
+            tempatLahir: String(row[5] || '').trim(),
+            tanggalLahir: String(row[6] || '').trim(),
+            jenisKelamin: String(row[7] || '').trim(),
+            kampung: String(row[8] || '').trim(),
+            rt: String(row[9] || '').trim().padStart(3, '0'),
+            rw: String(row[10] || '').trim().padStart(3, '0'),
+            umur: row[11] ? parseInt(row[11]) : null,
+            shdk: String(row[12] || '').trim(),
+            agama: String(row[13] || '').trim(),
+            pendidikan: String(row[14] || '').trim(),
+            pekerjaan: String(row[15] || '').trim(),
+            ayah: String(row[16] || '').trim(),
+            ibu: String(row[17] || '').trim()
+        });
+    }
+
+    // Set alamat
+    penduduk.forEach(p => { p.alamat = `${p.kampung} RT ${p.rt}/RW ${p.rw}`; });
+
+    console.log(`✅ Penduduk imported: ${penduduk.length} records (${skipped} skipped)`);
+    return penduduk;
 }
 
 // ==============================
-// IMPORT PBB
+// SPPT PBB -> PBB DATABASE
 // ==============================
-async function importPBB(filePath, conn) {
-  console.log(`\n📄 Membaca file PBB: ${filePath}`);
-  const wb = XLSX.readFile(filePath);
-  
-  let totalWarga = 0;
-  let totalPayments = 0;
-
-  for (const sheetName of wb.SheetNames) {
-    // Try to determine year from sheet name
-    let year = null;
-    for (const y of TAHUN_PBB) {
-      if (sheetName.includes(String(y))) { year = y; break; }
+function importSPPT() {
+    console.log('\n📋 Importing SPPT PBB 2026.xlsx...');
+    
+    if (!fs.existsSync(SPPT_FILE)) {
+        console.error('❌ File not found:', SPPT_FILE);
+        return { warga: [], pbb: [] };
     }
-    console.log(`   📋 Sheet: "${sheetName}" ${year ? `→ Tahun ${year}` : '(tahun tidak terdeteksi, coba import sebagai data biasa)'}`);
 
-    const sheet = wb.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-    console.log(`      ${data.length} baris`);
+    const wb = XLSX.readFile(SPPT_FILE);
+    console.log(`   Sheets found: ${wb.SheetNames.join(', ')}`);
 
-    for (const row of data) {
-      const nop = cleanNOP(row['NOP'] || row['nop'] || row['No Objek Pajak'] || '');
-      const nik = cleanNIK(row['NIK'] || row['nik'] || '');
-      const nama = (row['NAMA'] || row['nama'] || row['Nama WP'] || row['Nama Wajib Pajak'] || '').trim();
-      const alamat = (row['ALAMAT'] || row['alamat'] || row['Alamat OP'] || '').trim();
-      const rt = String(row['RT'] || row['rt'] || '').trim();
-      const rw = String(row['RW'] || row['rw'] || '').trim();
-      const dusun = (row['DUSUN'] || row['dusun'] || row['Kampung'] || LOKASI_DUSUN.defaultDusunNama).trim();
-      
-      // Pajak - bisa dari kolom spesifik atau kolom 'PAJAK'
-      const pajak = cleanRupiah(row['PAJAK'] || row['pajak'] || row['Jumlah'] || row['PBB'] || '');
-      const status = (row['STATUS'] || row['status'] || row['Ket'] || (pajak > 0 ? 'Belum Bayar' : 'Lunas')).trim();
+    const pbbByNOP = {};
 
-      if (!nop || !nama) continue;
+    for (const sheetName of wb.SheetNames) {
+        const yearMatch = sheetName.match(/(\d{4})/);
+        if (!yearMatch) continue;
+        const year = parseInt(yearMatch[1]);
+        
+        const ws = wb.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        
+        console.log(`\n   📄 Processing sheet: ${sheetName} (${data.length - 2} rows)`);
+        
+        let processed = 0, skipped = 0;
 
-      // Insert into pbb table
-      const rwNum = rw.replace(/[^0-9]/g, '');
-      const rtNum = rt.replace(/[^0-9]/g, '');
-      
-      await conn.query(
-        `INSERT INTO pbb (nop, nik, nama, alamat, dusun, dusunNama, rw, rwNama, rt, rtNama, year, pajak, status, payments, proofs)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '[]', '[]')
-         ON DUPLICATE KEY UPDATE status=VALUES(status), pajak=VALUES(pajak)`,
-        [
-          nop, nik, nama, alamat,
-          dusun.toLowerCase().replace(/\s+/g, ''),
-          dusun,
-          `rw${rwNum}`, `RW ${rwNum}`,
-          `rt${rtNum}`, `RT ${rtNum}`,
-          year || 2026, pajak, status
-        ]
-      );
-      totalPayments++;
+        for (let i = 2; i < data.length; i++) {
+            const row = data[i];
+            if (!row) { skipped++; continue; }
+
+            let nop, rtRwCode, jumlah, wajibBayar, namaPemilik, nikPemilik, namaSppt, tanggal, namaPenyetor, ket;
+
+            if (year === 2020) {
+                // 2020: NO, PEMOHON..., RT(col3), RW(col4), BGN, TANAH, LUAS, null, NAMA SPPT(col9), NOP(col10), ...JUMLAH(col12), WAJIB(col13), TGL(col14), PENYETOR(col15), KET(col16)
+                nop = String(row[10] || '').trim();
+                const rtCol = String(row[3] || '').trim();
+                const rwCol = String(row[4] || '').trim();
+                rtRwCode = `${rtCol}${rwCol}`;
+                namaSppt = String(row[9] || '').trim();
+                namaPemilik = namaSppt;
+                nikPemilik = '';
+                jumlah = row[12] || 0;
+                wajibBayar = row[13] || 0;
+                tanggal = row[14] || null;
+                namaPenyetor = String(row[15] || '').trim();
+                ket = String(row[16] || '').trim();
+            } else if (year === 2021) {
+                // 2021: NOP(col0), NO, PEMOHON..., RT(col5), RW(col6), BGN, TANAH, LUAS, null, NAMA SPPT(col11), NOP2(col12), ..., JUMLAH(col19), WAJIB(col20), TGL(col21), PENYETOR(col22), KET(col23)
+                nop = String(row[0] || '').trim();
+                const rtCol = String(row[5] || '').trim();
+                const rwCol = String(row[6] || '').trim();
+                rtRwCode = `${rtCol}${rwCol}`;
+                namaSppt = String(row[11] || '').trim();
+                namaPemilik = namaSppt;
+                nikPemilik = '';
+                jumlah = row[19] || 0;
+                wajibBayar = row[20] || 0;
+                tanggal = row[21] || null;
+                namaPenyetor = String(row[22] || '').trim();
+                ket = String(row[23] || '').trim();
+            } else {
+                nop = String(row[0] || '').trim();
+                rtRwCode = String(row[2] || '').trim();
+                jumlah = row[3] || 0;
+                wajibBayar = row[4] || 0;
+                namaPemilik = String(row[5] || '').trim();
+                nikPemilik = String(row[6] || '').trim();
+                namaSppt = String(row[7] || '').trim();
+                tanggal = row[8] || null;
+                namaPenyetor = String(row[9] || '').trim();
+                ket = String(row[10] || '').trim();
+            }
+
+            nop = nop.replace(/\s+/g, '');
+            if (!nop || nop.length < 10) { skipped++; continue; }
+
+            // Parse RT/RW
+            let rt = '00', rw = '00';
+            const codeNum = parseInt(rtRwCode);
+            if (!isNaN(codeNum) && codeNum > 0) {
+                rt = String(Math.floor(codeNum / 10)).padStart(2, '0');
+                rw = String(codeNum % 10).padStart(2, '0');
+            }
+
+            // Status
+            const statusBayar = (ket || '').toUpperCase();
+            let status = 'Belum Bayar';
+            if (statusBayar.includes('SUDAH') || statusBayar.includes('BAYAR') || statusBayar === 'LUNAS') {
+                status = 'Lunas';
+            } else if (statusBayar.includes('PENDING') || statusBayar.includes('PROSES')) {
+                status = 'Pending';
+            }
+
+            const nama = namaPemilik || namaSppt || 'Unknown';
+
+            if (!pbbByNOP[nop]) {
+                pbbByNOP[nop] = { nop, nama, nik: nikPemilik || '', rt, rw, payments: {} };
+            }
+
+            if (jumlah > 0) {
+                pbbByNOP[nop].payments[year] = {
+                    year, pajak: parseInt(jumlah) || 0, wajibBayar: parseInt(wajibBayar) || 0,
+                    status, paidAt: tanggal ? String(tanggal) : null,
+                    namaPenyetor: namaPenyetor || '', keterangan: ket || ''
+                };
+            }
+
+            if (nama !== 'Unknown') pbbByNOP[nop].nama = nama;
+            if (nikPemilik && !pbbByNOP[nop].nik) pbbByNOP[nop].nik = nikPemilik;
+
+            processed++;
+        }
+        
+        console.log(`   ✅ ${sheetName}: ${processed} processed, ${skipped} skipped`);
     }
-    totalWarga += data.length;
-  }
 
-  console.log(`   ✅ ${totalPayments} data PBB diimport`);
-  return totalPayments;
-}
+    // Build warga and pbb arrays
+    const warga = [];
+    const pbb = [];
+    let wargaId = 0, pbbId = 0;
+    const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026];
 
-// ==============================
-// BUILD WARGA FROM PBB DATA
-// ==============================
-async function buildWarga(conn) {
-  console.log('\n🔨 Membangun data warga dari data PBB...');
-  
-  // Aggregate per NOP
-  const [rows] = await conn.query(`
-    SELECT nop, nik, nama, alamat, dusun, dusunNama, rw, rwNama, rt, rtNama,
-           JSON_ARRAYAGG(JSON_OBJECT('year', year, 'pajak', pajak, 'status', status)) AS payments_raw,
-           SUM(pajak) AS total_pajak
-    FROM pbb
-    GROUP BY nop
-  `);
+    for (const nop of Object.keys(pbbByNOP)) {
+        const entry = pbbByNOP[nop];
+        wargaId++;
 
-  let imported = 0;
-  for (const row of rows) {
-    const payments = JSON.parse(row.payments_raw);
-    const totalLunas = payments.filter(p => p.status === 'Lunas').reduce((s, p) => s + p.pajak, 0);
-    const totalBelum = payments.filter(p => p.status !== 'Lunas').reduce((s, p) => s + p.pajak, 0);
-    const lunasCount = payments.filter(p => p.status === 'Lunas').length;
-    let status = 'Belum Bayar';
-    if (lunasCount === payments.length) status = 'Lunas';
-    else if (payments.some(p => p.status === 'Pending')) status = 'Pending';
-    else if (lunasCount >= 3) status = 'Sebagian';
-    else status = 'Menunggak';
+        const payments = [];
+        for (const year of years) {
+            if (entry.payments[year]) {
+                payments.push(entry.payments[year]);
+            } else {
+                payments.push({ year, pajak: 0, wajibBayar: 0, status: 'Belum Bayar', paidAt: null, namaPenyetor: '', keterangan: '' });
+            }
+        }
 
-    const nik = row.nik || `AUTO${String(imported).padStart(10, '0')}`;
+        const totalPajak = payments.reduce((s, p) => s + (p.pajak || 0), 0);
+        const totalLunas = payments.filter(p => p.status === 'Lunas').reduce((s, p) => s + (p.pajak || 0), 0);
+        const totalBelumBayar = payments.filter(p => p.status !== 'Lunas').reduce((s, p) => s + (p.pajak || 0), 0);
+        const lunasCount = payments.filter(p => p.status === 'Lunas').length;
+        const pendingCount = payments.filter(p => p.status === 'Pending').length;
 
-    await conn.query(
-      `INSERT INTO warga (nik, nop, nama, alamat, dusun, dusunNama, rw, rwNama, rt, rtNama, pajak, status, totalPajak, totalLunas, totalBelumBayar, payments)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE nama=VALUES(nama), status=VALUES(status), payments=VALUES(payments)`,
-      [nik, row.nop, row.nama, row.alamat, row.dusun, row.dusunNama, row.rw, row.rwNama, row.rt, row.rtNama,
-       payments.reduce((s,p) => s + p.pajak, 0) / payments.length, status,
-       row.total_pajak, totalLunas, totalBelum, JSON.stringify(payments)]
-    );
-    imported++;
-  }
+        let summaryStatus = 'Belum Bayar';
+        if (lunasCount === years.length) summaryStatus = 'Lunas';
+        else if (pendingCount > 0) summaryStatus = 'Pending';
+        else if (lunasCount >= 3) summaryStatus = 'Sebagian';
+        else if (lunasCount === 0) summaryStatus = 'Menunggak';
 
-  console.log(`   ✅ ${imported} warga dibuat`);
-  return imported;
+        const rtStr = entry.rt || '00';
+        const rwStr = entry.rw || '00';
+        const alamat = `RT ${rtStr}/RW ${rwStr}`;
+
+        let dusun = 'dusun1', dusunNama = 'Dusun 01';
+        const rwNum = parseInt(rwStr);
+        if (rwNum >= 3 && rwNum <= 6) { dusun = 'dusun2'; dusunNama = 'Dusun 02'; }
+        else if (rwNum >= 7) { dusun = 'dusun3'; dusunNama = 'Dusun 03'; }
+
+        const pajak2026 = (entry.payments[2026] || {}).pajak || (entry.payments[2025] || {}).pajak || 0;
+
+        warga.push({
+            id: wargaId, nik: entry.nik || `PBB${String(wargaId).padStart(10, '0')}`,
+            nop: entry.nop, nama: entry.nama, alamat,
+            dusun, dusunNama, rw: `rw${rwStr}`, rwNama: `RW ${rwStr}`,
+            rt: `rt${rtStr}`, rtNama: `RT ${rtStr}`,
+            pajak: pajak2026, status: summaryStatus,
+            totalPajak, totalLunas, totalBelumBayar, payments
+        });
+
+        for (const payment of payments) {
+            if (payment.pajak > 0) {
+                pbbId++;
+                pbb.push({
+                    id: pbbId, nop: entry.nop, nik: entry.nik || '', nama: entry.nama, alamat,
+                    dusun, dusunNama, rw: `rw${rwStr}`, rwNama: `RW ${rwStr}`,
+                    rt: `rt${rtStr}`, rtNama: `RT ${rtStr}`,
+                    year: payment.year, pajak: payment.pajak, status: payment.status,
+                    payments: [payment], proofs: []
+                });
+            }
+        }
+    }
+
+    console.log(`\n✅ PBB Warga: ${warga.length} unique NOP`);
+    console.log(`✅ PBB Records: ${pbb.length} year-records`);
+    return { warga, pbb };
 }
 
 // ==============================
 // MAIN
 // ==============================
-async function main() {
-  console.log('╔══════════════════════════════════╗');
-  console.log('║   SI-KASKUL Excel Import Tool    ║');
-  console.log('╚══════════════════════════════════╝');
+function main() {
+    console.log('🚀 SI-KASKUL Excel Import Tool');
+    console.log('================================\n');
 
-  const args = process.argv.slice(2);
-  const pendudukFile = args.includes('--penduduk') ? args[args.indexOf('--penduduk') + 1] : null;
-  const pbbFile = args.includes('--pbb') ? args[args.indexOf('--pbb') + 1] : null;
+    const penduduk = importMonografi();
+    const { warga, pbb } = importSPPT();
 
-  if (!pendudukFile && !pbbFile) {
-    console.log('\nGunakan:');
-    console.log('  node import-excel.js --penduduk data-penduduk.xlsx --pbb data-pbb.xlsx');
-    console.log('\nAtau:');
-    console.log('  node import-excel.js --penduduk data-penduduk.xlsx');
-    console.log('  node import-excel.js --pbb data-pbb.xlsx');
-    process.exit(1);
-  }
-
-  // Cek file exists
-  for (const f of [pendudukFile, pbbFile].filter(Boolean)) {
-    if (!fs.existsSync(f)) {
-      console.error(`❌ File tidak ditemukan: ${f}`);
-      process.exit(1);
+    const importedData = { penduduk, warga, pbb };
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(importedData, null, 2));
+    
+    console.log('\n================================');
+    console.log(`💾 Data saved to: ${OUTPUT_FILE}`);
+    console.log(`\n📊 Summary:`);
+    console.log(`   Penduduk: ${penduduk.length} records`);
+    console.log(`   PBB Warga: ${warga.length} unique taxpayers`);
+    console.log(`   PBB Records: ${pbb.length} year-records`);
+    
+    if (penduduk.length > 0) {
+        const rtSet = new Set(penduduk.map(p => `${p.rt}/${p.rw}`));
+        console.log(`   Unique RT/RW combinations: ${rtSet.size}`);
+        const lk = penduduk.filter(p => p.jenisKelamin === 'LAKI-LAKI').length;
+        const pr = penduduk.filter(p => p.jenisKelamin === 'PEREMPUAN').length;
+        console.log(`   Laki-laki: ${lk}, Perempuan: ${pr}`);
     }
-  }
-
-  console.log(`\n🔌 Koneksi ke MySQL: ${DB_CONFIG.host}:${DB_CONFIG.port}/${DB_CONFIG.database}`);
-  const conn = await mysql.createConnection(DB_CONFIG);
-  console.log('   ✅ Terhubung');
-
-  if (pendudukFile) {
-    await importPenduduk(pendudukFile, conn);
-  }
-
-  if (pbbFile) {
-    const count = await importPBB(pbbFile, conn);
-    if (count > 0) {
-      await buildWarga(conn);
+    
+    if (warga.length > 0) {
+        const l = warga.filter(w => w.status === 'Lunas').length;
+        const s = warga.filter(w => w.status === 'Sebagian').length;
+        const m = warga.filter(w => w.status === 'Menunggak').length;
+        console.log(`   PBB Status - Lunas: ${l}, Sebagian: ${s}, Menunggak: ${m}`);
     }
-  }
-
-  console.log('\n✅ Import selesai!');
-  await conn.end();
+    
+    console.log('\n✅ Import complete!');
 }
 
-main().catch(e => {
-  console.error('\n❌ Error:', e.message);
-  process.exit(1);
-});
+main();

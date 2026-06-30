@@ -154,7 +154,7 @@ async function ensureTables(pool) {
   await pool.query(`CREATE TABLE IF NOT EXISTS approvals (id INT PRIMARY KEY AUTO_INCREMENT, pbbId INT NOT NULL, nop VARCHAR(100), nama VARCHAR(255), approvedBy VARCHAR(255), approveStatus VARCHAR(50), note TEXT, approvedAt VARCHAR(100)) ENGINE=InnoDB`);
   await pool.query(`CREATE TABLE IF NOT EXISTS surat (id INT PRIMARY KEY AUTO_INCREMENT, jenis VARCHAR(255) NOT NULL, nama VARCHAR(255) NOT NULL, nik VARCHAR(50) NOT NULL, alamat TEXT, keperluan TEXT, status VARCHAR(50) DEFAULT 'Diajukan', nomorSurat VARCHAR(100), ditandatanganiOleh VARCHAR(255), catatan TEXT, diajukanPada VARCHAR(100) NOT NULL, diprosesPada VARCHAR(100)) ENGINE=InnoDB`);
   await pool.query(`CREATE TABLE IF NOT EXISTS activity_logs (id INT PRIMARY KEY AUTO_INCREMENT, action VARCHAR(255) NOT NULL, userId INT, userName VARCHAR(255), details TEXT, createdAt VARCHAR(100) NOT NULL) ENGINE=InnoDB`);
-  await pool.query(`CREATE TABLE IF NOT EXISTS penduduk (id INT PRIMARY KEY AUTO_INCREMENT, nik VARCHAR(50) UNIQUE NOT NULL, nama VARCHAR(255) NOT NULL, alamat TEXT, rt VARCHAR(50), rw VARCHAR(50)) ENGINE=InnoDB`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS penduduk (id INT PRIMARY KEY AUTO_INCREMENT, nik VARCHAR(50) UNIQUE NOT NULL, kk VARCHAR(50), nama VARCHAR(255) NOT NULL, tempatLahir VARCHAR(100), tanggalLahir VARCHAR(50), jenisKelamin VARCHAR(20), alamat TEXT, kampung VARCHAR(100), rt VARCHAR(50), rw VARCHAR(50), umur INT, shdk VARCHAR(100), agama VARCHAR(50), pendidikan VARCHAR(100), pekerjaan VARCHAR(100), ayah VARCHAR(255), ibu VARCHAR(255)) ENGINE=InnoDB`);
 }
 
 async function seedIfEmpty(pool, database) {
@@ -242,8 +242,8 @@ async function syncAll(pool, database) {
         [s.id, s.jenis, s.nama, s.nik, s.alamat, s.keperluan, s.status, s.nomorSurat, s.ditandatanganiOleh, s.catatan, s.diajukanPada, s.diprosesPada]);
     }
     for (const p of database.penduduk) {
-      await conn.query('INSERT INTO penduduk (id, nik, nama, alamat, rt, rw) VALUES (?,?,?,?,?,?)',
-        [p.id, p.nik, p.nama, p.alamat, p.rt, p.rw]);
+      await conn.query('INSERT INTO penduduk (id, nik, kk, nama, tempatLahir, tanggalLahir, jenisKelamin, alamat, kampung, rt, rw, umur, shdk, agama, pendidikan, pekerjaan, ayah, ibu) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [p.id, p.nik, p.kk || null, p.nama, p.tempatLahir || null, p.tanggalLahir || null, p.jenisKelamin || null, p.alamat, p.kampung || null, p.rt, p.rw, p.umur || null, p.shdk || null, p.agama || null, p.pendidikan || null, p.pekerjaan || null, p.ayah || null, p.ibu || null]);
     }
 
     await conn.query('COMMIT');
