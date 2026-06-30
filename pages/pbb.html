@@ -12,8 +12,6 @@
         :root { --em: #059669; --em-dark: #065f46; --gold: #d97706; --red: #dc2626; }
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Playfair Display', serif; }
-
-        /* Hero metrics */
         .hero { background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #059669 100%); padding: 7rem 1rem 2rem; }
         .hero-inner { max-width: 1200px; margin: 0 auto; }
         .hero-eyebrow { display: inline-block; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); border-radius: 999px; padding: .45rem 1.1rem; font-size: .8rem; color: #d1fae5; margin-bottom: 1rem; }
@@ -24,8 +22,6 @@
         .hm-val { font-size: 1.75rem; font-weight: 800; color: #fff; }
         .hm-val.gold { color: #fcd34d; }
         .hm-sub { font-size: .75rem; color: #d1fae5; margin-top: .2rem; }
-
-        /* Dusun strip */
         .dusun-strip { padding: 1.5rem 1rem; overflow-x: auto; }
         .dusun-inner { display: flex; gap: .75rem; max-width: 1200px; margin: 0 auto; min-width: min-content; }
         .dcard { flex: 1; min-width: 180px; background: #fff; border: 2px solid #e5e7eb; border-radius: 1.15rem; padding: 1rem 1.25rem; cursor: pointer; transition: all .25s ease; }
@@ -35,9 +31,7 @@
         .dcard-rw { font-size: .7rem; color: #6b7280; margin-bottom: .5rem; }
         .dcard-n { font-size: 1.15rem; font-weight: 800; color: #065f46; }
         .dcard-rp { font-size: .75rem; color: var(--gold); font-weight: 600; margin-top: .1rem; }
-
-        /* Analytics */
-        .analytics { max-width: 1200px; margin: 0 auto; padding: 1rem 1rem 3rem; }
+        .analytics { max-width: 1200px; margin: 0 auto; padding: 1rem 1rem 1rem; }
         .analytics-title { font-weight: 700; font-size: 1.15rem; color: #065f46; margin-bottom: 1rem; padding-left: .5rem; }
         .rw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 1rem; }
         .rw-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 1.15rem; padding: 1.25rem; cursor: pointer; transition: all .25s ease; }
@@ -48,8 +42,6 @@
         .rw-card-rp { font-size: .85rem; color: var(--gold); font-weight: 700; margin-bottom: .5rem; }
         .rw-card-bar-bg { height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
         .rw-card-bar { height: 100%; background: linear-gradient(90deg, #059669, #34d399); border-radius: 999px; transition: width .5s ease; }
-
-        /* RT accordion */
         .rt-accordion { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
         .rt-accordion.open { max-height: 600px; }
         .rt-row { display: flex; align-items: center; gap: .5rem; padding: .45rem 0; border-top: 1px solid #f3f4f6; }
@@ -58,29 +50,28 @@
         .rt-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 999px; transition: width .5s ease; }
         .rt-rp { font-size: .7rem; color: var(--gold); font-weight: 600; min-width: 80px; text-align: right; }
         .rt-wp { font-size: .65rem; color: #9ca3af; min-width: 40px; text-align: right; }
-
-        /* Search */
         .search-bar { max-width: 1200px; margin: 0 auto; padding: 0 1rem 1rem; }
         .search-input { width: 100%; padding: .75rem 1rem; border: 2px solid #e5e7eb; border-radius: 1rem; font-size: .9rem; outline: none; transition: border-color .2s; }
         .search-input:focus { border-color: var(--em); }
-
-        @media (max-width: 768px) {
-            .hero-metrics { grid-template-columns: 1fr; }
-            .rw-grid { grid-template-columns: 1fr; }
-            .dcard { min-width: 150px; }
-        }
+        /* Data table section */
+        .data-section { max-width: 1200px; margin: 0 auto; padding: 0 1rem 3rem; }
+        .data-section-title { font-weight: 700; font-size: 1.15rem; color: #065f46; margin-bottom: 1rem; padding-left: .5rem; }
+        .page-btn { min-width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid #e2e8f0; background: white; cursor: pointer; transition: all 0.15s; font-size: 0.85rem; }
+        .page-btn:hover { border-color: var(--em); color: var(--em); }
+        .page-btn.active { background: var(--em); color: white; border-color: var(--em); }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .status-lunas { background: #d1fae5; color: #065f46; }
+        .status-menunggak { background: #fee2e2; color: #991b1b; }
+        .status-sebagian { background: #fef3c7; color: #92400e; }
+        .status-pending { background: #e0e7ff; color: #3730a3; }
+        .status-belum { background: #fee2e2; color: #991b1b; }
+        @media (max-width: 768px) { .hero-metrics, .rw-grid { grid-template-columns: 1fr; } .dcard { min-width: 150px; } }
     </style>
 </head>
 <body class="w-full min-h-screen bg-gray-50">
-    <!-- Page Loader -->
     <div id="page-loader" class="page-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p class="loader-text">Memuat data PBB...</p>
-        </div>
+        <div class="loader-content"><div class="loader-spinner"></div><p class="loader-text">Memuat data PBB...</p></div>
     </div>
-
-    <!-- Navigation -->
     <div id="navbar-container"></div>
 
     <!-- Hero -->
@@ -89,31 +80,15 @@
             <div class="hero-eyebrow">📋 Data Tunggakan PBB-P2</div>
             <div class="hero-title">Wajib Pajak Belum Lunas<br>Desa Kasomalang Kulon</div>
             <div class="hero-metrics">
-                <div class="hm-card">
-                    <div class="hm-label">Wajib Pajak</div>
-                    <div class="hm-val" id="h-wp">—</div>
-                    <div class="hm-sub" id="h-wp-sub">Belum melunasi PBB</div>
-                </div>
-                <div class="hm-card">
-                    <div class="hm-label">Total Tunggakan</div>
-                    <div class="hm-val gold" id="h-rp">—</div>
-                    <div class="hm-sub" id="h-rp-sub">Seluruh data desa</div>
-                </div>
-                <div class="hm-card">
-                    <div class="hm-label">Data Tersaring</div>
-                    <div class="hm-val" id="h-fil">—</div>
-                    <div class="hm-sub" id="h-fil-sub">Hasil filter</div>
-                </div>
+                <div class="hm-card"><div class="hm-label">Wajib Pajak</div><div class="hm-val" id="h-wp">—</div><div class="hm-sub" id="h-wp-sub">Belum melunasi PBB</div></div>
+                <div class="hm-card"><div class="hm-label">Total Tunggakan</div><div class="hm-val gold" id="h-rp">—</div><div class="hm-sub" id="h-rp-sub">Seluruh data desa</div></div>
+                <div class="hm-card"><div class="hm-label">Data Tersaring</div><div class="hm-val" id="h-fil">—</div><div class="hm-sub" id="h-fil-sub">Hasil filter</div></div>
             </div>
         </div>
     </section>
 
     <!-- Dusun Strip -->
-    <div class="dusun-strip">
-        <div class="dusun-inner" id="dusun-strip">
-            <!-- Rendered by JS -->
-        </div>
-    </div>
+    <div class="dusun-strip"><div class="dusun-inner" id="dusun-strip"></div></div>
 
     <!-- Search -->
     <div class="search-bar">
@@ -123,12 +98,38 @@
     <!-- Analytics -->
     <div class="analytics" id="analytics-section">
         <div class="analytics-title">📊 Analitik Tunggakan per RW & RT</div>
-        <div class="rw-grid" id="rw-grid">
-            <!-- Rendered by JS -->
+        <div class="rw-grid" id="rw-grid"></div>
+    </div>
+
+    <!-- Data Table Section -->
+    <div class="data-section">
+        <div class="data-section-title">📋 Data Wajib Pajak (Pagination per 50)</div>
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-emerald-800 text-white">
+                            <th class="px-4 py-3 text-left font-semibold">No</th>
+                            <th class="px-4 py-3 text-left font-semibold">NOP</th>
+                            <th class="px-4 py-3 text-left font-semibold">Nama</th>
+                            <th class="px-4 py-3 text-left font-semibold hidden md:table-cell">Alamat</th>
+                            <th class="px-4 py-3 text-center font-semibold">RW/RT</th>
+                            <th class="px-4 py-3 text-center font-semibold">Status 2026</th>
+                            <th class="px-4 py-3 text-right font-semibold">Total Pajak</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body">
+                        <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Memuat data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+                <span id="page-info" class="text-xs text-gray-500">—</span>
+                <div id="pagination" class="flex items-center gap-1"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="py-10 px-4 text-center bg-emerald-900 text-white">
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
     </footer>
@@ -138,116 +139,88 @@
     <script src="../assets/script.js"></script>
     <script>
         const API = (() => {
-            const base = API_BASE_URL; // from script.js, already includes /api
+            const base = API_BASE_URL;
             return {
                 get: async (path) => { const r = await fetch(base + path); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
                 post: async (path, body) => { const r = await fetch(base + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
             };
         })();
 
-        let overviewData = null;
         let allDusunData = [];
-        let currentDusun = null; // null = semua
+        let currentDusun = null;
         let rwData = [];
         let maxBelumBayar = 0;
+
+        // Pagination state
+        let currentPage = 1;
+        const pageSize = 50;
+        let searchTimeout = null;
 
         function formatRp(n) {
             if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + ' M';
             if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(0) + '.' + String(Math.round((n % 1e6) / 1e3)).padStart(3, '0').substring(0, 3) + '.000';
             return 'Rp ' + Number(n).toLocaleString('id-ID');
         }
-
         function formatRpShort(n) {
             if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(1) + ' M';
             if (n >= 1e6) return 'Rp ' + (n / 1e6).toFixed(1) + ' Jt';
             return 'Rp ' + Number(n).toLocaleString('id-ID');
         }
 
-        // Load overview
+        // ── ANALYTICS: Overview ──
         async function loadOverview() {
             try {
                 const res = await API.get('/pbb/stats/overview');
-                overviewData = res.data;
                 const ov = res.data.overview;
                 document.getElementById('h-wp').textContent = ov.totalWp;
                 document.getElementById('h-rp').textContent = formatRpShort(ov.totalBelumBayar);
                 document.getElementById('h-rp-sub').textContent = 'Dari total ' + formatRpShort(ov.totalPajak);
                 document.getElementById('h-fil').textContent = ov.totalWp;
                 document.getElementById('h-fil-sub').textContent = 'Total ' + ov.totalWp + ' WP terdaftar';
-            } catch (e) {
-                console.error('Failed to load overview:', e);
-            }
+            } catch (e) { console.error('Overview error:', e); }
         }
 
-        // Load dusun cards
+        // ── ANALYTICS: Dusun Cards ──
         async function loadDusunCards() {
             try {
                 const res = await API.get('/pbb/stats/overview');
                 allDusunData = res.data.perDusun || [];
-
-                // Compute totals for "Semua Dusun"
                 const totalWP = allDusunData.reduce((s, d) => s + d.count, 0);
                 const totalTunggakan = allDusunData.reduce((s, d) => s + d.totalBelumBayar, 0);
-
                 const strip = document.getElementById('dusun-strip');
                 strip.innerHTML = '';
 
-                // "Semua Dusun" card
                 const allCard = document.createElement('div');
-                allCard.className = 'dcard on';
-                allCard.id = 'dc-all';
+                allCard.className = 'dcard on'; allCard.id = 'dc-all';
                 allCard.onclick = () => setDusun(null);
-                allCard.innerHTML = `
-                    <div class="dcard-name">🏘️ Semua Dusun</div>
-                    <div class="dcard-rw">Semua RW</div>
-                    <div class="dcard-n">${totalWP} WP</div>
-                    <div class="dcard-rp">${formatRpShort(totalTunggakan)}</div>
-                `;
+                allCard.innerHTML = `<div class="dcard-name">🏘️ Semua Dusun</div><div class="dcard-rw">Semua RW</div><div class="dcard-n">${totalWP} WP</div><div class="dcard-rp">${formatRpShort(totalTunggakan)}</div>`;
                 strip.appendChild(allCard);
 
-                // Individual dusun cards
                 const icons = { dusun1: '🌿 Dusun I', dusun2: '🌿 Dusun II', dusun3: '🌿 Dusun III', luardesa: '🔹 Luar Desa' };
                 const rwLabels = { dusun1: 'RW 01 · RW 02', dusun2: 'RW 03 · RW 04', dusun3: 'RW 05 · RW 06 · RW 07', luardesa: 'Alamat tidak terdata' };
-
                 for (const d of allDusunData) {
                     const card = document.createElement('div');
-                    card.className = 'dcard';
-                    card.id = 'dc-' + d.dusun;
+                    card.className = 'dcard'; card.id = 'dc-' + d.dusun;
                     card.onclick = () => setDusun(d.dusun);
-                    card.innerHTML = `
-                        <div class="dcard-name">${icons[d.dusun] || d.dusunNama}</div>
-                        <div class="dcard-rw">${rwLabels[d.dusun] || d.dusunNama}</div>
-                        <div class="dcard-n">${d.count} WP</div>
-                        <div class="dcard-rp">${formatRpShort(d.totalBelumBayar)}</div>
-                    `;
+                    card.innerHTML = `<div class="dcard-name">${icons[d.dusun] || d.dusunNama}</div><div class="dcard-rw">${rwLabels[d.dusun] || d.dusunNama}</div><div class="dcard-n">${d.count} WP</div><div class="dcard-rp">${formatRpShort(d.totalBelumBayar)}</div>`;
                     strip.appendChild(card);
                 }
-            } catch (e) {
-                console.error('Failed to load dusun cards:', e);
-            }
+            } catch (e) { console.error('Dusun cards error:', e); }
         }
 
         function setDusun(dusunId) {
             currentDusun = dusunId;
-
-            // Update card styles
             document.querySelectorAll('.dcard').forEach(c => c.classList.remove('on'));
-            if (dusunId === null) {
-                document.getElementById('dc-all')?.classList.add('on');
-            } else {
-                document.getElementById('dc-' + dusunId)?.classList.add('on');
-            }
-
+            if (dusunId === null) document.getElementById('dc-all')?.classList.add('on');
+            else document.getElementById('dc-' + dusunId)?.classList.add('on');
             loadRWData();
         }
 
         async function loadRWData() {
             const grid = document.getElementById('rw-grid');
             grid.innerHTML = '<div class="text-center text-gray-400 py-8 col-span-full">Memuat data...</div>';
-
             try {
                 if (currentDusun === null) {
-                    // Load all RW data across all dusun
                     let allRW = [];
                     for (const d of allDusunData) {
                         const res = await API.get('/pbb/stats/by-dusun/' + d.dusun);
@@ -259,47 +232,22 @@
                     const res = await API.get('/pbb/stats/by-dusun/' + currentDusun);
                     rwData = (res.data || []).map(rw => ({ ...rw, dusunId: currentDusun }));
                 }
-
                 maxBelumBayar = Math.max(...rwData.map(r => r.totalBelumBayar), 1);
                 renderRWGrid();
-            } catch (e) {
-                console.error('Failed to load RW data:', e);
-                grid.innerHTML = '<div class="text-center text-red-400 py-8 col-span-full">Gagal memuat data.</div>';
-            }
+            } catch (e) { console.error('RW data error:', e); grid.innerHTML = '<div class="text-center text-red-400 py-8 col-span-full">Gagal memuat data.</div>'; }
         }
 
         function renderRWGrid() {
             const grid = document.getElementById('rw-grid');
             grid.innerHTML = '';
-
-            // Update filtered count
             const totalFilteredWP = rwData.reduce((s, r) => s + r.count, 0);
-            const totalFilteredTunggakan = rwData.reduce((s, r) => s + r.totalBelumBayar, 0);
             document.getElementById('h-fil').textContent = totalFilteredWP;
             document.getElementById('h-fil-sub').textContent = rwData.length + ' RW ditampilkan';
-
-            if (rwData.length === 0) {
-                grid.innerHTML = '<div class="text-center text-gray-400 py-8 col-span-full">Tidak ada data untuk filter ini.</div>';
-                return;
-            }
-
+            if (rwData.length === 0) { grid.innerHTML = '<div class="text-center text-gray-400 py-8 col-span-full">Tidak ada data untuk filter ini.</div>'; return; }
             rwData.forEach((rw, idx) => {
                 const pct = Math.round((rw.totalBelumBayar / maxBelumBayar) * 100);
-                const card = document.createElement('div');
-                card.className = 'rw-card';
-                card.id = 'rwc-' + idx;
-                const rwLabel = rw.rwNama || rw.rw;
-                card.innerHTML = `
-                    <div class="rw-card-head">
-                        <span class="rw-card-label">${rwLabel}</span>
-                        <span class="rw-card-wp">${rw.count} WP</span>
-                    </div>
-                    <div class="rw-card-rp">${formatRpShort(rw.totalBelumBayar)}</div>
-                    <div class="rw-card-bar-bg"><div class="rw-card-bar" style="width:${pct}%"></div></div>
-                    <div class="rt-accordion" id="rta-${idx}">
-                        <div class="text-xs text-gray-400 py-2">Memuat data RT...</div>
-                    </div>
-                `;
+                const card = document.createElement('div'); card.className = 'rw-card'; card.id = 'rwc-' + idx;
+                card.innerHTML = `<div class="rw-card-head"><span class="rw-card-label">${rw.rwNama || rw.rw}</span><span class="rw-card-wp">${rw.count} WP</span></div><div class="rw-card-rp">${formatRpShort(rw.totalBelumBayar)}</div><div class="rw-card-bar-bg"><div class="rw-card-bar" style="width:${pct}%"></div></div><div class="rt-accordion" id="rta-${idx}"><div class="text-xs text-gray-400 py-2">Memuat data RT...</div></div>`;
                 card.onclick = () => toggleRWCard(idx, rw);
                 grid.appendChild(card);
             });
@@ -307,57 +255,104 @@
 
         async function toggleRWCard(idx, rw) {
             const acc = document.getElementById('rta-' + idx);
-            if (acc.classList.contains('open')) {
-                acc.classList.remove('open');
-                return;
-            }
-
-            // Close others
+            if (acc.classList.contains('open')) { acc.classList.remove('open'); return; }
             document.querySelectorAll('.rt-accordion.open').forEach(el => el.classList.remove('open'));
             acc.classList.add('open');
-
-            // Load RT data if not loaded
             if (acc.querySelector('.text-gray-400')) {
                 try {
                     const res = await API.get(`/pbb/stats/by-dusun/${rw.dusunId}/rw/${rw.rw}`);
                     const rtData = res.data || [];
                     const maxRt = Math.max(...rtData.map(r => r.totalBelumBayar), 1);
-
                     acc.innerHTML = '';
                     rtData.forEach(rt => {
                         const rtPct = Math.round((rt.totalBelumBayar / maxRt) * 100);
-                        const row = document.createElement('div');
-                        row.className = 'rt-row';
-                        row.innerHTML = `
-                            <span class="rt-label">${rt.rtNama || rt.rt}</span>
-                            <div class="rt-bar-wrap"><div class="rt-bar" style="width:${rtPct}%"></div></div>
-                            <span class="rt-rp">${formatRpShort(rt.totalBelumBayar)}</span>
-                            <span class="rt-wp">${rt.count} WP</span>
-                        `;
+                        const row = document.createElement('div'); row.className = 'rt-row';
+                        row.innerHTML = `<span class="rt-label">${rt.rtNama || rt.rt}</span><div class="rt-bar-wrap"><div class="rt-bar" style="width:${rtPct}%"></div></div><span class="rt-rp">${formatRpShort(rt.totalBelumBayar)}</span><span class="rt-wp">${rt.count} WP</span>`;
                         acc.appendChild(row);
                     });
-
-                    if (rtData.length === 0) {
-                        acc.innerHTML = '<div class="text-xs text-gray-400 py-2">Tidak ada data RT.</div>';
-                    }
-                } catch (e) {
-                    acc.innerHTML = '<div class="text-xs text-red-400 py-2">Gagal memuat data RT.</div>';
-                }
+                    if (rtData.length === 0) acc.innerHTML = '<div class="text-xs text-gray-400 py-2">Tidak ada data RT.</div>';
+                } catch (e) { acc.innerHTML = '<div class="text-xs text-red-400 py-2">Gagal memuat data RT.</div>'; }
             }
         }
 
-        // Search
-        document.getElementById('search-input').addEventListener('input', async (e) => {
-            const q = e.target.value.trim();
-            if (q.length < 2) {
-                loadRWData();
-                return;
-            }
+        // ── DATA TABLE: Paginated ──
+        async function loadDataTable() {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Memuat data...</td></tr>';
             try {
-                const res = await API.post('/pbb/warga-list', {});
-                // Filter locally if API doesn't support search
-                // For now, just filter the RW data display
-            } catch (e) { /* ignore */ }
+                const q = document.getElementById('search-input').value.trim();
+                const params = new URLSearchParams({ page: currentPage, limit: pageSize });
+                if (q) params.set('q', q);
+                if (currentDusun) params.set('dusun', currentDusun);
+
+                const res = await API.get('/pbb/warga-list?' + params.toString());
+                const data = res.data || [];
+                const total = res.total || 0;
+                const totalPages = res.totalPages || 1;
+                const startIdx = (currentPage - 1) * pageSize;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Tidak ada data ditemukan</td></tr>';
+                    document.getElementById('page-info').textContent = '—';
+                    document.getElementById('pagination').innerHTML = '';
+                    return;
+                }
+
+                tbody.innerHTML = data.map((item, i) => {
+                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'status-lunas' :
+                        (item.status || '').toLowerCase() === 'sebagian' ? 'status-sebagian' :
+                        (item.status || '').toLowerCase() === 'pending' ? 'status-pending' : 'status-belum';
+                    return `<tr class="border-b border-gray-50 hover:bg-emerald-50/50 transition">
+                        <td class="px-4 py-3 text-gray-500">${startIdx + i + 1}</td>
+                        <td class="px-4 py-3 font-mono text-xs text-gray-600">${item.nop || '-'}</td>
+                        <td class="px-4 py-3 font-medium text-gray-800">${item.nama || '-'}</td>
+                        <td class="px-4 py-3 text-gray-600 hidden md:table-cell text-xs">${item.alamat || '-'}</td>
+                        <td class="px-4 py-3 text-center text-gray-600 text-xs">${item.rwNama || '-'}/${item.rtNama || '-'}</td>
+                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-800">${item.totalPajak ? 'Rp ' + Number(item.totalPajak).toLocaleString('id-ID') : '-'}</td>
+                    </tr>`;
+                }).join('');
+
+                document.getElementById('page-info').textContent = `Halaman ${currentPage} dari ${totalPages} (${total} data)`;
+                renderPagination(currentPage, totalPages);
+            } catch (e) {
+                console.error('Table load error:', e);
+                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-red-400">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderPagination(page, totalPages) {
+            const pagDiv = document.getElementById('pagination');
+            let html = '';
+            html += `<button class="page-btn" data-page="${page-1}" ${page<=1?'disabled':''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>`;
+            const pages = [];
+            if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); }
+            else {
+                pages.push(1);
+                if (page > 3) pages.push('...');
+                for (let i = Math.max(2, page-1); i <= Math.min(totalPages-1, page+1); i++) pages.push(i);
+                if (page < totalPages - 2) pages.push('...');
+                pages.push(totalPages);
+            }
+            pages.forEach(p => {
+                if (p === '...') html += `<span class="px-2 text-gray-400">...</span>`;
+                else html += `<button class="page-btn ${p===page?'active':''}" data-page="${p}">${p}</button>`;
+            });
+            html += `<button class="page-btn" data-page="${page+1}" ${page>=totalPages?'disabled':''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>`;
+            pagDiv.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // Event delegation for pagination
+        document.getElementById('pagination').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-page]');
+            if (btn && !btn.disabled) { currentPage = parseInt(btn.dataset.page); loadDataTable(); window.scrollTo({ top: 600, behavior: 'smooth' }); }
+        });
+
+        // Search
+        document.getElementById('search-input').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => { currentPage = 1; loadDataTable(); }, 300);
         });
 
         // Init
@@ -365,10 +360,10 @@
             await loadOverview();
             await loadDusunCards();
             await loadRWData();
+            await loadDataTable();
             PageLoader.hide();
             lucide.createIcons();
         }
-
         window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

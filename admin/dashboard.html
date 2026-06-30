@@ -61,6 +61,10 @@
                 Kelola PBB
                 <span id="pbb-badge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span>
             </a>
+            <a href="#penduduk" id="nav-penduduk" onclick="switchPage('penduduk', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
+                <i data-lucide="database" style="width:20px;height:20px"></i>
+                Data Penduduk
+            </a>
             <a href="#bansos" id="nav-bansos" onclick="switchPage('bansos', this)" class="nav-item p-3 rounded-lg font-medium text-sm transition flex items-center gap-3 text-emerald-200 hover:bg-emerald-800">
                 <i data-lucide="heart-handshake" style="width:20px;height:20px"></i>
                 Kelola Bansos
@@ -412,6 +416,69 @@
                             </thead>
                             <tbody id="tunggakan-table" class="divide-y divide-gray-100"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PENDUDUK PAGE ==================== -->
+            <div id="penduduk-page" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">Data Penduduk</h3>
+                        <p class="text-sm text-gray-600 mt-1">Database penduduk dari Monografi Desa</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="penduduk-total-badge" class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold">—</span>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white rounded-2xl shadow-lg p-4 mb-4">
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <div class="relative flex-1">
+                            <i data-lucide="search" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                            <input id="penduduk-search" type="text" placeholder="Cari nama, NIK, atau KK..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition">
+                        </div>
+                        <select id="penduduk-filter-agama" class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+                            <option value="">Semua Agama</option>
+                        </select>
+                        <select id="penduduk-filter-jk" class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+                            <option value="">Semua</option>
+                            <option value="LAKI-LAKI">Laki-laki</option>
+                            <option value="PEREMPUAN">Perempuan</option>
+                        </select>
+                        <select id="penduduk-filter-rt" class="px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white">
+                            <option value="">Semua RT</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[900px] text-sm">
+                            <thead>
+                                <tr class="bg-emerald-800 text-white">
+                                    <th class="px-4 py-3 text-left font-semibold">No</th>
+                                    <th class="px-4 py-3 text-left font-semibold">NIK</th>
+                                    <th class="px-4 py-3 text-left font-semibold">Nama</th>
+                                    <th class="px-4 py-3 text-left font-semibold hidden lg:table-cell">TTL</th>
+                                    <th class="px-4 py-3 text-center font-semibold">JK</th>
+                                    <th class="px-4 py-3 text-left font-semibold hidden md:table-cell">Alamat</th>
+                                    <th class="px-4 py-3 text-left font-semibold hidden lg:table-cell">Agama</th>
+                                    <th class="px-4 py-3 text-left font-semibold hidden lg:table-cell">Pekerjaan</th>
+                                    <th class="px-4 py-3 text-center font-semibold">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="penduduk-table" class="divide-y divide-gray-200">
+                                <tr><td colspan="9" class="px-4 py-12 text-center text-gray-400">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+                        <span id="penduduk-page-info" class="text-xs text-gray-500">—</span>
+                        <div id="penduduk-pagination" class="flex items-center gap-1"></div>
                     </div>
                 </div>
             </div>
@@ -790,6 +857,20 @@
         </div>
     </div>
 
+    <!-- Penduduk Detail Modal -->
+    <div id="penduduk-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="text-lg font-bold text-gray-800">Detail Penduduk</h4>
+                <button onclick="closeModal('penduduk-detail-modal')" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <div id="penduduk-detail-body"></div>
+            <div class="mt-4 text-right">
+                <button onclick="closeModal('penduduk-detail-modal')" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../assets/script.js"></script>
     <script>
         // =============================
@@ -889,6 +970,7 @@
                             'dashboard': 'Dashboard',
                             'berita': 'Kelola Berita',
                             'pbb': 'Kelola PBB',
+                            'penduduk': 'Data Penduduk',
                             'bansos': 'Kelola Bansos',
                             'pengaduan': 'Pengaduan Masyarakat',
                             'surat': 'Surat Online',
@@ -909,6 +991,7 @@
             if (page === 'dashboard') loadDashboardStats();
             else if (page === 'berita') loadBerita();
             else if (page === 'pbb') { loadPbbData(); loadApprovalsTable(); loadRiwayat(); loadTunggakan(); populatePbbFilters(); }
+            else if (page === 'penduduk') loadPendudukData();
             else if (page === 'bansos') { loadBansosPrograms(); loadBansos(); }
             else if (page === 'pengaduan') loadPengaduan();
                         else if (page === 'surat') loadSurat();
@@ -1934,6 +2017,164 @@
             div.textContent = str;
             return div.innerHTML;
         }
+
+        // =============================
+        // PENDUDUK DATA
+        // =============================
+        let pendudukPage = 1;
+        const pendudukLimit = 50;
+        let pendudukFiltersLoaded = false;
+
+        async function loadPendudukFilters() {
+            if (pendudukFiltersLoaded) return;
+            try {
+                const res = await apiGet(API_BASE_URL + '/penduduk/filters');
+                if (!res.success) return;
+                const { rt, agama, total } = res.data;
+                document.getElementById('penduduk-total-badge').textContent = total.toLocaleString('id-ID') + ' jiwa';
+
+                const rtSelect = document.getElementById('penduduk-filter-rt');
+                rt.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = 'RT ' + r; rtSelect.appendChild(o); });
+
+                const agamaSelect = document.getElementById('penduduk-filter-agama');
+                agamaSelect.innerHTML = '<option value="">Semua Agama</option>';
+                agama.forEach(a => { const o = document.createElement('option'); o.value = a; o.textContent = a; agamaSelect.appendChild(o); });
+
+                pendudukFiltersLoaded = true;
+            } catch (e) { console.error('Penduduk filters error:', e); }
+        }
+
+        async function loadPendudukData() {
+            await loadPendudukFilters();
+            const tbody = document.getElementById('penduduk-table');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-12 text-center text-gray-500">Memuat data...</td></tr>';
+
+            try {
+                const search = document.getElementById('penduduk-search')?.value || '';
+                const agama = document.getElementById('penduduk-filter-agama')?.value || '';
+                const jk = document.getElementById('penduduk-filter-jk')?.value || '';
+                const rt = document.getElementById('penduduk-filter-rt')?.value || '';
+
+                const params = new URLSearchParams({ page: pendudukPage, limit: pendudukLimit });
+                if (search) params.set('search', search);
+                if (agama) params.set('agama', agama);
+                if (jk) params.set('jenisKelamin', jk);
+                if (rt) params.set('rt', rt);
+
+                const res = await apiGet(API_BASE_URL + '/penduduk?' + params.toString());
+                const data = res.success ? (res.data || []) : [];
+                const total = res.total || 0;
+                const totalPages = res.totalPages || 1;
+                const startIdx = (pendudukPage - 1) * pendudukLimit;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-12 text-center text-gray-400">Tidak ada data ditemukan</td></tr>';
+                    document.getElementById('penduduk-page-info').textContent = '—';
+                    document.getElementById('penduduk-pagination').innerHTML = '';
+                    return;
+                }
+
+                tbody.innerHTML = data.map((p, i) => {
+                    const jkBadge = p.jenisKelamin === 'LAKI-LAKI'
+                        ? '<span class="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">L</span>'
+                        : '<span class="px-2 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-700">P</span>';
+                    return `<tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                        <td class="px-4 py-3 text-gray-500">${startIdx + i + 1}</td>
+                        <td class="px-4 py-3 font-mono text-xs text-gray-600">${escapeHtml(p.nik)}</td>
+                        <td class="px-4 py-3 font-medium text-gray-800">${escapeHtml(p.nama)}</td>
+                        <td class="px-4 py-3 text-gray-600 hidden lg:table-cell text-xs">${escapeHtml(p.tempatLahir)}, ${escapeHtml(p.tanggalLahir)}</td>
+                        <td class="px-4 py-3 text-center">${jkBadge}</td>
+                        <td class="px-4 py-3 text-gray-600 hidden md:table-cell text-xs">${escapeHtml(p.kampung || '')} RT${p.rt}/RW${p.rw}</td>
+                        <td class="px-4 py-3 text-gray-600 hidden lg:table-cell text-xs">${escapeHtml(p.agama || '-')}</td>
+                        <td class="px-4 py-3 text-gray-600 hidden lg:table-cell text-xs truncate max-w-[120px]">${escapeHtml(p.pekerjaan || '-')}</td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="showPendudukDetail('${escapeHtml(p.nik)}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded text-xs hover:bg-emerald-700">
+                                <i data-lucide="eye" style="width:14px;height:14px"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                document.getElementById('penduduk-page-info').textContent = `Halaman ${pendudukPage} dari ${totalPages} (${total} data)`;
+                renderPendudukPagination(totalPages);
+                lucide.createIcons();
+            } catch (e) {
+                console.error('Load penduduk error:', e);
+                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-12 text-center text-red-500">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function renderPendudukPagination(totalPages) {
+            const pagDiv = document.getElementById('penduduk-pagination');
+            if (!pagDiv) return;
+            pagDiv.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const prev = document.createElement('button');
+            prev.className = 'px-3 py-1 border rounded text-sm ' + (pendudukPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-50');
+            prev.textContent = '←'; prev.disabled = pendudukPage <= 1;
+            prev.onclick = () => { if (pendudukPage > 1) { pendudukPage--; loadPendudukData(); } };
+            pagDiv.appendChild(prev);
+
+            const info = document.createElement('span');
+            info.className = 'px-3 py-1 text-sm text-gray-600';
+            info.textContent = pendudukPage + ' / ' + totalPages;
+            pagDiv.appendChild(info);
+
+            const next = document.createElement('button');
+            next.className = 'px-3 py-1 border rounded text-sm hover:bg-emerald-50';
+            next.textContent = '→'; next.disabled = pendudukPage >= totalPages;
+            next.onclick = () => { if (pendudukPage < totalPages) { pendudukPage++; loadPendudukData(); } };
+            pagDiv.appendChild(next);
+        }
+
+        async function showPendudukDetail(nik) {
+            try {
+                const res = await apiGet(API_BASE_URL + '/penduduk/' + nik);
+                if (!res.success || !res.data) { showToast('Data tidak ditemukan', 'error'); return; }
+                const p = res.data;
+                const fields = [
+                    ['NIK', p.nik], ['No. KK', p.kk], ['Nama Lengkap', p.nama],
+                    ['Tempat Lahir', p.tempatLahir], ['Tanggal Lahir', p.tanggalLahir],
+                    ['Jenis Kelamin', p.jenisKelamin], ['Umur', p.umur ? p.umur + ' tahun' : '-'],
+                    ['Kampung', p.kampung], ['RT', p.rt], ['RW', p.rw],
+                    ['Status Hubungan', p.shdk], ['Agama', p.agama],
+                    ['Pendidikan', p.pendidikan], ['Pekerjaan', p.pekerjaan],
+                    ['Nama Ayah', p.ayah], ['Nama Ibu', p.ibu]
+                ];
+                let html = '<div class="grid grid-cols-1 gap-2">';
+                fields.forEach(([label, val]) => {
+                    html += `<div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500 text-sm">${label}</span><span class="text-gray-800 text-sm font-medium">${escapeHtml(val || '-')}</span></div>`;
+                });
+                html += '</div>';
+
+                // Use existing modal or show inline
+                const modal = document.getElementById('penduduk-detail-modal');
+                if (modal) {
+                    document.getElementById('penduduk-detail-body').innerHTML = `
+                        <div class="bg-emerald-50 rounded-xl p-4 mb-4 text-center">
+                            <h4 class="font-display text-lg font-bold text-emerald-800">${escapeHtml(p.nama)}</h4>
+                            <p class="text-sm text-emerald-600">NIK: ${escapeHtml(p.nik)}</p>
+                        </div>${html}`;
+                    modal.classList.add('active');
+                }
+            } catch (e) { showToast('Gagal memuat detail', 'error'); }
+        }
+
+        // Penduduk search/filter event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            let pendudukSearchTimeout;
+            const searchEl = document.getElementById('penduduk-search');
+            if (searchEl) searchEl.addEventListener('input', () => {
+                clearTimeout(pendudukSearchTimeout);
+                pendudukSearchTimeout = setTimeout(() => { pendudukPage = 1; loadPendudukData(); }, 300);
+            });
+            ['penduduk-filter-agama', 'penduduk-filter-jk', 'penduduk-filter-rt'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('change', () => { pendudukPage = 1; loadPendudukData(); });
+            });
+        });
 
         // =============================
         // INIT

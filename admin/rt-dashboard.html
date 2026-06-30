@@ -244,6 +244,7 @@
                         </thead>
                         <tbody id="warga-table" class="divide-y divide-gray-200"></tbody>
                     </table>
+                    <div id="warga-pagination" class="flex items-center justify-between px-6 py-3 border-t border-gray-100 bg-gray-50"></div>
                 </div>
             </div>
 
@@ -306,6 +307,7 @@
                         </thead>
                         <tbody id="pbb-table" class="divide-y divide-gray-200"></tbody>
                     </table>
+                    <div id="pbb-pagination" class="flex items-center justify-between px-6 py-3 border-t border-gray-100 bg-gray-50"></div>
                 </div>
             </div>
 
@@ -552,15 +554,32 @@
         }
 
         // =============================
-        // FILTER BY RT
+        // FILTER BY RT - Parse wilayah format
         // =============================
+        function getRtRwFromUser() {
+            const user = getAdminUser();
+            if (!user || !user.rt) return { rt: null, rw: null };
+            // user.rt format: 'dusun1/rw1/rt1' or 'dusun1/rw1/rt1,rt2,rt3'
+            const parts = String(user.rt).split('/');
+            let rwPart = null, rtPart = null;
+            if (parts.length >= 2) {
+                const rwMatch = parts[1].match(/(\d+)/);
+                if (rwMatch) rwPart = 'rw' + rwMatch[1].padStart(2, '0');
+            }
+            if (parts.length >= 3) {
+                const rtMatch = parts[2].match(/(\d+)/);
+                if (rtMatch) rtPart = 'rt' + rtMatch[1].padStart(2, '0');
+            }
+            return { rt: rtPart, rw: rwPart };
+        }
+
         function filterByRt(items, rtField) {
-            const rtId = getRtId();
-            if (!rtId || !items) return items || [];
-            return items.filter(item => {
-                const itemRt = item[rtField || 'rt'];
-                if (itemRt === undefined || itemRt === null) return false;
-                return String(itemRt).trim() === rtId;
+            const { rt, rw } = getRtRwFromUser();
+            if (!rt && !rw) return items || [];
+            return (items || []).filter(item => {
+                if (rt && item.rt && String(item.rt).trim() !== rt) return false;
+                if (rw && item.rw && String(item.rw).trim() !== rw) return false;
+                return true;
             });
         }
 
@@ -634,32 +653,27 @@
         }
 
         // =============================
-        // WARGA DATA
+        // WARGA DATA (with server-side pagination + RT filter)
         // =============================
+        let wargaPage = 1;
+        const wargaLimit = 50;
+
         async function loadWargaData() {
             const tbody = document.getElementById('warga-table');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
             try {
                 const search = document.getElementById('warga-search')?.value || '';
-                const res = await apiGet(API_BASE_URL + '/pbb');
-                let data = res.success ? (res.data || []) : [];
+                const { rt, rw } = getRtRwFromUser();
+                const params = new URLSearchParams({ page: wargaPage, limit: wargaLimit });
+                if (search) params.set('q', search);
+                if (rt) params.set('rt', rt);
+                if (rw) params.set('rw', rw);
 
-                // Filter by RT
-                const rtId = getRtId();
-                if (rtId) {
-                    data = filterByRt(data, 'rt');
-                }
-
-                // Apply search filter
-                if (search) {
-                    const q = search.toLowerCase();
-                    data = data.filter(item =>
-                        (item.nop || '').toLowerCase().includes(q) ||
-                        (item.nama || '').toLowerCase().includes(q) ||
-                        (item.alamat || '').toLowerCase().includes(q)
-                    );
-                }
+                const res = await apiGet(API_BASE_URL + '/pbb/warga-list?' + params.toString());
+                const data = res.success ? (res.data || []) : [];
+                const total = res.total || 0;
+                const totalPages = res.totalPages || 1;
 
                 wargaData = data;
 
@@ -681,13 +695,16 @@
                         <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
                         <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusun || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.dusunNama || item.dusun || '-')}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rwNama || item.rw || '-'}/${item.rtNama || item.rt || '-'}</td>
                         <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusLabel}</span></td>
-                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${item.pajak || item.totalPajak ? 'Rp ' + Number(item.pajak || item.totalPajak).toLocaleString('id-ID') : '-'}</td>
+                        <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${item.totalPajak ? 'Rp ' + Number(item.totalPajak).toLocaleString('id-ID') : '-'}</td>
                     `;
                     tbody.appendChild(row);
                 });
+
+                // Render pagination
+                renderWargaPagination(total, totalPages);
                 lucide.createIcons();
             } catch (err) {
                 console.error('Load warga error:', err);
@@ -695,22 +712,52 @@
             }
         }
 
+        function renderWargaPagination(total, totalPages) {
+            const container = document.getElementById('warga-pagination');
+            if (!container) return;
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const info = document.createElement('span');
+            info.className = 'text-sm text-gray-500 mr-4';
+            info.textContent = `Halaman ${wargaPage} dari ${totalPages} (${total} data)`;
+            container.appendChild(info);
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'px-3 py-1 border rounded text-sm mr-1 ' + (wargaPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-50');
+            prevBtn.textContent = '←';
+            prevBtn.disabled = wargaPage <= 1;
+            prevBtn.onclick = () => { if (wargaPage > 1) { wargaPage--; loadWargaData(); } };
+            container.appendChild(prevBtn);
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'px-3 py-1 border rounded text-sm hover:bg-emerald-50';
+            nextBtn.textContent = '→';
+            nextBtn.disabled = wargaPage >= totalPages;
+            nextBtn.onclick = () => { if (wargaPage < totalPages) { wargaPage++; loadWargaData(); } };
+            container.appendChild(nextBtn);
+        }
+
         // =============================
-        // STATUS PBB WARGA
+        // STATUS PBB WARGA (with server-side pagination + RT filter)
         // =============================
+        let pbbPage = 1;
+        const pbbLimit = 50;
+
         async function loadPbbStatus() {
             const tbody = document.getElementById('pbb-table');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Memuat data...</td></tr>';
             try {
-                const res = await apiGet(API_BASE_URL + '/pbb');
-                let data = res.success ? (res.data || []) : [];
+                const { rt, rw } = getRtRwFromUser();
+                const params = new URLSearchParams({ page: pbbPage, limit: pbbLimit });
+                if (rt) params.set('rt', rt);
+                if (rw) params.set('rw', rw);
 
-                // Filter by RT
-                const rtId = getRtId();
-                if (rtId) {
-                    data = filterByRt(data, 'rt');
-                }
+                const res = await apiGet(API_BASE_URL + '/pbb/warga-list?' + params.toString());
+                let data = res.success ? (res.data || []) : [];
+                const total = res.total || 0;
+                const totalPages = res.totalPages || 1;
 
                 tbody.innerHTML = '';
                 if (data.length === 0) {
@@ -718,7 +765,7 @@
                     return;
                 }
 
-                // Update summary counts
+                // Update summary counts from total dataset
                 const lunas = data.filter(w => (w.status || '').toLowerCase() === 'lunas').length;
                 const pending = data.filter(w => (w.status || '').toLowerCase() === 'pending').length;
                 const belum = data.length - lunas - pending;
@@ -733,12 +780,12 @@
                                         (item.status || '').toLowerCase() === 'pending' ? 'status-pending' :
                                         'status-belum';
                     const statusLabel = item.status || 'Belum';
-                    const pajakVal = item.pajak || item.totalPajak;
+                    const pajakVal = item.totalPajak;
                     row.innerHTML = `
                         <td class="px-6 py-4 text-sm font-mono text-gray-700">${escapeHtml(item.nop || '-')}</td>
                         <td class="px-6 py-4 text-sm font-medium text-gray-800">${escapeHtml(item.nama || '-')}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">${escapeHtml(item.alamat || '-')}</td>
-                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rw || '-'}/${item.rt || '-'}</td>
+                        <td class="px-6 py-4 text-sm text-center text-gray-600">${item.rwNama || item.rw || '-'}/${item.rtNama || item.rt || '-'}</td>
                         <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusLabel}</span></td>
                         <td class="px-6 py-4 text-sm text-right font-medium text-gray-800">${pajakVal ? 'Rp ' + Number(pajakVal).toLocaleString('id-ID') : '-'}</td>
                         <td class="px-6 py-4 text-center">
@@ -749,11 +796,40 @@
                     `;
                     tbody.appendChild(row);
                 });
+
+                // Render pagination
+                renderPbbPagination(total, totalPages);
                 lucide.createIcons();
             } catch (err) {
                 console.error('Load PBB status error:', err);
                 tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
             }
+        }
+
+        function renderPbbPagination(total, totalPages) {
+            const container = document.getElementById('pbb-pagination');
+            if (!container) return;
+            container.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const info = document.createElement('span');
+            info.className = 'text-sm text-gray-500 mr-4';
+            info.textContent = `Halaman ${pbbPage} dari ${totalPages} (${total} data)`;
+            container.appendChild(info);
+
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'px-3 py-1 border rounded text-sm mr-1 ' + (pbbPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-50');
+            prevBtn.textContent = '←';
+            prevBtn.disabled = pbbPage <= 1;
+            prevBtn.onclick = () => { if (pbbPage > 1) { pbbPage--; loadPbbStatus(); } };
+            container.appendChild(prevBtn);
+
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'px-3 py-1 border rounded text-sm hover:bg-emerald-50';
+            nextBtn.textContent = '→';
+            nextBtn.disabled = pbbPage >= totalPages;
+            nextBtn.onclick = () => { if (pbbPage < totalPages) { pbbPage++; loadPbbStatus(); } };
+            container.appendChild(nextBtn);
         }
 
         // =============================

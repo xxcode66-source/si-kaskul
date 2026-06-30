@@ -223,16 +223,18 @@ app.post('/api/pbb/accessible', (req, res) => {
   res.json({ success: true, data: hasil });
 });
 
-// --- PBB Warga List (for table view) ---
+// --- PBB Warga List (for table view, with pagination + RT/RW filter) ---
 app.get('/api/pbb/warga-list', (req, res) => {
   let w = getWarga();
-  const { q, dusun, status } = req.query;
+  const { q, dusun, rw, rt, status, page = 1, limit = 50 } = req.query;
   // Filter
   if (q) {
     const lq = q.toLowerCase();
     w = w.filter(x => (x.nama || '').toLowerCase().includes(lq) || (x.nop || '').includes(lq) || (x.rtNama || '').toLowerCase().includes(lq) || (x.rwNama || '').toLowerCase().includes(lq));
   }
   if (dusun) w = w.filter(x => (x.dusun || '') === dusun);
+  if (rw) w = w.filter(x => (x.rw || '') === rw || (x.rwNama || '').toLowerCase() === rw.toLowerCase());
+  if (rt) w = w.filter(x => (x.rt || '') === rt || (x.rtNama || '').toLowerCase() === rt.toLowerCase());
   if (status) w = w.filter(x => {
     const p2026 = (x.payments || []).find(p => p.year === 2026);
     return p2026 && p2026.status === status;
@@ -258,7 +260,13 @@ app.get('/api/pbb/warga-list', (req, res) => {
       perYear: payments.map(p => ({ year: p.year, status: p.status, pajak: p.pajak }))
     };
   });
-  res.json({ success: true, data: list });
+  // Pagination
+  const total = list.length;
+  const lim = parseInt(limit) || 50;
+  const pg = parseInt(page) || 1;
+  const start = (pg - 1) * lim;
+  const paginated = list.slice(start, start + lim);
+  res.json({ success: true, data: paginated, total, page: pg, limit: lim, totalPages: Math.ceil(total / lim) });
 });
 
 // --- PBB Admin CRUD ---
@@ -614,6 +622,46 @@ app.get('/api/penduduk/filters', (req, res) => {
   const total = penduduk.length;
   const lk = penduduk.filter(p => p.jenisKelamin === 'LAKI-LAKI').length;
   res.json({ success: true, data: { rt: rtSet, agama: agamaSet, total, lakiLaki: lk, perempuan: total - lk } });
+});
+
+// Analytics stats endpoint (for public analytics page)
+app.get('/api/penduduk/stats', (req, res) => {
+  const penduduk = database.penduduk || [];
+  const total = penduduk.length;
+  const lk = penduduk.filter(p => p.jenisKelamin === 'LAKI-LAKI').length;
+  const pr = total - lk;
+
+  // Per-agama breakdown
+  const byAgama = {};
+  penduduk.forEach(p => { const a = p.agama || 'Lainnya'; byAgama[a] = (byAgama[a] || 0) + 1; });
+
+  // Per-RT breakdown
+  const byRt = {};
+  penduduk.forEach(p => { const key = `RT ${p.rt}/RW ${p.rw}`; byRt[key] = (byRt[key] || 0) + 1; });
+
+  // Age groups
+  const ageGroups = { '0-14': 0, '15-24': 0, '25-44': 0, '45-64': 0, '65+': 0, 'N/A': 0 };
+  penduduk.forEach(p => {
+    if (!p.umur) { ageGroups['N/A']++; return; }
+    if (p.umur <= 14) ageGroups['0-14']++;
+    else if (p.umur <= 24) ageGroups['15-24']++;
+    else if (p.umur <= 44) ageGroups['25-44']++;
+    else if (p.umur <= 64) ageGroups['45-64']++;
+    else ageGroups['65+']++;
+  });
+
+  // Unique RT/RW count
+  const rtSet = new Set(penduduk.map(p => `${p.rt}/${p.rw}`));
+  const kkSet = new Set(penduduk.map(p => p.kk).filter(Boolean));
+
+  res.json({
+    success: true,
+    data: {
+      total, lakiLaki: lk, perempuan: pr,
+      uniqueRT: rtSet.size, uniqueKK: kkSet.size,
+      byAgama, byRt, ageGroups
+    }
+  });
 });
 
 // Single record lookup by NIK
