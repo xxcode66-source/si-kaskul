@@ -275,12 +275,12 @@
                         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                             <div class="relative w-full sm:w-72">
                                 <i data-lucide="search" style="width:18px;height:18px" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input id="pbb-search" type="text" placeholder="Cari nama / NOP / RT / RW..." oninput="loadPbbData()" class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-sm bg-gray-50">
+                                <input id="pbb-search" type="text" placeholder="Cari nama / NOP / RT / RW..." oninput="pbbPage=1;loadPbbData()" class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none text-sm bg-gray-50">
                             </div>
-                            <select id="pbb-filter-dusun" onchange="loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <select id="pbb-filter-dusun" onchange="pbbPage=1;loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
                                 <option value="">Semua Dusun</option>
                             </select>
-                            <select id="pbb-filter-status" onchange="loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <select id="pbb-filter-status" onchange="pbbPage=1;loadPbbData()" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:ring-2 focus:ring-emerald-500 outline-none">
                                 <option value="">Semua Status</option>
                                 <option value="Lunas">Lunas</option>
                                 <option value="Pending">Pending</option>
@@ -305,6 +305,10 @@
                             </thead>
                             <tbody id="pbb-table" class="divide-y divide-gray-100"></tbody>
                         </table>
+                    </div>
+                    <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+                        <span id="pbb-page-info" class="text-xs text-gray-500">—</span>
+                        <div id="pbb-pagination" class="flex items-center gap-1"></div>
                     </div>
                 </div>
 
@@ -1342,6 +1346,9 @@
         // =============================
         // PBB — DATA WAJIB PAJAK
         // =============================
+        let pbbPage = 1;
+        const pbbLimit = 50;
+
         async function loadPbbData() {
             const tbody = document.getElementById('pbb-table');
             if (!tbody) return;
@@ -1350,19 +1357,23 @@
                 const search = document.getElementById('pbb-search')?.value || '';
                 const filterDusun = document.getElementById('pbb-filter-dusun')?.value || '';
                 const filterStatus = document.getElementById('pbb-filter-status')?.value || '';
-                let url = API_BASE_URL + '/pbb/warga-list';
-                const params = [];
-                if (search) params.push('q=' + encodeURIComponent(search));
-                if (filterDusun) params.push('dusun=' + encodeURIComponent(filterDusun));
-                if (filterStatus) params.push('status=' + encodeURIComponent(filterStatus));
-                if (params.length) url += '?' + params.join('&');
-                const res = await apiGet(url);
+                const params = new URLSearchParams({ page: pbbPage, limit: pbbLimit });
+                if (search) params.set('q', search);
+                if (filterDusun) params.set('dusun', filterDusun);
+                if (filterStatus) params.set('status', filterStatus);
+                const res = await apiGet(API_BASE_URL + '/pbb/warga-list?' + params.toString());
                 const data = res.success ? (res.data || []) : [];
+                const total = res.total || 0;
+                const totalPages = res.totalPages || 1;
                 tbody.innerHTML = '';
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">' + (search ? 'Tidak ditemukan data.' : 'Belum ada data PBB.') + '</td></tr>';
+                    document.getElementById('pbb-page-info').textContent = '—';
+                    document.getElementById('pbb-pagination').innerHTML = '';
                     return;
                 }
+                document.getElementById('pbb-page-info').textContent = 'Halaman ' + pbbPage + ' dari ' + totalPages + ' (' + total + ' data)';
+                renderPbbPagination(totalPages);
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50 transition';
@@ -1390,6 +1401,30 @@
                 console.error('Load PBB error:', err);
                 tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-red-500">Gagal memuat data PBB.</td></tr>';
             }
+        }
+
+        function renderPbbPagination(totalPages) {
+            const pagDiv = document.getElementById('pbb-pagination');
+            if (!pagDiv) return;
+            pagDiv.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            const prev = document.createElement('button');
+            prev.className = 'px-3 py-1 border rounded text-sm ' + (pbbPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-50');
+            prev.textContent = '←'; prev.disabled = pbbPage <= 1;
+            prev.onclick = () => { if (pbbPage > 1) { pbbPage--; loadPbbData(); } };
+            pagDiv.appendChild(prev);
+
+            const info = document.createElement('span');
+            info.className = 'px-3 py-1 text-sm text-gray-600';
+            info.textContent = pbbPage + ' / ' + totalPages;
+            pagDiv.appendChild(info);
+
+            const next = document.createElement('button');
+            next.className = 'px-3 py-1 border rounded text-sm hover:bg-emerald-50';
+            next.textContent = '→'; next.disabled = pbbPage >= totalPages;
+            next.onclick = () => { if (pbbPage < totalPages) { pbbPage++; loadPbbData(); } };
+            pagDiv.appendChild(next);
         }
 
         // =============================
