@@ -90,9 +90,23 @@
     <!-- Dusun Strip -->
     <div class="dusun-strip"><div class="dusun-inner" id="dusun-strip"></div></div>
 
-    <!-- Search -->
+    <!-- Search / Cek PBB -->
     <div class="search-bar">
-        <input type="text" class="search-input" id="search-input" placeholder="🔍 Cari nama wajib pajak atau NOP...">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                <h3 class="font-bold text-emerald-800 text-lg mb-2 flex items-center gap-2">
+                    <i data-lucide="search" style="width:20px;height:20px"></i> Cek Status PBB
+                </h3>
+                <p class="text-gray-500 text-sm mb-4">Masukkan NOP (Nomor Objek Pajak) Anda untuk melihat status pembayaran PBB.</p>
+                <div class="flex gap-3">
+                    <input type="text" class="search-input flex-1" id="cek-nop-input" placeholder="Contoh: 32.08.120.001.0001-0001-1">
+                    <button onclick="cekPBB()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition whitespace-nowrap flex items-center gap-2">
+                        <i data-lucide="search" style="width:16px;height:16px"></i> Cek
+                    </button>
+                </div>
+                <div id="cek-result" class="mt-4"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Analytics -->
@@ -101,34 +115,7 @@
         <div class="rw-grid" id="rw-grid"></div>
     </div>
 
-    <!-- Data Table Section -->
-    <div class="data-section">
-        <div class="data-section-title">📋 Data Wajib Pajak (Pagination per 50)</div>
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-emerald-800 text-white">
-                            <th class="px-4 py-3 text-left font-semibold">No</th>
-                            <th class="px-4 py-3 text-left font-semibold">NOP</th>
-                            <th class="px-4 py-3 text-left font-semibold">Nama</th>
-                            <th class="px-4 py-3 text-left font-semibold hidden md:table-cell">Alamat</th>
-                            <th class="px-4 py-3 text-center font-semibold">RW/RT</th>
-                            <th class="px-4 py-3 text-center font-semibold">Status 2026</th>
-                            <th class="px-4 py-3 text-right font-semibold">Total Pajak</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-table-body">
-                        <tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Memuat data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
-                <span id="page-info" class="text-xs text-gray-500">—</span>
-                <div id="pagination" class="flex items-center gap-1"></div>
-            </div>
-        </div>
-    </div>
+    <!-- Data Table Section removed - data privacy -->
 
     <footer class="py-10 px-4 text-center bg-emerald-900 text-white">
         <p class="text-sm">&copy; 2024 Desa Kasomalang Kulon. Semua Hak Dilindungi.</p>
@@ -275,84 +262,74 @@
             }
         }
 
-        // ── DATA TABLE: Paginated ──
-        async function loadDataTable() {
-            const tbody = document.getElementById('data-table-body');
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Memuat data...</td></tr>';
+        // ── CEK PBB: NOP Lookup ──
+        async function cekPBB() {
+            const nop = document.getElementById('cek-nop-input').value.trim();
+            const resultEl = document.getElementById('cek-result');
+            if (!nop) {
+                resultEl.innerHTML = '<div class="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium">Masukkan NOP Anda terlebih dahulu.</div>';
+                return;
+            }
+            resultEl.innerHTML = '<div class="text-center py-4 text-gray-400 text-sm">Memeriksa...</div>';
             try {
-                const q = document.getElementById('search-input').value.trim();
-                const params = new URLSearchParams({ page: currentPage, limit: pageSize });
-                if (q) params.set('q', q);
-                if (currentDusun) params.set('dusun', currentDusun);
-
-                const res = await API.get('/pbb/warga-list?' + params.toString());
-                const data = res.data || [];
-                const total = res.total || 0;
-                const totalPages = res.totalPages || 1;
-                const startIdx = (currentPage - 1) * pageSize;
-
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">Tidak ada data ditemukan</td></tr>';
-                    document.getElementById('page-info').textContent = '—';
-                    document.getElementById('pagination').innerHTML = '';
-                    return;
+                const res = await API.post('/pbb/check-nop', { nop });
+                if (res.success && res.data) {
+                    const d = res.data;
+                    const statusClass = (d.perYear && d.perYear.length > 0) ? (() => {
+                        const latest = d.perYear[d.perYear.length - 1];
+                        return latest.status === 'Lunas' ? 'status-lunas' : latest.status === 'Pending' ? 'status-pending' : latest.status === 'Sebagian' ? 'status-sebagian' : 'status-belum';
+                    })() : 'status-belum';
+                    const latestStatus = d.perYear && d.perYear.length > 0 ? d.perYear[d.perYear.length - 1].status : '-';
+                    
+                    let yearRows = '';
+                    if (d.perYear && d.perYear.length > 0) {
+                        yearRows = d.perYear.map(p => {
+                            const sc = p.status === 'Lunas' ? 'status-lunas' : p.status === 'Pending' ? 'status-pending' : p.status === 'Sebagian' ? 'status-sebagian' : 'status-belum';
+                            return `<tr class="border-b border-gray-50"><td class="px-3 py-2 text-sm text-gray-600">${p.year}</td><td class="px-3 py-2 text-sm text-right">${formatRp(p.pajak)}</td><td class="px-3 py-2 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${sc}">${p.status}</span></td></tr>`;
+                        }).join('');
+                    }
+                    
+                    resultEl.innerHTML = `
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+                                    <i data-lucide="check-circle" style="width:20px;height:20px;color:#059669"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-emerald-900">${d.nama}</p>
+                                    <p class="text-xs text-gray-500">NOP: ${d.nop}</p>
+                                    <p class="text-xs text-gray-500">${d.alamat} · ${d.rw}/${d.rt}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 mb-4">
+                                <div class="bg-white rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-500">Total Pajak</p>
+                                    <p class="font-bold text-gray-800 text-sm">${formatRpShort(d.totalPajak)}</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-500">Sudah Lunas</p>
+                                    <p class="font-bold text-emerald-600 text-sm">${formatRpShort(d.totalLunas)}</p>
+                                </div>
+                                <div class="bg-white rounded-lg p-3 text-center">
+                                    <p class="text-xs text-gray-500">Belum Bayar</p>
+                                    <p class="font-bold text-red-600 text-sm">${formatRpShort(d.totalBelumBayar)}</p>
+                                </div>
+                            </div>
+                            ${yearRows ? `<div class="bg-white rounded-lg overflow-hidden"><table class="w-full"><thead><tr class="bg-gray-50"><th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Tahun</th><th class="px-3 py-2 text-right text-xs font-semibold text-gray-600">Pajak</th><th class="px-3 py-2 text-center text-xs font-semibold text-gray-600">Status</th></tr></thead><tbody>${yearRows}</tbody></table></div>` : ''}
+                        </div>
+                    `;
+                    lucide.createIcons();
+                } else {
+                    resultEl.innerHTML = '<div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">NOP tidak ditemukan. Periksa kembali nomor NOP Anda.</div>';
                 }
-
-                tbody.innerHTML = data.map((item, i) => {
-                    const statusClass = (item.status || '').toLowerCase() === 'lunas' ? 'status-lunas' :
-                        (item.status || '').toLowerCase() === 'sebagian' ? 'status-sebagian' :
-                        (item.status || '').toLowerCase() === 'pending' ? 'status-pending' : 'status-belum';
-                    return `<tr class="border-b border-gray-50 hover:bg-emerald-50/50 transition">
-                        <td class="px-4 py-3 text-gray-500">${startIdx + i + 1}</td>
-                        <td class="px-4 py-3 font-mono text-xs text-gray-600">${item.nop || '-'}</td>
-                        <td class="px-4 py-3 font-medium text-gray-800">${item.nama || '-'}</td>
-                        <td class="px-4 py-3 text-gray-600 hidden md:table-cell text-xs">${item.alamat || '-'}</td>
-                        <td class="px-4 py-3 text-center text-gray-600 text-xs">${item.rwNama || '-'}/${item.rtNama || '-'}</td>
-                        <td class="px-4 py-3 text-center"><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${item.status || '-'}</span></td>
-                        <td class="px-4 py-3 text-right font-medium text-gray-800">${item.totalPajak ? 'Rp ' + Number(item.totalPajak).toLocaleString('id-ID') : '-'}</td>
-                    </tr>`;
-                }).join('');
-
-                document.getElementById('page-info').textContent = `Halaman ${currentPage} dari ${totalPages} (${total} data)`;
-                renderPagination(currentPage, totalPages);
             } catch (e) {
-                console.error('Table load error:', e);
-                tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-12 text-center text-red-400">Gagal memuat data.</td></tr>';
+                resultEl.innerHTML = '<div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">Gagal terhubung ke server.</div>';
             }
         }
 
-        function renderPagination(page, totalPages) {
-            const pagDiv = document.getElementById('pagination');
-            let html = '';
-            html += `<button class="page-btn" data-page="${page-1}" ${page<=1?'disabled':''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>`;
-            const pages = [];
-            if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); }
-            else {
-                pages.push(1);
-                if (page > 3) pages.push('...');
-                for (let i = Math.max(2, page-1); i <= Math.min(totalPages-1, page+1); i++) pages.push(i);
-                if (page < totalPages - 2) pages.push('...');
-                pages.push(totalPages);
-            }
-            pages.forEach(p => {
-                if (p === '...') html += `<span class="px-2 text-gray-400">...</span>`;
-                else html += `<button class="page-btn ${p===page?'active':''}" data-page="${p}">${p}</button>`;
-            });
-            html += `<button class="page-btn" data-page="${page+1}" ${page>=totalPages?'disabled':''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>`;
-            pagDiv.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        // Event delegation for pagination
-        document.getElementById('pagination').addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-page]');
-            if (btn && !btn.disabled) { currentPage = parseInt(btn.dataset.page); loadDataTable(); window.scrollTo({ top: 600, behavior: 'smooth' }); }
-        });
-
-        // Search
-        document.getElementById('search-input').addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => { currentPage = 1; loadDataTable(); }, 300);
+        // Enter key support for Cek PBB
+        document.getElementById('cek-nop-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') cekPBB();
         });
 
         // Init
@@ -360,7 +337,6 @@
             await loadOverview();
             await loadDusunCards();
             await loadRWData();
-            await loadDataTable();
             PageLoader.hide();
             lucide.createIcons();
         }

@@ -112,15 +112,15 @@
                 <!-- Animated Stats -->
                 <div class="grid grid-cols-3 gap-4 max-w-lg animate-slideUp" style="animation-delay:0.4s">
                     <div class="prayer-chip rounded-2xl px-4 py-5 text-center" data-tilt>
-                        <p class="text-3xl md:text-4xl font-bold" data-count-target="3245" data-count-duration="2500">0</p>
+                        <p class="text-3xl md:text-4xl font-bold" data-count-target="0" data-count-duration="2500">0</p>
                         <p class="text-[10px] uppercase tracking-[0.25em] text-emerald-100/80 mt-2 font-medium">Penduduk</p>
                     </div>
                     <div class="prayer-chip rounded-2xl px-4 py-5 text-center" data-tilt>
-                        <p class="text-3xl md:text-4xl font-bold" data-count-target="856" data-count-duration="2200">0</p>
+                        <p class="text-3xl md:text-4xl font-bold" data-count-target="0" data-count-duration="2200">0</p>
                         <p class="text-[10px] uppercase tracking-[0.25em] text-emerald-100/80 mt-2 font-medium">Kepala Keluarga</p>
                     </div>
                     <div class="prayer-chip rounded-2xl px-4 py-5 text-center" data-tilt>
-                        <p class="text-3xl md:text-4xl font-bold" data-count-target="4" data-count-duration="1500">0</p>
+                        <p class="text-3xl md:text-4xl font-bold" data-count-target="0" data-count-duration="1500">0</p>
                         <p class="text-[10px] uppercase tracking-[0.25em] text-emerald-100/80 mt-2 font-medium">RW</p>
                     </div>
                 </div>
@@ -310,7 +310,7 @@
                             </div>
                             <p class="text-sm text-gray-500">Total Penduduk</p>
                         </div>
-                        <p class="text-4xl font-bold text-emerald-900" data-count-target="3245" data-count-duration="2500">0</p>
+                        <p class="text-4xl font-bold text-emerald-900" data-count-target="0" data-count-duration="2500">0</p>
                         <p class="text-xs text-emerald-600 mt-2 flex items-center gap-1">
                             <i data-lucide="trending-up" style="width:12px;height:12px"></i>
                             +4.2% tahun ini
@@ -323,7 +323,7 @@
                             </div>
                             <p class="text-sm text-gray-500">Total KK</p>
                         </div>
-                        <p class="text-4xl font-bold text-cyan-900" data-count-target="856" data-count-duration="2200">0</p>
+                        <p class="text-4xl font-bold text-cyan-900" data-count-target="0" data-count-duration="2200">0</p>
                         <p class="text-xs text-cyan-600 mt-2 flex items-center gap-1">
                             <i data-lucide="trending-up" style="width:12px;height:12px"></i>
                             +2.1% tahun ini
@@ -336,7 +336,7 @@
                             </div>
                             <p class="text-sm text-gray-500">Kepadatan</p>
                         </div>
-                        <p class="text-4xl font-bold text-purple-900" data-count-target="120" data-count-suffix=" /km²" data-count-duration="2000">0</p>
+                        <p class="text-4xl font-bold text-purple-900" data-count-target="0" data-count-suffix=" /km²" data-count-duration="2000">0</p>
                         <p class="text-xs text-purple-600 mt-2">Per kilometer persegi</p>
                     </div>
                     <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100/80">
@@ -346,7 +346,7 @@
                             </div>
                             <p class="text-sm text-gray-500">Dusun</p>
                         </div>
-                        <p class="text-4xl font-bold text-amber-900" data-count-target="3" data-count-duration="1500">0</p>
+                        <p class="text-4xl font-bold text-amber-900" data-count-target="0" data-count-duration="1500">0</p>
                         <p class="text-xs text-amber-600 mt-2">Wilayah administratif</p>
                     </div>
                 </div>
@@ -523,7 +523,7 @@
             loadHomepageStats();
         });
 
-        // ─── Load Stats from API ─────────────────────
+        // ── Load Stats from API ─────────────────────
         async function loadHomepageStats() {
             try {
                 const res = await fetch(API_BASE_URL + '/penduduk/stats');
@@ -532,26 +532,25 @@
                 const d = json.data;
                 const kk = d.uniqueKK || Math.floor(d.total / 3.3);
                 const dusunCount = new Set((d.byRt ? Object.keys(d.byRt) : []).map(k => k.split('/')[1])).size || 3;
-                const density = Math.round(d.total / 27.04); // approx area in km²
+                const density = Math.round(d.total / 27.04);
                 
-                // Update all counter targets
+                // Update counter targets and reset animation state
                 document.querySelectorAll('[data-count-target]').forEach(el => {
                     const label = el.closest('.prayer-chip, .stat-card');
                     const text = label ? label.textContent.toLowerCase() : '';
-                    if (text.includes('penduduk')) {
-                        el.setAttribute('data-count-target', d.total);
-                        el.textContent = d.total.toLocaleString('id-ID');
-                    } else if (text.includes('kepala keluarga') || text.includes('kk')) {
-                        el.setAttribute('data-count-target', kk);
-                        el.textContent = kk.toLocaleString('id-ID');
-                    } else if (text.includes('kepadatan')) {
-                        el.setAttribute('data-count-target', density);
-                        el.textContent = density.toLocaleString('id-ID');
-                    } else if (text.includes('dusun')) {
-                        el.setAttribute('data-count-target', dusunCount);
-                        el.textContent = dusunCount;
-                    }
+                    let target = 0;
+                    if (text.includes('penduduk')) target = d.total;
+                    else if (text.includes('kepala keluarga') || text.includes('kk')) target = kk;
+                    else if (text.includes('kepadatan')) target = density;
+                    else if (text.includes('dusun')) target = dusunCount;
+                    
+                    el.setAttribute('data-count-target', target);
+                    el.textContent = '0';
+                    delete el.dataset.counted; // Reset animation flag
                 });
+                
+                // Re-trigger counter animations
+                if (typeof initScrollAnimations === 'function') initScrollAnimations();
             } catch (e) { console.error('Stats load error:', e); }
         }
     </script>
