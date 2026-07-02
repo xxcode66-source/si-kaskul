@@ -99,25 +99,38 @@
     <script>renderNavbar('galeri');</script>
     <script src="../assets/script.js"></script>
     <script>
-        // Gallery data
-        const galleryData = [
-            { id: 1, category: 'kegiatan', title: 'Rapat Koordinasi', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
-            { id: 2, category: 'acara', title: 'Festival Desa', image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop' },
-            { id: 3, category: 'infrastruktur', title: 'Jalan Baru', image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400&h=400&fit=crop' },
-            { id: 4, category: 'kegiatan', title: 'Sosialisasi Program', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
-            { id: 5, category: 'acara', title: 'Perayaan 17 Agustus', image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=400&fit=crop' },
-            { id: 6, category: 'lainnya', title: 'Kehidupan Masyarakat', image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=400&fit=crop' },
-            { id: 7, category: 'infrastruktur', title: 'Kantor Desa', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=400&fit=crop' },
-            { id: 8, category: 'kegiatan', title: 'Pelatihan Masyarakat', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' },
-            { id: 9, category: 'acara', title: 'Pengajian Rutin', image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=400&h=400&fit=crop' },
-            { id: 10, category: 'lainnya', title: 'Pesawahan Desa', image: 'https://images.unsplash.com/photo-1500595046891-e9eda8b2fa4d?w=400&h=400&fit=crop' },
-            { id: 11, category: 'infrastruktur', title: 'Sarana Air Bersih', image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=400&h=400&fit=crop' },
-            { id: 12, category: 'kegiatan', title: 'Bakti Sosial', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop' }
-        ];
-
+        let galleryData = [];
         let currentFilter = 'semua';
         let currentLightboxIndex = 0;
         let currentFilteredItems = [];
+
+        async function loadGallery() {
+            try {
+                const res = await fetch(API_BASE_URL + '/gallery');
+                const json = await res.json();
+                if (json.success) {
+                    galleryData = json.data;
+                    renderFilterButtons();
+                    renderGallery();
+                    PageLoader.hide();
+                } else {
+                    PageLoader.hide();
+                }
+            } catch (e) {
+                console.error('Failed to load gallery:', e);
+                PageLoader.hide();
+            }
+        }
+
+        function renderFilterButtons() {
+            const container = document.querySelector('.mb-12.flex');
+            const categories = ['semua', ...new Set(galleryData.map(g => g.category).filter(Boolean))];
+            container.innerHTML = categories.map((cat, i) => {
+                const label = cat === 'semua' ? 'Semua' : cat.charAt(0).toUpperCase() + cat.slice(1);
+                const isActive = cat === 'semua';
+                return `<button onclick="filterGallery('${cat}', this)" class="filter-btn-animated px-6 py-2 rounded-full font-medium text-sm transition ${isActive ? 'bg-emerald-600 text-white active' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">${label}</button>`;
+            }).join('');
+        }
 
         function renderGallery() {
             const grid = document.getElementById('gallery-grid');
@@ -128,9 +141,14 @@
                 : galleryData.filter(item => item.category === currentFilter);
             currentFilteredItems = filtered;
 
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-16 text-gray-400"><i data-lucide="images" style="width:48px;height:48px;margin:0 auto 1rem"></i><p>Belum ada foto di galeri</p></div>';
+                lucide.createIcons();
+                return;
+            }
+
             filtered.forEach((item, index) => {
                 const div = document.createElement('div');
-                // Make some items taller for masonry effect
                 const isTall = index % 5 === 0;
                 div.className = `gallery-item group rounded-[1.5rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl stagger-item relative bg-gray-900 ${isTall ? 'row-span-2' : ''}`;
                 div.style.animationDelay = (index * 0.08) + 's';
@@ -140,7 +158,7 @@
                     <div class="absolute inset-x-0 bottom-0 p-4 text-white">
                         <div class="flex items-center justify-between gap-3">
                             <div>
-                                <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-200 mb-1">${item.category}</p>
+                                <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-200 mb-1">${item.category || ''}</p>
                                 <p class="font-semibold text-sm md:text-base leading-snug">${item.title}</p>
                             </div>
                             <span class="px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold">Lihat</span>
@@ -159,7 +177,7 @@
             if (!item) return;
             document.getElementById('lightbox-img').src = item.image;
             document.getElementById('lightbox-caption').textContent = item.title;
-            document.getElementById('lightbox-category').textContent = item.category;
+            document.getElementById('lightbox-category').textContent = item.category || '';
             const lb = document.getElementById('lightbox');
             lb.classList.remove('hidden');
             lb.style.display = 'flex';
@@ -182,7 +200,6 @@
         function filterGallery(category, button) {
             currentFilter = category;
             
-            // Update button styles
             document.querySelectorAll('.filter-btn-animated').forEach(btn => {
                 btn.classList.remove('bg-emerald-600', 'text-white', 'active');
                 btn.classList.add('bg-gray-200', 'text-gray-700');
@@ -196,9 +213,8 @@
             renderGallery();
         }
 
-        // Initialize gallery on page load
         window.addEventListener('DOMContentLoaded', () => {
-            renderGallery();
+            loadGallery();
         });
     </script>
 </body>

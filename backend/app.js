@@ -838,6 +838,27 @@ app.get('/api/gangs/structure/tree', (req, res) => {
   res.json({ success: true, data: result });
 });
 
+// --- Gallery ---
+if (!database.gallery) database.gallery = [];
+
+app.get('/api/gallery', (req, res) => {
+  let gallery = database.gallery || [];
+  const { category } = req.query;
+  if (category) gallery = gallery.filter(g => g.category === category);
+  res.json({ success: true, data: gallery, total: gallery.length });
+});
+
+app.get('/api/gallery/:id', (req, res) => {
+  const item = (database.gallery || []).find(g => g.id === Number(req.params.id));
+  if (!item) return res.status(404).json({ success: false, message: 'Galeri tidak ditemukan' });
+  res.json({ success: true, data: item });
+});
+
+app.get('/api/gallery/categories', (req, res) => {
+  const categories = [...new Set((database.gallery || []).map(g => g.category).filter(Boolean))];
+  res.json({ success: true, data: categories });
+});
+
 // --- 404 ---
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' }));
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ success: false, message: 'Server error' }); });

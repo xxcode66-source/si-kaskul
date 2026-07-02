@@ -173,7 +173,19 @@ function createSeedDatabase() {
     { id: 28, nama: 'Gang Sedap Malam', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt03', rtNama: 'RT 03', lat: -6.8648, lng: 108.1565, bearing: 290, description: 'Gang dekat warung kopi' },
   ];
 
-  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals: [], warga, wilayah, surat: [], gangs };
+  // Gallery seed data
+  const gallery = [
+    { id: 1, category: 'kegiatan', title: 'Musyawarah Desa', image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop', description: 'Rapat musyawarah desa untuk membahas program kerja', createdAt: '2025-06-15' },
+    { id: 2, category: 'kegiatan', title: 'Kerja Bakti Bersama', image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=500&h=300&fit=crop', description: 'Kerja bakti membersihkan lingkungan desa', createdAt: '2025-06-10' },
+    { id: 3, category: 'kegiatan', title: 'Posyandu Balita', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=300&fit=crop', description: 'Pemeriksaan kesehatan balita rutin bulanan', createdAt: '2025-06-05' },
+    { id: 4, category: 'acara', title: 'HUT Kemerdekaan RI', image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&h=300&fit=crop', description: 'Perayaan HUT Kemerdekaan Republik Indonesia', createdAt: '2025-08-17' },
+    { id: 5, category: 'acara', title: 'Festival Budaya Desa', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=500&h=300&fit=crop', description: 'Festival budaya tahunan desa Kasomalang Kulon', createdAt: '2025-07-20' },
+    { id: 6, category: 'pembangunan', title: 'Pembangunan Jalan Desa', image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500&h=300&fit=crop', description: 'Proses pembangunan jalan desa baru', createdAt: '2025-05-15' },
+    { id: 7, category: 'pembangunan', title: 'Renovasi Balai Desa', image: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=500&h=300&fit=crop', description: 'Renovasi dan perbaikan balai desa', createdAt: '2025-04-10' },
+    { id: 8, category: 'kegiatan', title: 'Pelatihan UMKM', image: 'https://images.unsplash.com/photo-1516321318423-f06f70fc504e?w=500&h=300&fit=crop', description: 'Pelatihan pengembangan usaha mikro kecil menengah', createdAt: '2025-06-01' },
+  ];
+
+  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals: [], warga, wilayah, surat: [], gangs, gallery };
 }
 
 // ==============================
@@ -193,6 +205,7 @@ async function ensureTables(pool) {
   await pool.query(`CREATE TABLE IF NOT EXISTS surat (id INT PRIMARY KEY AUTO_INCREMENT, jenis VARCHAR(255) NOT NULL, nama VARCHAR(255) NOT NULL, nik VARCHAR(50) NOT NULL, alamat TEXT, keperluan TEXT, status VARCHAR(50) DEFAULT 'Diajukan', nomorSurat VARCHAR(100), ditandatanganiOleh VARCHAR(255), catatan TEXT, diajukanPada VARCHAR(100) NOT NULL, diprosesPada VARCHAR(100)) ENGINE=InnoDB`);
   await pool.query(`CREATE TABLE IF NOT EXISTS activity_logs (id INT PRIMARY KEY AUTO_INCREMENT, action VARCHAR(255) NOT NULL, userId INT, userName VARCHAR(255), details TEXT, createdAt VARCHAR(100) NOT NULL) ENGINE=InnoDB`);
   await pool.query(`CREATE TABLE IF NOT EXISTS penduduk (id INT PRIMARY KEY AUTO_INCREMENT, nik VARCHAR(50) UNIQUE NOT NULL, kk VARCHAR(50), nama VARCHAR(255) NOT NULL, tempatLahir VARCHAR(100), tanggalLahir VARCHAR(50), jenisKelamin VARCHAR(20), alamat TEXT, kampung VARCHAR(100), rt VARCHAR(50), rw VARCHAR(50), umur INT, shdk VARCHAR(100), agama VARCHAR(50), pendidikan VARCHAR(100), pekerjaan VARCHAR(100), ayah VARCHAR(255), ibu VARCHAR(255)) ENGINE=InnoDB`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS gallery (id INT PRIMARY KEY AUTO_INCREMENT, category VARCHAR(100), title VARCHAR(255) NOT NULL, image TEXT NOT NULL, description TEXT, createdAt VARCHAR(100)) ENGINE=InnoDB`);
 }
 
 async function seedIfEmpty(pool, database) {
@@ -214,6 +227,8 @@ async function loadAll(pool) {
   const [warga] = await pool.query('SELECT * FROM warga ORDER BY id');
   let gangs = [];
   try { const [g] = await pool.query('SELECT * FROM gangs ORDER BY id'); gangs = g; } catch (e) { /* table may not exist yet */ }
+  let gallery = [];
+  try { const [gal] = await pool.query('SELECT * FROM gallery ORDER BY id'); gallery = gal; } catch (e) { /* table may not exist yet */ }
 
   // Parse JSON fields
   for (const row of pbb) {
@@ -224,7 +239,7 @@ async function loadAll(pool) {
     if (typeof row.payments === 'string') row.payments = JSON.parse(row.payments);
   }
 
-  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat, warga, wilayah: [], gangs };
+  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat, warga, wilayah: [], gangs, gallery };
 }
 
 async function syncAll(pool, database) {
@@ -243,6 +258,7 @@ async function syncAll(pool, database) {
     await conn.query('DELETE FROM approvals');
     await conn.query('DELETE FROM surat');
     await conn.query('DELETE FROM penduduk');
+    await conn.query('DELETE FROM gallery');
 
     // Insert seed data
     for (const u of database.users) {
@@ -284,6 +300,10 @@ async function syncAll(pool, database) {
     for (const p of database.penduduk) {
       await conn.query('INSERT INTO penduduk (id, nik, kk, nama, tempatLahir, tanggalLahir, jenisKelamin, alamat, kampung, rt, rw, umur, shdk, agama, pendidikan, pekerjaan, ayah, ibu) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
         [p.id, p.nik, p.kk || null, p.nama, p.tempatLahir || null, p.tanggalLahir || null, p.jenisKelamin || null, p.alamat, p.kampung || null, p.rt, p.rw, p.umur || null, p.shdk || null, p.agama || null, p.pendidikan || null, p.pekerjaan || null, p.ayah || null, p.ibu || null]);
+    }
+    for (const g of (database.gallery || [])) {
+      await conn.query('INSERT INTO gallery (id, category, title, image, description, createdAt) VALUES (?,?,?,?,?,?)',
+        [g.id, g.category || null, g.title, g.image, g.description || null, g.createdAt || null]);
     }
 
     await conn.query('COMMIT');

@@ -202,4 +202,16 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   createdAt VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB;
 
+-- ============================================
+-- Gallery
+-- ============================================
+CREATE TABLE IF NOT EXISTS gallery (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  category VARCHAR(100),
+  title VARCHAR(255) NOT NULL,
+  image TEXT NOT NULL,
+  description TEXT,
+  createdAt VARCHAR(100)
+) ENGINE=InnoDB;
+
 SHOW TABLES;
