@@ -793,6 +793,51 @@ app.get(['/api/health', '/health'], (req, res) => {
 // --- PBB Routes ---
 createPbbRoutes(app, getWarga, getPbb, database, persistDatabase);
 
+// --- Gang Desa ---
+if (!database.gangs) database.gangs = [];
+
+app.get('/api/gangs', (req, res) => {
+  let gangs = database.gangs || [];
+  const { dusun, rw, rt, q } = req.query;
+  if (dusun) gangs = gangs.filter(g => g.dusun === dusun);
+  if (rw) gangs = gangs.filter(g => g.rw === rw);
+  if (rt) gangs = gangs.filter(g => g.rt === rt);
+  if (q) {
+    const lq = q.toLowerCase();
+    gangs = gangs.filter(g => (g.nama || '').toLowerCase().includes(lq));
+  }
+  res.json({ success: true, data: gangs, total: gangs.length });
+});
+
+app.get('/api/gangs/:id', (req, res) => {
+  const gang = (database.gangs || []).find(g => g.id === Number(req.params.id));
+  if (!gang) return res.status(404).json({ success: false, message: 'Gang tidak ditemukan' });
+  res.json({ success: true, data: gang });
+});
+
+app.get('/api/gangs/structure/tree', (req, res) => {
+  const gangs = database.gangs || [];
+  const tree = {};
+  gangs.forEach(g => {
+    if (!tree[g.dusun]) tree[g.dusun] = { dusun: g.dusun, dusunNama: g.dusunNama, rwList: {} };
+    const dusunObj = tree[g.dusun];
+    if (!dusunObj.rwList[g.rw]) dusunObj.rwList[g.rw] = { rw: g.rw, rwNama: g.rwNama, rtList: {} };
+    const rwObj = dusunObj.rwList[g.rw];
+    if (!rwObj.rtList[g.rt]) rwObj.rtList[g.rt] = { rt: g.rt, rtNama: g.rtNama, gangs: [] };
+    rwObj.rtList[g.rt].gangs.push({ id: g.id, nama: g.nama, lat: g.lat, lng: g.lng });
+  });
+  const result = Object.values(tree).map(d => ({
+    dusun: d.dusun, dusunNama: d.dusunNama,
+    rwList: Object.values(d.rwList).map(r => ({
+      rw: r.rw, rwNama: r.rwNama,
+      rtList: Object.values(r.rtList).map(t => ({
+        rt: t.rt, rtNama: t.rtNama, gangs: t.gangs
+      }))
+    }))
+  }));
+  res.json({ success: true, data: result });
+});
+
 // --- 404 ---
 app.use((req, res) => res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan' }));
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ success: false, message: 'Server error' }); });

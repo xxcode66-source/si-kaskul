@@ -12,7 +12,7 @@ window.NAV_CONFIG = {
         { href: '/pages/profil/struktur.html', label: 'Struktur Organisasi', key: 'struktur', icon: 'git-branch' },
         { href: '/pages/profil/perangkat.html', label: 'Perangkat Desa', key: 'perangkat', icon: 'users' },
         { href: '/pages/profil/wilayah.html', label: 'Wilayah Administratif', key: 'wilayah', icon: 'map' },
-        { href: '/index.html#profil', label: 'Peta Desa', key: 'peta', icon: 'map-pin' },
+        { href: '/pages/gang-desa.html', label: 'Gang Desa (3D Map)', key: 'gang', icon: 'map-pin' },
       ]
     },
     {

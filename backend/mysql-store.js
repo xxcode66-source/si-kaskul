@@ -135,7 +135,45 @@ function createSeedDatabase() {
     { id: 2, name: 'Warga 2', contact: '081298765432', type: 'Lingkungan', message: 'Drainase tersumbat di depan SDN.', submittedAt: '2026-01-12T14:20:00Z', status: 'Diproses' },
   ];
 
-  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals: [], warga, wilayah, surat: [] };
+  // Gang Desa - Dummy data around Desa Kasomalang Kulon (-6.85, 108.15)
+  const gangs = [
+    // Dusun 1 - RW 01
+    { id: 1, nama: 'Gang Anggur', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8498, lng: 108.1512, bearing: 45, description: 'Gang dekat Masjid Al-Ikhlas' },
+    { id: 2, nama: 'Gang Mangga', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8502, lng: 108.1518, bearing: 90, description: 'Gang dekat Balai Desa' },
+    { id: 3, nama: 'Gang Durian', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8508, lng: 108.1505, bearing: 180, description: 'Gang dekat SDN Kasomalang' },
+    { id: 4, nama: 'Gang Rambutan', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8515, lng: 108.1522, bearing: 270, description: 'Gang dekat lapangan voli' },
+    { id: 5, nama: 'Gang Jeruk', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw01', rwNama: 'RW 01', rt: 'rt03', rtNama: 'RT 03', lat: -6.8522, lng: 108.1498, bearing: 135, description: 'Gang dekat pos ronda' },
+    // Dusun 1 - RW 02
+    { id: 6, nama: 'Gang Apel', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8485, lng: 108.1535, bearing: 0, description: 'Gang dekat warung Bu Neng' },
+    { id: 7, nama: 'Gang Pisang', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8492, lng: 108.1542, bearing: 60, description: 'Gang dekat mushola' },
+    { id: 8, nama: 'Gang Nangka', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw02', rwNama: 'RW 02', rt: 'rt02', rtNama: 'RT 02', lat: -6.8478, lng: 108.1528, bearing: 120, description: 'Gang dekat sumur umum' },
+    { id: 9, nama: 'Gang Salak', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw02', rwNama: 'RW 02', rt: 'rt03', rtNama: 'RT 03', lat: -6.8472, lng: 108.1555, bearing: 200, description: 'Gang dekat taman bermain' },
+    { id: 10, nama: 'Gang Sawo', dusun: 'dusun1', dusunNama: 'Dusun 1', rw: 'rw02', rwNama: 'RW 02', rt: 'rt04', rtNama: 'RT 04', lat: -6.8465, lng: 108.1548, bearing: 300, description: 'Gang dekat kandang sapi' },
+    // Dusun 2 - RW 01
+    { id: 11, nama: 'Gang Melati', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8535, lng: 108.1485, bearing: 30, description: 'Gang dekat pabrik tahu' },
+    { id: 12, nama: 'Gang Mawar', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8542, lng: 108.1478, bearing: 150, description: 'Gang dekat bengkel Pak Asep' },
+    { id: 13, nama: 'Gang Dahlia', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8548, lng: 108.1492, bearing: 210, description: 'Gang dekat kolam ikan' },
+    { id: 14, nama: 'Gang Kenanga', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8555, lng: 108.1472, bearing: 330, description: 'Gang dekat rumah Pak RT' },
+    // Dusun 2 - RW 02
+    { id: 15, nama: 'Gang Cempaka', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8562, lng: 108.1505, bearing: 75, description: 'Gang dekat toko kelontong' },
+    { id: 16, nama: 'Gang Flamboyan', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8568, lng: 108.1512, bearing: 195, description: 'Gang dekat sekolah PAUD' },
+    { id: 17, nama: 'Gang Bougenville', dusun: 'dusun2', dusunNama: 'Dusun 2', rw: 'rw02', rwNama: 'RW 02', rt: 'rt02', rtNama: 'RT 02', lat: -6.8575, lng: 108.1498, bearing: 285, description: 'Gang dekat lapangan basket' },
+    // Dusun 3 - RW 01
+    { id: 18, nama: 'Gang Teratai', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8582, lng: 108.1525, bearing: 15, description: 'Gang dekat sawah' },
+    { id: 19, nama: 'Gang Tulip', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw01', rwNama: 'RW 01', rt: 'rt01', rtNama: 'RT 01', lat: -6.8588, lng: 108.1532, bearing: 105, description: 'Gang dekat sungai kecil' },
+    { id: 20, nama: 'Gang Lily', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8595, lng: 108.1518, bearing: 225, description: 'Gang dekat kebun sayur' },
+    { id: 21, nama: 'Gang Matahari', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw01', rwNama: 'RW 01', rt: 'rt02', rtNama: 'RT 02', lat: -6.8602, lng: 108.1542, bearing: 315, description: 'Gang dekat pos kamling' },
+    { id: 22, nama: 'Gang Aster', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw01', rwNama: 'RW 01', rt: 'rt03', rtNama: 'RT 03', lat: -6.8608, lng: 108.1528, bearing: 50, description: 'Gang dekat kandang ayam' },
+    // Dusun 3 - RW 02
+    { id: 23, nama: 'Gang Lavender', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8615, lng: 108.1555, bearing: 170, description: 'Gang dekat hutan bambu' },
+    { id: 24, nama: 'Gang Orchid', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt01', rtNama: 'RT 01', lat: -6.8622, lng: 108.1548, bearing: 250, description: 'Gang dekat embung desa' },
+    { id: 25, nama: 'Gang Sakura', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt02', rtNama: 'RT 02', lat: -6.8628, lng: 108.1562, bearing: 340, description: 'Gang dekat gazebo' },
+    { id: 26, nama: 'Gang Lotus', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt02', rtNama: 'RT 02', lat: -6.8635, lng: 108.1552, bearing: 80, description: 'Gang dekat tempat pembakaran sampah' },
+    { id: 27, nama: 'Gang Kamboja', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt03', rtNama: 'RT 03', lat: -6.8642, lng: 108.1572, bearing: 160, description: 'Gang dekat makam desa' },
+    { id: 28, nama: 'Gang Sedap Malam', dusun: 'dusun3', dusunNama: 'Dusun 3', rw: 'rw02', rwNama: 'RW 02', rt: 'rt03', rtNama: 'RT 03', lat: -6.8648, lng: 108.1565, bearing: 290, description: 'Gang dekat warung kopi' },
+  ];
+
+  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals: [], warga, wilayah, surat: [], gangs };
 }
 
 // ==============================
@@ -174,6 +212,8 @@ async function loadAll(pool) {
   const [approvals] = await pool.query('SELECT * FROM approvals ORDER BY id');
   const [surat] = await pool.query('SELECT * FROM surat ORDER BY id');
   const [warga] = await pool.query('SELECT * FROM warga ORDER BY id');
+  let gangs = [];
+  try { const [g] = await pool.query('SELECT * FROM gangs ORDER BY id'); gangs = g; } catch (e) { /* table may not exist yet */ }
 
   // Parse JSON fields
   for (const row of pbb) {
@@ -184,7 +224,7 @@ async function loadAll(pool) {
     if (typeof row.payments === 'string') row.payments = JSON.parse(row.payments);
   }
 
-  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat, warga, wilayah: [] };
+  return { users, penduduk, berita, pbb, bansos, bansosPrograms, pengaduan, approvals, surat, warga, wilayah: [], gangs };
 }
 
 async function syncAll(pool, database) {
