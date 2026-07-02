@@ -13,10 +13,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-// Serve static frontend
-app.use(express.static(path.join(__dirname, '..')));
-
-// Clean URL support: try .html extension for requests without file extension
+// Clean URL support: try .html extension BEFORE static serving
 app.use((req, res, next) => {
   // Skip if path has extension, is API, or ends with /
   if (path.extname(req.path) || req.path.startsWith('/api/') || req.path.endsWith('/')) return next();
@@ -26,6 +23,9 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// Serve static frontend (after clean URL rewrite)
+app.use(express.static(path.join(__dirname, '..')));
 
 const PORT = process.env.PORT || 3000;
 let database = store.createSeedDatabase();
