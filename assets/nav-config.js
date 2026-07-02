@@ -4,53 +4,53 @@
 
 window.NAV_CONFIG = {
   items: [
-    { href: '/index.html', label: 'Beranda', key: 'beranda', icon: 'home' },
+    { href: '/', label: 'Beranda', key: 'beranda', icon: 'home' },
     {
       label: 'Profil Desa', key: 'profil', icon: 'building',
       children: [
-        { href: '/pages/profil/sejarah.html', label: 'Sejarah & Visi Misi', key: 'sejarah', icon: 'book-open' },
-        { href: '/pages/profil/struktur.html', label: 'Struktur Organisasi', key: 'struktur', icon: 'git-branch' },
-        { href: '/pages/profil/perangkat.html', label: 'Perangkat Desa', key: 'perangkat', icon: 'users' },
-        { href: '/pages/profil/wilayah.html', label: 'Wilayah Administratif', key: 'wilayah', icon: 'map' },
-        { href: '/pages/gang-desa.html', label: 'Gang Desa (3D Map)', key: 'gang', icon: 'map-pin' },
+        { href: '/pages/profil/sejarah', label: 'Sejarah & Visi Misi', key: 'sejarah', icon: 'book-open' },
+        { href: '/pages/profil/struktur', label: 'Struktur Organisasi', key: 'struktur', icon: 'git-branch' },
+        { href: '/pages/profil/perangkat', label: 'Perangkat Desa', key: 'perangkat', icon: 'users' },
+        { href: '/pages/profil/wilayah', label: 'Wilayah Administratif', key: 'wilayah', icon: 'map' },
+        { href: '/pages/gang-desa', label: 'Gang Desa (3D Map)', key: 'gang', icon: 'map-pin' },
       ]
     },
     {
       label: 'Data & Statistik', key: 'data', icon: 'bar-chart-3',
       children: [
-        { href: '/pages/data/penduduk.html', label: 'Jumlah Penduduk', key: 'penduduk', icon: 'users' },
-        { href: '/pages/data/penduduk.html#usia', label: 'Berdasarkan Usia', key: 'usia', icon: 'user-check' },
-        { href: '/pages/data/penduduk.html#pendidikan', label: 'Berdasarkan Pendidikan', key: 'pendidikan', icon: 'graduation-cap' },
-        { href: '/pages/data/penduduk.html#pekerjaan', label: 'Berdasarkan Pekerjaan', key: 'pekerjaan', icon: 'briefcase' },
+        { href: '/pages/data/penduduk', label: 'Jumlah Penduduk', key: 'penduduk', icon: 'users' },
+        { href: '/pages/data/penduduk#usia', label: 'Berdasarkan Usia', key: 'usia', icon: 'user-check' },
+        { href: '/pages/data/penduduk#pendidikan', label: 'Berdasarkan Pendidikan', key: 'pendidikan', icon: 'graduation-cap' },
+        { href: '/pages/data/penduduk#pekerjaan', label: 'Berdasarkan Pekerjaan', key: 'pekerjaan', icon: 'briefcase' },
       ]
     },
-    { href: '/pages/pbb.html', label: 'PBB', key: 'pbb', icon: 'receipt' },
-    { href: '/pages/lapak-desa.html', label: 'Lapak Desa', key: 'lapak', icon: 'shopping-bag' },
+    { href: '/pages/pbb', label: 'PBB', key: 'pbb', icon: 'receipt' },
+    { href: '/pages/lapak-desa', label: 'Lapak Desa', key: 'lapak', icon: 'shopping-bag' },
     {
       label: 'Bansos', key: 'bansos', icon: 'heart-handshake',
       children: [
-        { href: '/pages/bansos.html', label: 'Program Aktif', key: 'program', icon: 'list-checks' },
-        { href: '/pages/bansos.html#cek-status', label: 'Cek Status Penerima', key: 'cek-bansos', icon: 'search' },
-        { href: '/pages/bansos.html#statistik', label: 'Statistik', key: 'stat-bansos', icon: 'pie-chart' },
+        { href: '/pages/bansos', label: 'Program Aktif', key: 'program', icon: 'list-checks' },
+        { href: '/pages/bansos#cek-status', label: 'Cek Status Penerima', key: 'cek-bansos', icon: 'search' },
+        { href: '/pages/bansos#statistik', label: 'Statistik', key: 'stat-bansos', icon: 'pie-chart' },
       ]
     },
     {
       label: 'Layanan', key: 'layanan', icon: 'concierge-bell',
       children: [
-        { href: '/pages/pengaduan.html', label: 'Pengaduan Masyarakat', key: 'pengaduan', icon: 'message-square' },
-        { href: '/pages/login.html', label: 'Permohonan Surat Online', key: 'surat', icon: 'file-text' },
-        { href: '/pages/layanan/formulir.html', label: 'Unduh Formulir', key: 'formulir', icon: 'download' },
+        { href: '/pages/pengaduan', label: 'Pengaduan Masyarakat', key: 'pengaduan', icon: 'message-square' },
+        { href: '/pages/login', label: 'Permohonan Surat Online', key: 'surat', icon: 'file-text' },
+        { href: '/pages/layanan/formulir', label: 'Unduh Formulir', key: 'formulir', icon: 'download' },
       ]
     },
-    { href: '/pages/berita.html', label: 'Berita', key: 'berita', icon: 'newspaper' },
-    { href: '/pages/gallery.html', label: 'Galeri', key: 'galeri', icon: 'image' },
+    { href: '/pages/berita', label: 'Berita', key: 'berita', icon: 'newspaper' },
+    { href: '/pages/gallery', label: 'Galeri', key: 'galeri', icon: 'image' },
     {
       label: 'Login', key: 'login', isButton: true, icon: 'log-in',
       children: [
-        { href: '/pages/login.html', label: 'Admin Desa', key: 'login-admin', icon: 'shield-check' },
-        { href: '/pages/login.html', label: 'RT', key: 'login-rt', icon: 'user' },
-        { href: '/pages/login.html', label: 'Kolektor', key: 'login-kolektor', icon: 'clipboard-list' },
-        { href: '/pages/login.html', label: 'Masyarakat', key: 'login-warga', icon: 'user' },
+        { href: '/pages/login', label: 'Admin Desa', key: 'login-admin', icon: 'shield-check' },
+        { href: '/pages/login', label: 'RT', key: 'login-rt', icon: 'user' },
+        { href: '/pages/login', label: 'Kolektor', key: 'login-kolektor', icon: 'clipboard-list' },
+        { href: '/pages/login', label: 'Masyarakat', key: 'login-warga', icon: 'user' },
       ]
     },
   ]
@@ -61,7 +61,7 @@ function renderNavbar(activeKey) {
     <nav class="nav-blur fixed top-0 left-0 right-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <!-- Logo -->
-        <a href="/index.html" class="flex items-center gap-3 shrink-0 group">
+        <a href="/" class="flex items-center gap-3 shrink-0 group">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200/50 group-hover:shadow-emerald-300/60 transition-all duration-300 group-hover:scale-105">
             <i data-lucide="trees" style="width:20px;height:20px;color:white"></i>
           </div>

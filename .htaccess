@@ -1,19 +1,30 @@
 RewriteEngine On
 
-# Enable proxy
+# ── API Proxy ──────────────────────────────────────────
+# Route all /api/* requests to Node.js backend
 RewriteCond %{ENV:REDIRECT_STATUS} ^$
 RewriteRule ^api/(.*)$ http://localhost:3000/api/$1 [P,L]
 
-# Serve static files directly (html, css, js, images, fonts)
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^(.*)$ $1 [L]
+# ── Clean URLs ─────────────────────────────────────────
+# If request is not a file, not a directory, and not an API call
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
 
-# Serve directories with index.html
-RewriteCond %{REQUEST_FILENAME} -d
+# Try adding .html extension
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# If still not found, try index.html in that directory
 RewriteCond %{REQUEST_FILENAME}/index.html -f
 RewriteRule ^(.*)$ $1/index.html [L]
 
-# Proxy all other requests to Node.js backend
+# ── Static Files ───────────────────────────────────────
+# Serve existing files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^(.*)$ $1 [L]
+
+# ── Fallback to Node.js ───────────────────────────────
 RewriteCond %{ENV:REDIRECT_STATUS} ^$
 RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
 

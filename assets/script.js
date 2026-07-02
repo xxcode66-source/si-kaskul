@@ -175,10 +175,12 @@ function initNavigation() {
 }
 
 function initNavigationLoader() {
-    document.querySelectorAll('a[href$=".html"]').forEach(link => {
+    document.querySelectorAll('a[href]').forEach(link => {
         link.addEventListener('click', (e) => {
             const href = link.getAttribute('href');
-            if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('http')) return;
+            // Only intercept internal page links (not API calls, not external)
+            if (href.includes('/api/') || href.includes('mailto:') || href.includes('tel:')) return;
             e.preventDefault();
             PageLoader.show('Memuat halaman...');
             setTimeout(() => { window.location.href = href; }, 180);
@@ -449,7 +451,7 @@ function renderBreadcrumbs(items) {
     
     container.innerHTML = `
         <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
-            <a href="/index.html" class="hover:text-emerald-600 transition flex items-center gap-1">
+            <a href="/" class="hover:text-emerald-600 transition flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 Beranda
             </a>
@@ -692,6 +694,81 @@ window.TextScramble = class TextScramble {
 };
 }
 
+// ═══════════════════════════════════════════════════════
+// SECURITY — Disable Right-Click & Inspect Element
+// ═══════════════════════════════════════════════════════
+(function() {
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // Disable keyboard shortcuts for dev tools
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.key === 'F12' || e.keyCode === 123) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+I (Inspect)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+Shift+C (Element picker)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+U (View source)
+        if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+            e.preventDefault();
+            return false;
+        }
+        // Ctrl+S (Save page)
+        if (e.ctrlKey && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // DevTools detection via window size difference
+    let devtoolsOpen = false;
+    function detectDevTools() {
+        const threshold = 160;
+        const widthDiff = window.outerWidth - window.innerWidth;
+        const heightDiff = window.outerHeight - window.innerHeight;
+        const isOpen = widthDiff > threshold || heightDiff > threshold;
+        if (isOpen && !devtoolsOpen) {
+            devtoolsOpen = true;
+            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#064e3b;color:white;font-family:sans-serif;text-align:center;padding:2rem"><div><h1 style="font-size:2rem;margin-bottom:1rem">Akses Ditolak</h1><p style="opacity:0.8;font-size:1.1rem">Developer tools terdeteksi. Halaman ini tidak mengizinkan inspeksi kode.<br>Silakan tutup developer tools dan refresh halaman.</p></div></div>';
+        } else if (!isOpen) {
+            devtoolsOpen = false;
+        }
+    }
+    setInterval(detectDevTools, 1000);
+
+    // Disable drag on images
+    document.addEventListener('dragstart', function(e) {
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+        }
+    });
+
+    // Disable text selection on sensitive elements
+    document.addEventListener('selectstart', function(e) {
+        if (e.target.closest('.no-select')) {
+            e.preventDefault();
+        }
+    });
+})();
+
 // ─── Initialize Everything ────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
     initScrollProgress();
@@ -711,19 +788,19 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Initialize Global Search with all pages
     GlobalSearch.init([
-        { label: 'Beranda', desc: 'Halaman utama desa', href: '/index.html' },
-        { label: 'Berita', desc: 'Informasi dan berita terkini', href: '/pages/berita.html' },
-        { label: 'Galeri', desc: 'Dokumentasi kegiatan desa', href: '/pages/gallery.html' },
-        { label: 'Lapak Desa', desc: 'Produk UMKM warga', href: '/pages/lapak-desa.html' },
-        { label: 'Pengaduan', desc: 'Laporan dan pengaduan warga', href: '/pages/pengaduan.html' },
-        { label: 'Bansos', desc: 'Data bantuan sosial', href: '/pages/bansos.html' },
-        { label: 'PBB', desc: 'Pajak bumi dan bangunan', href: '/pages/pbb.html' },
-        { label: 'Permohonan Surat Online', desc: 'Ajukan surat dari rumah', href: '/pages/login.html' },
-        { label: 'Sejarah Desa', desc: 'Sejarah Desa Kasomalang Kulon', href: '/pages/profil/sejarah.html' },
-        { label: 'Perangkat Desa', desc: 'Struktur organisasi desa', href: '/pages/profil/perangkat.html' },
-        { label: 'Peta Wilayah', desc: 'Peta wilayah desa', href: '/pages/profil/wilayah.html' },
-        { label: 'Data Penduduk', desc: 'Portal layanan warga', href: '/pages/user-portal.html' },
-        { label: 'Formulir Pengajuan', desc: 'Formulir pengajuan layanan', href: '/pages/layanan/formulir.html' }
+        { label: 'Beranda', desc: 'Halaman utama desa', href: '/' },
+        { label: 'Berita', desc: 'Informasi dan berita terkini', href: '/pages/berita' },
+        { label: 'Galeri', desc: 'Dokumentasi kegiatan desa', href: '/pages/gallery' },
+        { label: 'Lapak Desa', desc: 'Produk UMKM warga', href: '/pages/lapak-desa' },
+        { label: 'Pengaduan', desc: 'Laporan dan pengaduan warga', href: '/pages/pengaduan' },
+        { label: 'Bansos', desc: 'Data bantuan sosial', href: '/pages/bansos' },
+        { label: 'PBB', desc: 'Pajak bumi dan bangunan', href: '/pages/pbb' },
+        { label: 'Permohonan Surat Online', desc: 'Ajukan surat dari rumah', href: '/pages/login' },
+        { label: 'Sejarah Desa', desc: 'Sejarah Desa Kasomalang Kulon', href: '/pages/profil/sejarah' },
+        { label: 'Perangkat Desa', desc: 'Struktur organisasi desa', href: '/pages/profil/perangkat' },
+        { label: 'Peta Wilayah', desc: 'Peta wilayah desa', href: '/pages/profil/wilayah' },
+        { label: 'Data Penduduk', desc: 'Portal layanan warga', href: '/pages/user-portal' },
+        { label: 'Formulir Pengajuan', desc: 'Formulir pengajuan layanan', href: '/pages/layanan/formulir' }
     ]);
     
     // Initialize Lucide icons

@@ -36,16 +36,18 @@
                 </div>
 
                 <!-- Tab Navigation -->
-                <div class="grid grid-cols-2 gap-2 mb-6">
-                    <button onclick="switchTab('petugas')" id="admin-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-emerald-600 text-white">Petugas</button>
-                    <button onclick="switchTab('penduduk')" id="user-tab" class="py-2 px-4 rounded-lg font-semibold text-sm transition bg-gray-200 text-gray-700">Penduduk</button>
+                <div class="grid grid-cols-4 gap-1 mb-6">
+                    <button onclick="switchTab('admin')" id="tab-admin" class="py-2 px-2 rounded-lg font-semibold text-xs transition bg-emerald-600 text-white">Admin Desa</button>
+                    <button onclick="switchTab('rt')" id="tab-rt" class="py-2 px-2 rounded-lg font-semibold text-xs transition bg-gray-200 text-gray-700">RT/RW</button>
+                    <button onclick="switchTab('kolektor')" id="tab-kolektor" class="py-2 px-2 rounded-lg font-semibold text-xs transition bg-gray-200 text-gray-700">Kolektor</button>
+                    <button onclick="switchTab('warga')" id="tab-warga" class="py-2 px-2 rounded-lg font-semibold text-xs transition bg-gray-200 text-gray-700">Masyarakat</button>
                 </div>
 
-                <!-- Petugas Login Form -->
-                <form id="admin-form" class="space-y-5 block">
+                <!-- Admin Desa Login Form -->
+                <form id="form-admin" class="space-y-5 block">
                     <div>
-                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-2">Email Petugas</label>
-                        <input id="admin-email" type="email" placeholder="admin@kasomalangkulon.id" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                        <label for="admin-email" class="block text-sm font-medium text-gray-700 mb-2">Email Admin</label>
+                        <input id="admin-email" type="email" placeholder="Masukkan email admin" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
                     </div>
                     <div>
                         <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
@@ -61,33 +63,83 @@
                         <label for="admin-remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
                     </div>
                     <button type="submit" class="w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
-                        <i data-lucide="log-in" style="width:20px;height:20px"></i>
-                        Login Admin
+                        <i data-lucide="shield-check" style="width:20px;height:20px"></i>
+                        Login Admin Desa
                     </button>
                 </form>
 
-                <!-- User Login Form -->
-                <form id="user-form" class="space-y-5 hidden">
+                <!-- RT/RW Login Form -->
+                <form id="form-rt" class="space-y-5 hidden">
                     <div>
-                        <label for="user-nik" class="block text-sm font-medium text-gray-700 mb-2">NIK (Nomor Induk Kependudukan)</label>
-                        <input id="user-nik" type="text" placeholder="16 digit NIK" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                        <label for="rt-email" class="block text-sm font-medium text-gray-700 mb-2">Email RT/RW</label>
+                        <input id="rt-email" type="email" placeholder="Masukkan email RT/RW" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
                     </div>
                     <div>
-                        <label for="user-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <label for="rt-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
                         <div class="relative">
-                            <input id="user-password" type="password" placeholder="Masukkan password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
-                            <button type="button" onclick="togglePasswordVisibility('user-password')" class="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700">
+                            <input id="rt-password" type="password" placeholder="Masukkan password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                            <button type="button" onclick="togglePasswordVisibility('rt-password')" class="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700">
                                 <i data-lucide="eye" style="width:20px;height:20px"></i>
                             </button>
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <input id="user-remember" type="checkbox" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-2 focus:ring-emerald-500">
-                        <label for="user-remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
+                        <input id="rt-remember" type="checkbox" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-2 focus:ring-emerald-500">
+                        <label for="rt-remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
+                        <i data-lucide="user" style="width:20px;height:20px"></i>
+                        Login RT/RW
+                    </button>
+                </form>
+
+                <!-- Kolektor Login Form -->
+                <form id="form-kolektor" class="space-y-5 hidden">
+                    <div>
+                        <label for="kolektor-email" class="block text-sm font-medium text-gray-700 mb-2">Email Kolektor</label>
+                        <input id="kolektor-email" type="email" placeholder="Masukkan email kolektor" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                    </div>
+                    <div>
+                        <label for="kolektor-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <input id="kolektor-password" type="password" placeholder="Masukkan password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                            <button type="button" onclick="togglePasswordVisibility('kolektor-password')" class="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700">
+                                <i data-lucide="eye" style="width:20px;height:20px"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="kolektor-remember" type="checkbox" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-2 focus:ring-emerald-500">
+                        <label for="kolektor-remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
+                        <i data-lucide="clipboard-list" style="width:20px;height:20px"></i>
+                        Login Kolektor
+                    </button>
+                </form>
+
+                <!-- Warga/Masyarakat Login Form -->
+                <form id="form-warga" class="space-y-5 hidden">
+                    <div>
+                        <label for="warga-nik" class="block text-sm font-medium text-gray-700 mb-2">NIK (Nomor Induk Kependudukan)</label>
+                        <input id="warga-nik" type="text" placeholder="16 digit NIK" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                    </div>
+                    <div>
+                        <label for="warga-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <input id="warga-password" type="password" placeholder="Masukkan password" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition" required>
+                            <button type="button" onclick="togglePasswordVisibility('warga-password')" class="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700">
+                                <i data-lucide="eye" style="width:20px;height:20px"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="warga-remember" type="checkbox" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-2 focus:ring-emerald-500">
+                        <label for="warga-remember" class="ml-2 text-sm text-gray-600">Ingat saya</label>
                     </div>
                     <button type="submit" class="w-full py-3 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 btn-hover-glow flex items-center justify-center gap-2">
                         <i data-lucide="log-in" style="width:20px;height:20px"></i>
-                        Login Penduduk
+                        Login Masyarakat
                     </button>
                 </form>
 
@@ -100,18 +152,13 @@
                 </div>
             </div>
 
-            <!-- Demo Info -->
+            <!-- Info -->
             <div class="mt-8 bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white text-sm">
                 <div class="flex gap-2 mb-2">
                     <i data-lucide="info" style="width:20px;height:20px" class="flex-shrink-0"></i>
-                    <strong>Kredensial Demo:</strong>
+                    <strong>Informasi Login:</strong>
                 </div>
-                <ul class="ml-7 space-y-1 text-white/80">
-                    <li>Admin: <code class="bg-white/10 px-2 py-1 rounded">admin@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">admin123</code></li>
-                    <li>Kolektor: <code class="bg-white/10 px-2 py-1 rounded">kolektor1@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">kolektor123</code></li>
-                    <li>RT: <code class="bg-white/10 px-2 py-1 rounded">rt1@kasomalangkulon.id</code> / <code class="bg-white/10 px-2 py-1 rounded">rt123</code></li>
-                    <li>Penduduk: <code class="bg-white/10 px-2 py-1 rounded">1234567890123456</code> / <code class="bg-white/10 px-2 py-1 rounded">123456</code></li>
-                </ul>
+                <p class="text-white/80">Gunakan kredensial yang diberikan oleh Administrator Desa Kasomalang Kulon. Jika belum memiliki akun, silakan hubungi perangkat desa.</p>
             </div>
         </div>
     </div>
@@ -122,30 +169,29 @@
     <script>
         // Uses API_BASE_URL from script.js (already includes /api path)
 
-        let currentTab = 'petugas';
+        let currentTab = 'admin';
 
         function switchTab(tab) {
             currentTab = tab;
-            const adminForm = document.getElementById('admin-form');
-            const userForm = document.getElementById('user-form');
-            const adminTab = document.getElementById('admin-tab');
-            const userTab = document.getElementById('user-tab');
+            const tabs = ['admin', 'rt', 'kolektor', 'warga'];
+            const forms = ['form-admin', 'form-rt', 'form-kolektor', 'form-warga'];
+            const tabIds = ['tab-admin', 'tab-rt', 'tab-kolektor', 'tab-warga'];
 
-            if (tab === 'petugas') {
-                adminForm.classList.remove('hidden');
-                userForm.classList.add('hidden');
-                adminTab.classList.add('bg-emerald-600', 'text-white');
-                adminTab.classList.remove('bg-gray-200', 'text-gray-700');
-                userTab.classList.remove('bg-emerald-600', 'text-white');
-                userTab.classList.add('bg-gray-200', 'text-gray-700');
-            } else {
-                adminForm.classList.add('hidden');
-                userForm.classList.remove('hidden');
-                userTab.classList.add('bg-emerald-600', 'text-white');
-                userTab.classList.remove('bg-gray-200', 'text-gray-700');
-                adminTab.classList.remove('bg-emerald-600', 'text-white');
-                adminTab.classList.add('bg-gray-200', 'text-gray-700');
-            }
+            tabs.forEach((t, i) => {
+                const form = document.getElementById(forms[i]);
+                const tabBtn = document.getElementById(tabIds[i]);
+                if (t === tab) {
+                    form.classList.remove('hidden');
+                    form.classList.add('block');
+                    tabBtn.classList.add('bg-emerald-600', 'text-white');
+                    tabBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                } else {
+                    form.classList.add('hidden');
+                    form.classList.remove('block');
+                    tabBtn.classList.remove('bg-emerald-600', 'text-white');
+                    tabBtn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
             document.getElementById('login-message').classList.add('hidden');
         }
 
@@ -158,88 +204,69 @@
             }
         }
 
-        // Petugas Form Submit
-        document.getElementById('admin-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('admin-email').value;
-            const password = document.getElementById('admin-password').value;
+        // Unified login handler
+        async function handleLogin(emailField, passwordField, nikField, expectedRoles, redirectMap) {
+            const email = emailField ? document.getElementById(emailField).value : '';
+            const password = passwordField ? document.getElementById(passwordField).value : '';
+            const nik = nikField ? document.getElementById(nikField).value : '';
 
             PageLoader.show('Memverifikasi kredensial...');
             try {
-                const response = await fetch(API_BASE_URL + '/auth/admin-login', {
+                const body = password ? { email, password } : { nik, password };
+                const response = await fetch(API_BASE_URL + '/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(body)
                 }).then(r => r.json());
 
                 if (response.success) {
-                    // Save auth to localStorage
-                    localStorage.setItem('adminUser', JSON.stringify(response.user));
-                    localStorage.setItem('adminToken', response.token);
-
-                    showMessage('Login berhasil! Mengalihkan ke dashboard...', 'success');
-                    PageLoader.hide();
-
-                    // Redirect based on role
                     const role = response.user.role;
-                    let redirectUrl;
-                    if (role === 'admin') {
-                        redirectUrl = '../admin/dashboard.html';
-                    } else if (role === 'rt') {
-                        redirectUrl = '../admin/rt-dashboard.html';
-                    } else if (role === 'kolektor') {
-                        redirectUrl = '../admin/kolektor-dashboard.html';
-                    } else {
-                        showMessage('Role tidak dikenal. Hubungi administrator.', 'error');
+                    if (!expectedRoles.includes(role)) {
+                        showMessage('Akun ini tidak memiliki akses untuk portal ini.', 'error');
                         PageLoader.hide();
                         return;
                     }
 
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1200);
+                    localStorage.setItem('authUser', JSON.stringify(response.user));
+                    localStorage.setItem('authToken', response.token);
+
+                    showMessage('Login berhasil! Mengalihkan...', 'success');
+                    PageLoader.hide();
+
+                    const redirectUrl = redirectMap[role] || '../admin/dashboard.html';
+                    setTimeout(() => { window.location.href = redirectUrl; }, 1200);
                 } else {
                     showMessage(response.message || 'Login gagal', 'error');
                     PageLoader.hide();
                 }
             } catch (error) {
-                showMessage('Gagal terhubung ke server login', 'error');
+                showMessage('Gagal terhubung ke server', 'error');
                 PageLoader.hide();
             }
+        }
+
+        // Admin Form Submit
+        document.getElementById('form-admin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleLogin('admin-email', 'admin-password', null, ['admin'], { admin: '../admin/dashboard.html' });
         });
 
-        // Penduduk Form Submit
-        document.getElementById('user-form').addEventListener('submit', async (e) => {
+        // RT/RW Form Submit
+        document.getElementById('form-rt').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nik = document.getElementById('user-nik').value;
-            const password = document.getElementById('user-password').value;
+            await handleLogin('rt-email', 'rt-password', null, ['rt', 'rw'], { rt: '../admin/rt-dashboard.html', rw: '../admin/rt-dashboard.html' });
+        });
 
-            PageLoader.show('Memverifikasi kredensial...');
-            try {
-                const response = await fetch(API_BASE_URL + '/auth/user-login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nik, password })
-                }).then(r => r.json());
+        // Kolektor Form Submit
+        document.getElementById('form-kolektor').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleLogin('kolektor-email', 'kolektor-password', null, ['kolektor'], { kolektor: '../admin/kolektor-dashboard.html' });
+        });
 
-                if (response.success) {
-                    localStorage.setItem('wargaUser', JSON.stringify(response.user));
-                    localStorage.setItem('wargaToken', response.token);
-
-                    showMessage('Login berhasil! Mengalihkan ke portal warga...', 'success');
-                    PageLoader.hide();
-
-                    setTimeout(() => {
-                        window.location.href = '../pages/user-portal.html';
-                    }, 1200);
-                } else {
-                    showMessage(response.message || 'Login gagal', 'error');
-                    PageLoader.hide();
-                }
-            } catch (error) {
-                showMessage('Gagal terhubung ke server login', 'error');
-                PageLoader.hide();
-            }
+        // Warga/Masyarakat Form Submit
+        document.getElementById('form-warga').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleLogin(null, 'warga-password', 'warga-nik', ['warga'], { warga: '../pages/user-portal.html' });
         });
 
         function showMessage(msg, type) {
