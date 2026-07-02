@@ -16,6 +16,17 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 // Serve static frontend
 app.use(express.static(path.join(__dirname, '..')));
 
+// Clean URL support: try .html extension for requests without file extension
+app.use((req, res, next) => {
+  // Skip if path has extension, is API, or ends with /
+  if (path.extname(req.path) || req.path.startsWith('/api/') || req.path.endsWith('/')) return next();
+  const htmlPath = path.join(__dirname, '..', req.path + '.html');
+  if (fs.existsSync(htmlPath)) {
+    req.url = req.path + '.html' + (req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '');
+  }
+  next();
+});
+
 const PORT = process.env.PORT || 3000;
 let database = store.createSeedDatabase();
 let pool = null;

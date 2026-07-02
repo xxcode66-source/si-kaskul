@@ -1,31 +1,10 @@
-RewriteEngine On
-
-# ── API Proxy ─────────────────────────────────────────
-# Route all /api/* requests to Node.js backend
-RewriteCond %{ENV:REDIRECT_STATUS} ^$
-RewriteRule ^api/(.*)$ http://localhost:3000/api/$1 [P,L]
-
-# ── Clean URLs: try .html extension ────────────────────
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
-RewriteCond %{DOCUMENT_ROOT}/$1.html -f
-RewriteRule ^(.+?)/?$ $1.html [L]
-
-# ── Try index.html in directory ────────────────────────
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api/
-RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
-RewriteRule ^(.+?)/?$ $1/index.html [L]
-
-# ── Static Files ───────────────────────────────────────
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
-
-# ── Fallback to Node.js ───────────────────────────────
-RewriteCond %{ENV:REDIRECT_STATUS} ^$
-RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+# Proxy ALL requests to Node.js backend
+# Express handles static files, clean URLs, and API routes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+</IfModule>
 
 # Security headers
 <IfModule mod_headers.c>
