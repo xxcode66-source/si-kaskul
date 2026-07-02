@@ -34,6 +34,85 @@ async function createPool() {
   }
 }
 
+async function tableExists(pool, tableName) {
+  try {
+    const [rows] = await pool.query('SHOW TABLES LIKE ?', [tableName]);
+    return rows.length > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function getPbbTable(pool) {
+  const pbbExists = await tableExists(pool, 'pbb');
+  const pbbWargaExists = await tableExists(pool, 'pbb_warga');
+  if (pbbExists) {
+    try {
+      const [rows] = await pool.query('SELECT 1 FROM pbb LIMIT 1');
+      if (rows.length > 0) return 'pbb';
+    } catch (e) {
+      // ignore
+    }
+  }
+  if (pbbWargaExists) {
+    try {
+      const [rows] = await pool.query('SELECT 1 FROM pbb_warga LIMIT 1');
+      if (rows.length > 0) return 'pbb_warga';
+    } catch (e) {
+      // ignore
+    }
+  }
+  return pbbExists ? 'pbb' : (pbbWargaExists ? 'pbb_warga' : null);
+}
+
+async function loadTable(pool, tableName) {
+  const [rows] = await pool.query(`SELECT * FROM \`${tableName}\` ORDER BY id`);
+  return rows;
+}
+
+function mapPbbWargaRowToWarga(row) {
+  return {
+    id: row.id,
+    nik: row.nik,
+    nop: row.nop,
+    nama: row.nama,
+    alamat: row.alamat,
+    dusun: row.dusun,
+    dusunNama: row.dusunNama,
+    rw: row.rw,
+    rwNama: row.rwNama,
+    rt: row.rt,
+    rtNama: row.rtNama,
+    pajak: Number(row.pajak2026 || 0),
+    status: row.status,
+    totalPajak: Number(row.totalPajak || 0),
+    totalLunas: Number(row.totalLunas || 0),
+    totalBelumBayar: Number(row.totalBelumBayar || 0),
+    payments: typeof row.payments === 'string' ? JSON.parse(row.payments || '[]') : row.payments || []
+  };
+}
+
+function mapPbbRecordRowToPbb(row) {
+  return {
+    id: row.id,
+    nop: row.nop,
+    nik: row.nik,
+    nama: row.nama,
+    alamat: row.alamat,
+    dusun: row.dusun,
+    dusunNama: row.dusunNama,
+    rw: row.rw,
+    rwNama: row.rwNama,
+    rt: row.rt,
+    rtNama: row.rtNama,
+    year: Number(row.year || 0),
+    pajak: Number(row.pajak || row.wajibBayar || 0),
+    status: row.status,
+    payments: [],
+    proofs: []
+  };
+}
+
 // ==============================
 // SEED DATA — SAME AS supabase-store.js
 // ==============================
@@ -225,13 +304,29 @@ async function loadAll(pool) {
   const [users] = await pool.query('SELECT * FROM users ORDER BY id');
   const [penduduk] = await pool.query('SELECT * FROM penduduk ORDER BY id');
   const [berita] = await pool.query('SELECT * FROM berita ORDER BY id');
-  const [pbb] = await pool.query('SELECT * FROM pbb ORDER BY id');
   const [bansos] = await pool.query('SELECT * FROM bansos ORDER BY id');
   const [bansosPrograms] = await pool.query('SELECT * FROM bansos_programs ORDER BY id');
   const [pengaduan] = await pool.query('SELECT * FROM pengaduan ORDER BY id');
   const [approvals] = await pool.query('SELECT * FROM approvals ORDER BY id');
   const [surat] = await pool.query('SELECT * FROM surat ORDER BY id');
-  const [warga] = await pool.query('SELECT * FROM warga ORDER BY id');
+  let [warga] = await pool.query('SELECT * FROM warga ORDER BY id');
+  const pbbTable = await getPbbTable(pool);
+  let pbb = [];
+  if (pbbTable) {
+    const [rows] = await pool.query(`SELECT * FROM \`${pbbTable}\` ORDER BY id`);
+    pbb = rows;
+  }
+
+  if ((!warga || warga.length === 0) && await tableExists(pool, 'pbb_warga')) {
+    const rows = await loadTable(pool, 'pbb_warga');
+    warga = rows.map(mapPbbWargaRowToWarga);
+  }
+
+  if ((!pbb || pbb.length === 0) && await tableExists(pool, 'pbb_records')) {
+    const rows = await loadTable(pool, 'pbb_records');
+    pbb = rows.map(mapPbbRecordRowToPbb);
+  }
+
   let gangs = [];
   try { const [g] = await pool.query('SELECT * FROM gangs ORDER BY id'); gangs = g; } catch (e) { /* table may not exist yet */ }
   let gallery = [];
@@ -251,13 +346,15 @@ async function loadAll(pool) {
 
 async function syncAll(pool, database) {
   const conn = await pool.getConnection();
+  let pbbTable = await getPbbTable(pool);
+  if (!pbbTable) pbbTable = 'pbb';
   try {
     await conn.query('START TRANSACTION');
 
     // Clear all tables
     await conn.query('DELETE FROM users');
     await conn.query('DELETE FROM warga');
-    await conn.query('DELETE FROM pbb');
+    await conn.query(`DELETE FROM \`${pbbTable}\``);
     await conn.query('DELETE FROM berita');
     await conn.query('DELETE FROM bansos');
     await conn.query('DELETE FROM bansos_programs');
