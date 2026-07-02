@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/style.css">
     <script src="../assets/script.js"></script>
-    <!-- Mapbox GL JS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <!-- MapLibre GL JS (Free, no API key needed) -->
+    <link href="https://unpkg.com/maplibre-gl@4.1.1/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl@4.1.1/dist/maplibre-gl.js"></script>
     <style>
         body { font-family: 'DM Sans', sans-serif; }
         .font-display { font-family: 'Playfair Display', serif; }
@@ -311,10 +311,6 @@
 
     <script src="../assets/nav-config.js"></script>
     <script>
-        // Mapbox access token - Replace with your own token from https://mapbox.com
-        // For demo purposes, get a free token at mapbox.com
-        mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN_HERE';
-        
         let map;
         let markers = [];
         let allGangs = [];
@@ -329,9 +325,33 @@
         
         // Initialize map
         function initMap() {
-            map = new mapboxgl.Map({
+            map = new maplibregl.Map({
                 container: 'map',
-                style: 'mapbox://styles/mapbox/satellite-streets-v12',
+                style: {
+                    version: 8,
+                    sources: {
+                        'esri-satellite': {
+                            type: 'raster',
+                            tiles: [
+                                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                            ],
+                            tileSize: 256,
+                            attribution: '&copy; Esri'
+                        },
+                        'osm-labels': {
+                            type: 'raster',
+                            tiles: [
+                                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                            ],
+                            tileSize: 256,
+                            attribution: '&copy; OpenStreetMap'
+                        }
+                    },
+                    layers: [
+                        { id: 'esri-satellite-layer', type: 'raster', source: 'esri-satellite' },
+                        { id: 'osm-labels-layer', type: 'raster', source: 'osm-labels', paint: { 'raster-opacity': 0.35 } }
+                    ]
+                },
                 center: [VILLAGE_CENTER.lng, VILLAGE_CENTER.lat],
                 zoom: INITIAL_ZOOM,
                 pitch: INITIAL_PITCH,
@@ -339,30 +359,9 @@
                 antialias: true
             });
             
-            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-            map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+            map.addControl(new maplibregl.NavigationControl(), 'top-right');
             
             map.on('load', () => {
-                // Add 3D terrain
-                map.addSource('mapbox-dem', {
-                    type: 'raster-dem',
-                    url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-                    tileSize: 512,
-                    maxzoom: 16
-                });
-                map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
-                
-                // Add sky layer
-                map.addLayer({
-                    id: 'sky',
-                    type: 'sky',
-                    paint: {
-                        'sky-type': 'atmosphere',
-                        'sky-atmosphere-sun': [0.0, 90.0],
-                        'sky-atmosphere-sun-intensity': 15
-                    }
-                });
-                
                 // Cinematic intro animation
                 setTimeout(() => {
                     map.easeTo({
@@ -488,7 +487,7 @@
                 el.addEventListener('mouseenter', () => el.querySelector('div').style.transform = 'scale(1.2)');
                 el.addEventListener('mouseleave', () => el.querySelector('div').style.transform = 'scale(1)');
                 
-                const marker = new mapboxgl.Marker(el)
+                const marker = new maplibregl.Marker(el)
                     .setLngLat([gang.lng, gang.lat])
                     .addTo(map);
                 
