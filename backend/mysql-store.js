@@ -16,13 +16,20 @@ function hasDatabase() {
 }
 
 async function createPool() {
-  if (!hasDatabase()) return null;
+  if (!hasDatabase()) {
+    console.log('⚠️ No DB_HOST/DB_NAME set, skipping MySQL');
+    return null;
+  }
+  const config = getConfig();
+  console.log('🔌 Attempting MySQL connection:', config.host, config.database, config.user);
   try {
-    const pool = mysql.createPool(getConfig());
+    const pool = mysql.createPool(config);
     await pool.query('SELECT 1');
+    console.log('✅ MySQL connected successfully');
     return pool;
   } catch (e) {
-    console.error('MySQL connection failed:', e.message);
+    console.error('❌ MySQL connection failed:', e.code, e.message);
+    console.error('   Config used:', { host: config.host, port: config.port, user: config.user, database: config.database });
     return null;
   }
 }

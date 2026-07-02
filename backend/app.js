@@ -60,9 +60,9 @@ async function initDB() {
     await store.ensureTables(pool);
     await store.seedIfEmpty(pool, database);
     database = await store.loadAll(pool);
-    console.log('🗄️  Database: MySQL');
+    console.log(`🗄️  Database: MySQL — Penduduk: ${(database.penduduk||[]).length}, Warga: ${(database.warga||[]).length}, PBB: ${(database.pbb||[]).length}`);
   } else {
-    console.log('🗄️  Database: In-Memory (set DB_HOST etc for MySQL)');
+    console.log(`🗄️  Database: In-Memory — Penduduk: ${(database.penduduk||[]).length} (set DB_HOST etc for MySQL)`);
   }
 }
 
