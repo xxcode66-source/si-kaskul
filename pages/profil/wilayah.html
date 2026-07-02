@@ -15,11 +15,11 @@
 
 <!-- Info Umum -->
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-<p class="text-3xl font-bold text-emerald-700">3</p><p class="text-sm text-gray-500 mt-1">Dusun</p>
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center" id="stat-dusun">
+<p class="text-3xl font-bold text-emerald-700">—</p><p class="text-sm text-gray-500 mt-1">Dusun</p>
 </div>
-<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-<p class="text-3xl font-bold text-cyan-700">8</p><p class="text-sm text-gray-500 mt-1">RW</p>
+<div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center" id="stat-rw">
+<p class="text-3xl font-bold text-cyan-700">—</p><p class="text-sm text-gray-500 mt-1">RW</p>
 </div>
 <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center" id="stat-rt">
 <p class="text-3xl font-bold text-amber-700">—</p><p class="text-sm text-gray-500 mt-1">RT</p>
@@ -96,6 +96,10 @@ async function loadWilayahData() {
     
     // Compute stats
     const rtSet = new Set(data.map(d => d.rt));
+    const rwSet = new Set(data.map(d => d.rw));
+    const dusunSet = new Set(Object.values(dusunMap));
+    document.getElementById('stat-dusun').querySelector('p').textContent = new Set(data.map(d => dusunMap[d.rw] || 'Lainnya')).size;
+    document.getElementById('stat-rw').querySelector('p').textContent = rwSet.size;
     document.getElementById('stat-rt').querySelector('p').textContent = rtSet.size;
     document.getElementById('stat-pend').querySelector('p').textContent = json.total.toLocaleString('id-ID');
     

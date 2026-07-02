@@ -526,22 +526,30 @@
         // ─── Load Stats from API ─────────────────────
         async function loadHomepageStats() {
             try {
-                const res = await fetch(API_BASE_URL + '/penduduk/filters');
+                const res = await fetch(API_BASE_URL + '/penduduk/stats');
                 const json = await res.json();
                 if (!json.success) return;
-                const { total, lakiLaki } = json.data;
-                const kk = Math.floor(total / 3.3);
+                const d = json.data;
+                const kk = d.uniqueKK || Math.floor(d.total / 3.3);
+                const dusunCount = new Set((d.byRt ? Object.keys(d.byRt) : []).map(k => k.split('/')[1])).size || 3;
+                const density = Math.round(d.total / 27.04); // approx area in km²
                 
                 // Update all counter targets
                 document.querySelectorAll('[data-count-target]').forEach(el => {
                     const label = el.closest('.prayer-chip, .stat-card');
                     const text = label ? label.textContent.toLowerCase() : '';
                     if (text.includes('penduduk')) {
-                        el.setAttribute('data-count-target', total);
-                        el.textContent = total;
+                        el.setAttribute('data-count-target', d.total);
+                        el.textContent = d.total.toLocaleString('id-ID');
                     } else if (text.includes('kepala keluarga') || text.includes('kk')) {
                         el.setAttribute('data-count-target', kk);
-                        el.textContent = kk;
+                        el.textContent = kk.toLocaleString('id-ID');
+                    } else if (text.includes('kepadatan')) {
+                        el.setAttribute('data-count-target', density);
+                        el.textContent = density.toLocaleString('id-ID');
+                    } else if (text.includes('dusun')) {
+                        el.setAttribute('data-count-target', dusunCount);
+                        el.textContent = dusunCount;
                     }
                 });
             } catch (e) { console.error('Stats load error:', e); }

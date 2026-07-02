@@ -230,6 +230,19 @@
         </div>
     </div>
 
+    <!-- Navigation -->
+    <div id="navbar-container" style="position:absolute;top:0;left:0;right:0;z-index:50;"></div>
+
+    <!-- Map Error Fallback -->
+    <div id="map-error" class="hidden" style="position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:#f9fafb;flex-direction:column;gap:1rem;">
+        <div style="width:64px;height:64px;border-radius:1rem;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="map" style="width:32px;height:32px;color:white"></i>
+        </div>
+        <h2 class="font-display text-2xl font-bold text-gray-800">Peta Tidak Tersedia</h2>
+        <p class="text-gray-500 text-center max-w-md">Maaf, peta gang desa tidak dapat dimuat saat ini. Silakan coba lagi nanti atau hubungi admin.</p>
+        <a href="/" class="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 transition">Kembali ke Beranda</a>
+    </div>
+
     <!-- Map Container -->
     <div class="map-container">
         <div id="map"></div>
@@ -309,8 +322,12 @@
         </div>
     </div>
 
-    <script src="../assets/mapbox-config.js"></script>
     <script src="../assets/nav-config.js"></script>
+    <script>
+        // Render navbar for gang-desa page
+        renderNavbar('gang');
+    </script>
+    <script src="../assets/mapbox-config.js"></script>
     <script>
         // Mapbox access token (loaded from mapbox-config.js)
         mapboxgl.accessToken = window.MAPBOX_TOKEN || '';
@@ -329,6 +346,13 @@
         
         // Initialize map
         function initMap() {
+            // Check if Mapbox token is available
+            if (!mapboxgl.accessToken) {
+                showMapError();
+                return;
+            }
+            
+            try {
             map = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/satellite-streets-v12',
@@ -375,6 +399,25 @@
                 
                 loadGangs();
             });
+            
+            map.on('error', (e) => {
+                console.error('Mapbox error:', e);
+                showMapError();
+            });
+            } catch (e) {
+                console.error('Map init error:', e);
+                showMapError();
+            }
+        }
+        
+        function showMapError() {
+            PageLoader.hide();
+            const errDiv = document.getElementById('map-error');
+            if (errDiv) {
+                errDiv.classList.remove('hidden');
+                errDiv.style.display = 'flex';
+            }
+            lucide.createIcons();
         }
         
         // Load gang data

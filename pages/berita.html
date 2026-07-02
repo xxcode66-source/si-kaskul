@@ -106,94 +106,38 @@
     <script>renderNavbar('berita');</script>
     <script src="../assets/script.js"></script>
     <script>
-        // News data
-        const newsData = [
-            {
-                id: 1,
-                title: 'Program Pelatihan Kewirausahaan untuk Ibu PKK',
-                category: 'program',
-                date: '2024-01-15',
-                image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
-                excerpt: 'Desa Kasomalang Kulon mengadakan program pelatihan kewirausahaan untuk meningkatkan keterampilan dan ekonomi ibu-ibu PKK...',
-                content: 'Desa Kasomalang Kulon mengadakan program pelatihan kewirausahaan yang komprehensif untuk meningkatkan keterampilan dan ekonomi ibu-ibu PKK. Program ini dirancang untuk memberdayakan masyarakat dan menciptakan lapangan kerja baru.'
-            },
-            {
-                id: 2,
-                title: 'Pengumuman Pendaftaran Bansos 2024',
-                category: 'pengumuman',
-                date: '2024-01-10',
-                image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
-                excerpt: 'Dibuka pendaftaran bantuan sosial untuk periode tahun 2024. Pendaftar dapat langsung mengunjungi kantor desa...',
-                content: 'Dibuka pendaftaran bantuan sosial untuk periode tahun 2024. Pendaftar dapat langsung mengunjungi kantor desa dengan membawa dokumen-dokumen yang diperlukan.'
-            },
-            {
-                id: 3,
-                title: 'Perbaikan Infrastruktur Jalan Utama Selesai 100%',
-                category: 'program',
-                date: '2024-01-05',
-                image: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=500&h=300&fit=crop',
-                excerpt: 'Proyek perbaikan jalan utama desa telah mencapai 100% sesuai jadwal. Jalan sepanjang 5 km telah diaspal dengan baik...',
-                content: 'Proyek perbaikan jalan utama desa telah mencapai 100% sesuai jadwal. Jalan sepanjang 5 km telah diaspal dengan baik dan siap digunakan oleh masyarakat.'
-            },
-            {
-                id: 4,
-                title: 'Acara Pengajian Rutin Dilaksanakan Setiap Minggu',
-                category: 'acara',
-                date: '2024-01-01',
-                image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&h=300&fit=crop',
-                excerpt: 'Pengajian rutin diadakan setiap minggu sebagai bagian dari program pembinaan keagamaan masyarakat...',
-                content: 'Pengajian rutin diadakan setiap minggu sebagai bagian dari program pembinaan keagamaan masyarakat yang bertujuan meningkatkan pemahaman agama.'
-            },
-            {
-                id: 5,
-                title: 'Tips Kesehatan: Pentingnya Vaksinasi untuk Anak',
-                category: 'edukasi',
-                date: '2023-12-28',
-                image: 'https://images.unsplash.com/photo-1631217314831-dc56366b34fa?w=500&h=300&fit=crop',
-                excerpt: 'Vaksinasi merupakan langkah penting dalam menjaga kesehatan anak. Berikut adalah informasi lengkap tentang vaksinasi...',
-                content: 'Vaksinasi merupakan langkah penting dalam menjaga kesehatan anak. Vaksin dapat melindungi anak dari berbagai penyakit berbahaya yang dapat dicegah.'
-            },
-            {
-                id: 6,
-                title: 'Persiapan Perayaan 17 Agustus Dimulai',
-                category: 'acara',
-                date: '2023-12-20',
-                image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500&h=300&fit=crop',
-                excerpt: 'Persiapan perayaan hari kemerdekaan sudah dimulai. Berbagai kegiatan menarik telah direncanakan...',
-                content: 'Persiapan perayaan hari kemerdekaan sudah dimulai dengan antusiasme tinggi dari masyarakat. Berbagai kegiatan menarik telah direncanakan untuk memeriahkan perayaan.'
-            },
-            {
-                id: 7,
-                title: 'Program Penyuluhan Pertanian Berkelanjutan',
-                category: 'program',
-                date: '2023-12-15',
-                image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad576?w=500&h=300&fit=crop',
-                excerpt: 'Program penyuluhan pertanian berkelanjutan dilaksanakan untuk meningkatkan produktivitas pertanian lokal...',
-                content: 'Program penyuluhan pertanian berkelanjutan dilaksanakan untuk meningkatkan produktivitas pertanian lokal dan kesejahteraan petani.'
-            },
-            {
-                id: 8,
-                title: 'Edukasi Literasi Digital untuk Orang Tua',
-                category: 'edukasi',
-                date: '2023-12-10',
-                image: 'https://images.unsplash.com/photo-1516321318423-f06f70fc504e?w=500&h=300&fit=crop',
-                excerpt: 'Diadakan workshop literasi digital untuk orang tua agar dapat mendampingi anak-anak dalam menggunakan teknologi...',
-                content: 'Diadakan workshop literasi digital untuk orang tua agar dapat mendampingi anak-anak dalam menggunakan teknologi dengan bijak dan aman.'
-            },
-            {
-                id: 9,
-                title: 'Pembukaan Klinik Kesehatan Desa yang Baru',
-                category: 'pengumuman',
-                date: '2023-12-05',
-                image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&h=300&fit=crop',
-                excerpt: 'Klinik kesehatan desa yang baru telah diresmikan dan siap melayani masyarakat dengan fasilitas yang lebih baik...',
-                content: 'Klinik kesehatan desa yang baru telah diresmikan dan siap melayani masyarakat dengan fasilitas yang lebih baik dan pelayanan yang maksimal.'
-            }
-        ];
-
+        let newsData = [];
         const itemsPerPage = 6;
         let currentPage = 1;
-        let filteredNews = [...newsData];
+        let filteredNews = [];
+
+        const categoryImages = {
+            pengumuman: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
+            program: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
+            acara: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500&h=300&fit=crop',
+            edukasi: 'https://images.unsplash.com/photo-1516321318423-f06f70fc504e?w=500&h=300&fit=crop'
+        };
+
+        async function loadBerita() {
+            try {
+                const res = await fetch(API_BASE_URL + '/berita');
+                const json = await res.json();
+                if (json.success) {
+                    newsData = json.data.map(b => ({
+                        id: b.id,
+                        title: b.title,
+                        category: b.category || 'pengumuman',
+                        date: b.date,
+                        image: categoryImages[b.category] || categoryImages.pengumuman,
+                        excerpt: b.content ? b.content.substring(0, 120) + '...' : '',
+                        content: b.content || ''
+                    }));
+                    filteredNews = [...newsData];
+                    renderFeaturedNews();
+                    renderNews();
+                }
+            } catch (e) { console.error('Failed to load berita:', e); }
+        }
 
         function renderNews() {
             const start = (currentPage - 1) * itemsPerPage;
@@ -340,8 +284,7 @@
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
-            renderFeaturedNews();
-            renderNews();
+            loadBerita();
         });
     </script>
 </body>
