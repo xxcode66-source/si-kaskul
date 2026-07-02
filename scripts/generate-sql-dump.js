@@ -247,8 +247,9 @@ function generateSQL(penduduk, pbbWarga, pbbRecords) {
   lines.push('-- Contains: Schema + Data (import this single file)');
   lines.push('-- ============================================');
   lines.push('');
-  lines.push('CREATE DATABASE IF NOT EXISTS si_kaskul CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;');
-  lines.push('USE si_kaskul;');
+  lines.push('-- NOTE: Create the database first via cPanel, then import this file into it.');
+  lines.push('-- CREATE DATABASE IF NOT EXISTS si_kaskul CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;');
+  lines.push('-- USE si_kaskul;');
   lines.push('');
   lines.push('SET NAMES utf8mb4;');
   lines.push('SET FOREIGN_KEY_CHECKS = 0;');
