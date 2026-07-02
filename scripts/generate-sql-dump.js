@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 const MONOGRAFI_FILE = path.join(__dirname, '..', 'MONOGRAFI DESA.xlsx');
-const SPPT_FILE = path.join(__dirname, '..', 'SPPT PBB 2026.xlsx');
+const SPPT_FILE = path.join(__dirname, '..', 'tes pbb.xlsx');
 const OUTPUT_FILE = path.join(__dirname, '..', 'database', 'si-kaskul-data.sql');
 
 // Escape string for SQL
@@ -439,6 +439,24 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   userName VARCHAR(255),
   details TEXT,
   createdAt VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS gangs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nama VARCHAR(255) NOT NULL,
+  dusun VARCHAR(50),
+  dusunNama VARCHAR(100),
+  rw VARCHAR(50),
+  rwNama VARCHAR(50),
+  rt VARCHAR(50),
+  rtNama VARCHAR(50),
+  lat DECIMAL(10,7),
+  lng DECIMAL(10,7),
+  bearing INT DEFAULT 0,
+  description TEXT,
+  INDEX idx_dusun (dusun),
+  INDEX idx_rw (rw),
+  INDEX idx_rt (rt)
 ) ENGINE=InnoDB;`);
   lines.push('');
 
@@ -493,7 +511,76 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 
   lines.push('SET FOREIGN_KEY_CHECKS = 1;');
   lines.push('');
-  lines.push('-- Done!');
+  lines.push('-- ============================================');
+  lines.push('-- SEED DATA');
+  lines.push('-- ============================================');
+  lines.push('');
+
+  // --- USERS ---
+  lines.push('-- Users (admin, rt, kolektor, warga)');
+  lines.push(`INSERT INTO users (id, name, email, password, role, nik, rt, rw) VALUES
+(1, 'Admin Desa', 'admin@kasomalangkulon.id', 'admin123', 'admin', NULL, NULL, NULL),
+(2, 'Kolektor 1', 'kolektor1@kasomalangkulon.id', 'kolektor123', 'kolektor', NULL, 'dusun1/rw1/rt1,rt2,rt3', '01'),
+(3, 'Kolektor 2', 'kolektor2@kasomalangkulon.id', 'kolektor123', 'kolektor', NULL, 'dusun1/rw2/rt1,rt2,rt3,rt4', '02'),
+(4, 'Ketua RT 1', 'rt1@kasomalangkulon.id', 'rt123', 'rt', NULL, 'dusun1/rw1/rt1', '01'),
+(5, 'Ketua RT 2', 'rt2@kasomalangkulon.id', 'rt123', 'rt', NULL, 'dusun1/rw1/rt2', '01'),
+(6, 'Ketua RW 1', 'rwk1@kasomalangkulon.id', 'rt123', 'rw', NULL, 'dusun1/rw1', '01'),
+(7, 'Warga Demo 1', 'warga1@kasomalangkulon.id', '123456', 'warga', '1234567890123456', NULL, NULL),
+(8, 'Warga Demo 2', 'warga2@kasomalangkulon.id', '123456', 'warga', '9876543210987654', NULL, NULL);`);
+  lines.push('');
+
+  // --- BERITA ---
+  lines.push('-- Berita');
+  lines.push(`INSERT INTO berita (id, title, category, date, content) VALUES
+(1, 'Pembayaran PBB 2026 Sudah Dibuka', 'pengumuman', '2026-01-15', 'Pembayaran PBB tahun 2026 sudah dapat dilakukan melalui kolektor desa. Silakan hubungi kolektor di wilayah masing-masing.'),
+(2, 'Penyaluran BPNT Triwulan I 2026', 'program', '2026-01-10', 'Penyaluran BPNT triwulan I tahun 2026 akan dilaksanakan pada tanggal 20-25 Januari 2026 di Balai Desa.'),
+(3, 'Realisasi PBB 2025 Capai 78%', 'pengumuman', '2025-12-30', 'Realisasi pembayaran PBB tahun 2025 mencapai 78% dari total target.');`);
+  lines.push('');
+
+  // --- BANSOS PROGRAMS ---
+  lines.push('-- Bansos Programs');
+  lines.push(`INSERT INTO bansos_programs (id, nama, sumber, periode, kuota, deskripsi) VALUES
+(1, 'PKH', 'APBN', '2026', 85, 'Program Keluarga Harapan'),
+(2, 'BPNT', 'APBN', '2026', 120, 'Bantuan Pangan Non Tunai'),
+(3, 'BLT Dana Desa', 'APBDes', '2026', 65, 'Bantuan Langsung Tunai Dana Desa');`);
+  lines.push('');
+
+  // --- GANGS ---
+  lines.push('-- Gangs (28 gangs across 3 dusun)');
+  const gangs = [
+    [1,'Gang Anggur','dusun1','Dusun 1','rw01','RW 01','rt01','RT 01',-6.8498,108.1512,45,'Gang dekat Masjid Al-Ikhlas'],
+    [2,'Gang Mangga','dusun1','Dusun 1','rw01','RW 01','rt01','RT 01',-6.8502,108.1518,90,'Gang dekat Balai Desa'],
+    [3,'Gang Durian','dusun1','Dusun 1','rw01','RW 01','rt02','RT 02',-6.8508,108.1505,180,'Gang dekat SDN Kasomalang'],
+    [4,'Gang Rambutan','dusun1','Dusun 1','rw01','RW 01','rt02','RT 02',-6.8515,108.1522,270,'Gang dekat lapangan voli'],
+    [5,'Gang Jeruk','dusun1','Dusun 1','rw01','RW 01','rt03','RT 03',-6.8522,108.1498,135,'Gang dekat pos ronda'],
+    [6,'Gang Apel','dusun1','Dusun 1','rw02','RW 02','rt01','RT 01',-6.8485,108.1535,0,'Gang dekat warung Bu Neng'],
+    [7,'Gang Pisang','dusun1','Dusun 1','rw02','RW 02','rt01','RT 01',-6.8492,108.1542,60,'Gang dekat mushola'],
+    [8,'Gang Nangka','dusun1','Dusun 1','rw02','RW 02','rt02','RT 02',-6.8478,108.1528,120,'Gang dekat sumur umum'],
+    [9,'Gang Salak','dusun1','Dusun 1','rw02','RW 02','rt03','RT 03',-6.8472,108.1555,200,'Gang dekat taman bermain'],
+    [10,'Gang Sawo','dusun1','Dusun 1','rw02','RW 02','rt04','RT 04',-6.8465,108.1548,300,'Gang dekat kandang sapi'],
+    [11,'Gang Melati','dusun2','Dusun 2','rw01','RW 01','rt01','RT 01',-6.8535,108.1485,30,'Gang dekat pabrik tahu'],
+    [12,'Gang Mawar','dusun2','Dusun 2','rw01','RW 01','rt01','RT 01',-6.8542,108.1478,150,'Gang dekat bengkel Pak Asep'],
+    [13,'Gang Dahlia','dusun2','Dusun 2','rw01','RW 01','rt02','RT 02',-6.8548,108.1492,210,'Gang dekat kolam ikan'],
+    [14,'Gang Kenanga','dusun2','Dusun 2','rw01','RW 01','rt02','RT 02',-6.8555,108.1472,330,'Gang dekat rumah Pak RT'],
+    [15,'Gang Cempaka','dusun2','Dusun 2','rw02','RW 02','rt01','RT 01',-6.8562,108.1505,75,'Gang dekat toko kelontong'],
+    [16,'Gang Flamboyan','dusun2','Dusun 2','rw02','RW 02','rt01','RT 01',-6.8568,108.1512,195,'Gang dekat sekolah PAUD'],
+    [17,'Gang Bougenville','dusun2','Dusun 2','rw02','RW 02','rt02','RT 02',-6.8575,108.1498,285,'Gang dekat lapangan basket'],
+    [18,'Gang Teratai','dusun3','Dusun 3','rw01','RW 01','rt01','RT 01',-6.8582,108.1525,15,'Gang dekat sawah'],
+    [19,'Gang Tulip','dusun3','Dusun 3','rw01','RW 01','rt01','RT 01',-6.8588,108.1532,105,'Gang dekat sungai kecil'],
+    [20,'Gang Lily','dusun3','Dusun 3','rw01','RW 01','rt02','RT 02',-6.8595,108.1518,225,'Gang dekat kebun sayur'],
+    [21,'Gang Matahari','dusun3','Dusun 3','rw01','RW 01','rt02','RT 02',-6.8602,108.1542,315,'Gang dekat pos kamling'],
+    [22,'Gang Aster','dusun3','Dusun 3','rw01','RW 01','rt03','RT 03',-6.8608,108.1528,50,'Gang dekat kandang ayam'],
+    [23,'Gang Lavender','dusun3','Dusun 3','rw02','RW 02','rt01','RT 01',-6.8615,108.1555,170,'Gang dekat hutan bambu'],
+    [24,'Gang Orchid','dusun3','Dusun 3','rw02','RW 02','rt01','RT 01',-6.8622,108.1548,250,'Gang dekat embung desa'],
+    [25,'Gang Sakura','dusun3','Dusun 3','rw02','RW 02','rt02','RT 02',-6.8628,108.1562,340,'Gang dekat gazebo'],
+    [26,'Gang Lotus','dusun3','Dusun 3','rw02','RW 02','rt02','RT 02',-6.8635,108.1552,80,'Gang dekat tempat pembakaran sampah'],
+    [27,'Gang Kamboja','dusun3','Dusun 3','rw02','RW 02','rt03','RT 03',-6.8642,108.1572,160,'Gang dekat makam desa'],
+    [28,'Gang Sedap Malam','dusun3','Dusun 3','rw02','RW 02','rt03','RT 03',-6.8648,108.1565,290,'Gang dekat warung kopi'],
+  ];
+  lines.push('INSERT INTO gangs (id, nama, dusun, dusunNama, rw, rwNama, rt, rtNama, lat, lng, bearing, description) VALUES');
+  const gangVals = gangs.map(g => `(${g[0]}, ${esc(g[1])}, ${esc(g[2])}, ${esc(g[3])}, ${esc(g[4])}, ${esc(g[5])}, ${esc(g[6])}, ${esc(g[7])}, ${g[8]}, ${g[9]}, ${g[10]}, ${esc(g[11])})`);
+  lines.push(gangVals.join(',\n') + ';');
+  lines.push('');
 
   return lines.join('\n');
 }
@@ -520,6 +607,10 @@ function main() {
   console.log(`  penduduk:    ${penduduk.length} rows`);
   console.log(`  pbb_warga:   ${warga.length} rows`);
   console.log(`  pbb_records: ${records.length} rows`);
+  console.log(`  gangs:       28 rows`);
+  console.log(`  users:       8 rows`);
+  console.log(`  berita:      3 rows`);
+  console.log(`  bansos_prog: 3 rows`);
   console.log(`\nUpload this file to your cloud hosting MySQL (via phpMyAdmin or CLI).`);
 }
 
