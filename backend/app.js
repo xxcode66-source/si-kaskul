@@ -800,8 +800,11 @@ app.get('/api/dashboard/stats', (req, res) => {
 app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     success: true, message: 'API SI-KASKUL - OK',
-    dataCount: getWarga().length,
     db: pool ? 'MySQL' : 'In-Memory',
+    penduduk: (database.penduduk || []).length,
+    warga: getWarga().length,
+    pbb: getPbb().length,
+    berita: (database.berita || []).length,
     time: new Date().toISOString()
   });
 });
