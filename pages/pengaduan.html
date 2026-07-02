@@ -199,8 +199,8 @@
             renderFilePreview();
         }
 
-        // Track complaint
-        function trackComplaint() {
+        // Track complaint via API
+        async function trackComplaint() {
             const id = document.getElementById('tracking-id').value.trim();
             const resultEl = document.getElementById('tracking-result');
             if (!id) {
@@ -208,14 +208,25 @@
                 resultEl.classList.remove('hidden');
                 return;
             }
-            // Simulated tracking
-            const statuses = [
-                { status: 'Diterima', color: 'bg-blue-100 text-blue-700', desc: 'Pengaduan Anda telah diterima dan sedang menunggu review.' },
-                { status: 'Dalam Proses', color: 'bg-amber-100 text-amber-700', desc: 'Pengaduan sedang ditindaklanjuti oleh tim terkait.' },
-                { status: 'Selesai', color: 'bg-emerald-100 text-emerald-700', desc: 'Pengaduan telah diselesaikan. Terima kasih atas laporannya.' }
-            ];
-            const random = statuses[Math.floor(Math.random() * statuses.length)];
-            resultEl.innerHTML = `<div class="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm"><p class="font-bold text-gray-800 mb-1">ID: ${id}</p><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${random.color} mb-2">${random.status}</span><p class="text-gray-600">${random.desc}</p></div>`;
+            try {
+                const res = await fetch(API_BASE_URL + '/pengaduan/' + id);
+                const json = await res.json();
+                if (json.success && json.data) {
+                    const d = json.data;
+                    const statusMap = {
+                        'Diterima': { color: 'bg-blue-100 text-blue-700', desc: 'Pengaduan Anda telah diterima dan sedang menunggu review.' },
+                        'Dalam Proses': { color: 'bg-amber-100 text-amber-700', desc: 'Pengaduan sedang ditindaklanjuti oleh tim terkait.' },
+                        'Selesai': { color: 'bg-emerald-100 text-emerald-700', desc: 'Pengaduan telah diselesaikan. Terima kasih atas laporannya.' },
+                        'Ditolak': { color: 'bg-red-100 text-red-700', desc: 'Pengaduan tidak dapat diproses. Silakan hubungi admin.' }
+                    };
+                    const s = statusMap[d.status] || statusMap['Diterima'];
+                    resultEl.innerHTML = `<div class="p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm"><p class="font-bold text-gray-800 mb-1">ID: ${d.id} - ${d.name}</p><span class="inline-block px-3 py-1 rounded-full text-xs font-semibold ${s.color} mb-2">${d.status}</span><p class="text-gray-600">${s.desc}</p>${d.balasan ? `<p class="mt-2 text-gray-700 font-medium">Balasan: ${d.balasan}</p>` : ''}</div>`;
+                } else {
+                    resultEl.innerHTML = '<div class="p-3 rounded-xl bg-red-50 text-red-700 text-sm font-medium">ID pengaduan tidak ditemukan.</div>';
+                }
+            } catch (e) {
+                resultEl.innerHTML = '<div class="p-3 rounded-xl bg-red-50 text-red-700 text-sm font-medium">Gagal terhubung ke server.</div>';
+            }
             resultEl.classList.remove('hidden');
         }
 

@@ -499,11 +499,11 @@
             const user = getAdminUser();
             const token = getAdminToken();
             if (!user || !token) {
-                window.location.href = '../pages/login.html';
+                window.location.href = '/pages/login';
                 return;
             }
             if (user.role !== 'kolektor') {
-                window.location.href = '../pages/login.html';
+                window.location.href = '/pages/login';
                 return;
             }
             // Set user info
@@ -1064,7 +1064,7 @@
             if (!confirm('Yakin ingin logout?')) return;
             localStorage.removeItem('adminUser');
             localStorage.removeItem('adminToken');
-            window.location.href = '../pages/login.html';
+            window.location.href = '/pages/login';
         }
 
         // =============================

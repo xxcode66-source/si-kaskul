@@ -51,5 +51,5 @@ database/si-kaskul-data.sql
 # Excel source files (too large for GitHub)
 *.xlsx
 
-# Secrets / API tokens
+# Secrets / API tokens (token served via backend API instead)
 assets/mapbox-config.js

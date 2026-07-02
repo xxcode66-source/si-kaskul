@@ -148,7 +148,7 @@
 
                 <!-- Links -->
                 <div class="mt-6 text-center">
-                    <a href="../index.html" class="text-emerald-600 hover:text-emerald-700 font-semibold text-sm transition">← Kembali ke Beranda</a>
+                    <a href="/" class="text-emerald-600 hover:text-emerald-700 font-semibold text-sm transition">← Kembali ke Beranda</a>
                 </div>
             </div>
 
@@ -233,7 +233,7 @@
                     showMessage('Login berhasil! Mengalihkan...', 'success');
                     PageLoader.hide();
 
-                    const redirectUrl = redirectMap[role] || '../admin/dashboard.html';
+                    const redirectUrl = redirectMap[role] || '/admin/dashboard';
                     setTimeout(() => { window.location.href = redirectUrl; }, 1200);
                 } else {
                     showMessage(response.message || 'Login gagal', 'error');
@@ -248,25 +248,25 @@
         // Admin Form Submit
         document.getElementById('form-admin').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await handleLogin('admin-email', 'admin-password', null, ['admin'], { admin: '../admin/dashboard.html' });
+            await handleLogin('admin-email', 'admin-password', null, ['admin'], { admin: '/admin/dashboard' });
         });
 
         // RT/RW Form Submit
         document.getElementById('form-rt').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await handleLogin('rt-email', 'rt-password', null, ['rt', 'rw'], { rt: '../admin/rt-dashboard.html', rw: '../admin/rt-dashboard.html' });
+            await handleLogin('rt-email', 'rt-password', null, ['rt', 'rw'], { rt: '/admin/rt-dashboard', rw: '/admin/rt-dashboard' });
         });
 
         // Kolektor Form Submit
         document.getElementById('form-kolektor').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await handleLogin('kolektor-email', 'kolektor-password', null, ['kolektor'], { kolektor: '../admin/kolektor-dashboard.html' });
+            await handleLogin('kolektor-email', 'kolektor-password', null, ['kolektor'], { kolektor: '/admin/kolektor-dashboard' });
         });
 
         // Warga/Masyarakat Form Submit
         document.getElementById('form-warga').addEventListener('submit', async (e) => {
             e.preventDefault();
-            await handleLogin(null, 'warga-password', 'warga-nik', ['warga'], { warga: '../pages/user-portal.html' });
+            await handleLogin(null, 'warga-password', 'warga-nik', ['warga'], { warga: '/pages/user-portal' });
         });
 
         function showMessage(msg, type) {

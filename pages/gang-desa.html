@@ -327,10 +327,18 @@
         // Render navbar for gang-desa page
         renderNavbar('gang');
     </script>
-    <script src="../assets/mapbox-config.js"></script>
     <script>
-        // Mapbox access token (loaded from mapbox-config.js)
-        mapboxgl.accessToken = window.MAPBOX_TOKEN || '';
+        // Fetch Mapbox token from backend API
+        async function initMapWithToken() {
+            try {
+                const res = await fetch(API_BASE_URL + '/config/mapbox-token');
+                const json = await res.json();
+                mapboxgl.accessToken = json.token || '';
+            } catch (e) {
+                mapboxgl.accessToken = '';
+            }
+            initMap();
+        }
         
         let map;
         let markers = [];
@@ -639,7 +647,7 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            initMap();
+            initMapWithToken();
         });
     </script>
 </body>

@@ -29,7 +29,7 @@
                     <p class="text-emerald-100 mt-3 max-w-2xl">Akses layanan dasar desa dari satu tempat. Ajukan surat online dan pantau informasi penting desa Anda.</p>
                 </div>
                 <div class="flex gap-3">
-                    <a href="../index.html" class="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-white/10 border border-white/15 hover:bg-white/15 transition">Beranda</a>
+                    <a href="/" class="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-white/10 border border-white/15 hover:bg-white/15 transition">Beranda</a>
                     <button onclick="logout()" class="inline-flex items-center justify-center px-4 py-3 rounded-xl bg-red-500/90 hover:bg-red-500 transition">Logout</button>
                 </div>
             </header>
@@ -270,12 +270,12 @@
         function checkAuth() {
             const user = getLoggedUser();
             if (!user) {
-                window.location.href = '../pages/login.html';
+                window.location.href = '/pages/login';
                 return;
             }
 
             if (user.role && user.role !== 'penduduk' && user.role !== 'warga') {
-                window.location.href = '../admin/dashboard.html';
+                window.location.href = '/admin/dashboard';
                 return;
             }
 
@@ -541,7 +541,7 @@
             localStorage.removeItem('wargaToken');
             localStorage.removeItem('loggedUser');
             localStorage.removeItem('adminToken');
-            window.location.href = '../pages/login.html';
+            window.location.href = '/pages/login';
         }
 
         window.addEventListener('DOMContentLoaded', () => {

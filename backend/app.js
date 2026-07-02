@@ -488,6 +488,11 @@ app.delete('/api/bansos/:id', async (req, res) => {
 
 // --- Pengaduan CRUD ---
 app.get('/api/pengaduan', (req, res) => res.json({ success: true, data: database.pengaduan }));
+app.get('/api/pengaduan/:id', (req, res) => {
+  const item = (database.pengaduan || []).find(p => p.id == req.params.id);
+  if (!item) return res.status(404).json({ success: false, message: 'Pengaduan tidak ditemukan' });
+  res.json({ success: true, data: item });
+});
 app.post('/api/pengaduan', async (req, res) => {
   const { name, contact, type, message } = req.body;
   const id = (database.pengaduan || []).length + 1;
@@ -868,6 +873,12 @@ app.get('/api/gallery/:id', (req, res) => {
 app.get('/api/gallery/categories', (req, res) => {
   const categories = [...new Set((database.gallery || []).map(g => g.category).filter(Boolean))];
   res.json({ success: true, data: categories });
+});
+
+// --- Config ---
+app.get('/api/config/mapbox-token', (req, res) => {
+  const token = process.env.MAPBOX_TOKEN || '';
+  res.json({ success: true, token });
 });
 
 // --- 404 ---
